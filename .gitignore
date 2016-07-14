@@ -1,0 +1,10 @@
+*~
+__init__.py
+*.pyc
+*.so
+*.o
+*.d
+AutoDict_*
+*.root
+#*
+*.nfs*
