@@ -46,13 +46,16 @@
 #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/Common/interface/ValueMap.h"
-
 #include "DataFormats/PatCandidates/interface/VIDCutFlowResult.h"
+#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 #include "TTree.h"
 #include "TFile.h"
 #include<string>
 #include "TH1.h"
+#include "TLorentzVector.h"
 
 //
 // class declaration
@@ -65,22 +68,20 @@
 // This will improve performance in multithreaded jobs.
 
 class MiniAODAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
-   public:
+public:
   explicit MiniAODAnalyzer(const edm::ParameterSet&);
   ~MiniAODAnalyzer();
   
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-  //  bool CutBasedLooseEleID(const pat::Electron ele) ; 
   
+private:
+  virtual void beginJob() override;
+  virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+  virtual void endJob() override;
+  bool SelectTau(const pat::Tau &tau);
+  bool FindTauIDEfficiency(const edm::Event&,TLorentzVector gen_p4);
 
-   private:
-      virtual void beginJob() override;
-      virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
-      virtual void endJob() override;
-
-
-
-      // ----------member data ---------------------------
+  // ----------member data ---------------------------
   edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
   edm::EDGetTokenT<pat::TauCollection> tauToken_;
   edm::EDGetTokenT<pat::MuonCollection> muonToken_;
@@ -91,29 +92,27 @@ class MiniAODAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> triggerObjects_;
   edm::EDGetTokenT<pat::PackedTriggerPrescales> triggerPrescales_;
   // edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdMapToken_;
-
-  //------
+  edm::EDGetTokenT<edm::View<reco::GenParticle> > prunedGenToken_;
+  edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
+  //------//
 
   TFile*  rootFile_;
   std::string outputFile_; // output file
   TTree* mytree;
+  TH1D *h1_TauPt_Gen;
+  TH1I *h1_nGoodTau_Reco;
+  TH1I *h1_nGenTau;
+  TH1D *h1_TauPt_reco;
+  TH1D *h1_TauPt_goodreco;
   TH1D *h1_TauPt_Stage1;
   TH1D *h1_MT_Stage1;
   
-  bool RunOnData=true;
+  bool RunOnData;
   int Run;
   int Event;
   //  int num_PU_vertices;
 
 };
-
-//
-// constants, enums and typedefs
-//
-
-//
-// static data member definitions
-//
 
 //
 // constructors and destructor
@@ -129,8 +128,10 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   triggerObjects_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("objects"))),
   triggerPrescales_(consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("prescales"))),
   //  eleLooseIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdMap"))),
-  outputFile_(iConfig.getParameter<std::string>("outputFile"))
-
+  prunedGenToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("pruned"))),
+  packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
+  outputFile_(iConfig.getParameter<std::string>("outputFile")),
+  RunOnData(iConfig.getParameter<bool>("RunOnData_"))
 {
    //now do what ever initialization is needed
   //usesResource("TFileService");
@@ -138,10 +139,14 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   rootFile_   = TFile::Open(outputFile_.c_str(),"RECREATE"); // open output file to store histograms  
   edm::Service<TFileService> fs;
 
-  h1_TauPt_Stage1 = fs->make<TH1D>("tauPt_Stage1", "TauPt_Stage1", 100, 0, 500);
+  h1_nGenTau = fs->make<TH1I>("nGenTau", "nGenTau", 5, -0.5, 4.5);
+  h1_nGoodTau_Reco = fs->make<TH1I>("nGoodTauReco", "nGoodTauReco", 5, -0.5, 4.5);
+  h1_TauPt_Gen = fs->make<TH1D>("tauPt_Gen", "TauPt_Gen", 100, 0, 1000);
+  h1_TauPt_reco = fs->make<TH1D>("tauPt_reco", "TauPt_reco", 50, 0, 1000);
+  h1_TauPt_goodreco = fs->make<TH1D>("tauPt_goodreco", "TauPt_goodreco", 50, 0, 1000);
+  //h1_TauPt_passID = fs->make<TH1D>("tauPt_passID", "TauPt_passID", 100, 0, 1000);
+  h1_TauPt_Stage1 = fs->make<TH1D>("tauPt_Stage1", "TauPt_Stage1", 100, 0, 1000);
   h1_MT_Stage1 = fs->make<TH1D>("mT_Stage1", "MT_Stage1", 1000, 0, 2000);
-
-
 }
 
 
@@ -165,6 +170,8 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 {
   using namespace edm;
   using namespace std;
+  using namespace reco;
+  using namespace pat;
   
   //---Clear---//
   Run=0;
@@ -174,7 +181,42 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
    Run   = iEvent.id().run();
    Event = iEvent.id().event();
-   std::cout << "\n\n --EVENT-- " << Event << std::endl;
+   //  std::cout << "\n\n --EVENT-- " << Event << std::endl;
+
+   int nGenTau=0;
+   TLorentzVector tauGen_p4;
+   const Candidate * MyTau;
+   const Candidate * MyTauSel;
+
+   double TauPt_Gen=0;
+
+   if (!RunOnData) {
+     //--GenParticles--//
+     Handle<edm::View<reco::GenParticle> > pruned;
+     iEvent.getByToken(prunedGenToken_,pruned);
+     
+     Handle<edm::View<pat::PackedGenParticle> > packed;
+     iEvent.getByToken(packedGenToken_,packed);
+     
+     for(size_t i=0; i<pruned->size();i++){
+       if(   (abs((*pruned)[i].pdgId())==15) && ( ((*pruned)[i].status()==2) )) {
+	 MyTau = &(*pruned)[i];
+	 if (MyTau->pt()>20.0)  {
+	   MyTauSel=MyTau;
+	   nGenTau++;
+	   TauPt_Gen=MyTauSel->pt();
+	   // std::cout << " pt " << TauPt_Gen << " nMother=" << MyTau->numberOfMothers() << " mother pdgID = " << MyTau->mother(0)->pdgId() << " mother status = " << MyTau->mother(0)->status()  << std::endl;
+	   //  const Candidate * MotherOfMyTau=MyTau->mother(0);
+	 }
+       }
+     }
+   }
+   //   if ((!RunOnData) && (nGenTau>1))   std::cout << "\n#### #### #### ######### nGenTau=" << nGenTau << std::endl; 
+   h1_nGenTau->Fill(nGenTau);
+   h1_TauPt_Gen->Fill(TauPt_Gen);
+   if (nGenTau==1) tauGen_p4.SetPxPyPzE(MyTauSel->px(),MyTauSel->py(),MyTauSel->pz(),MyTauSel->energy());
+
+   if (nGenTau==1) FindTauIDEfficiency(iEvent,tauGen_p4);
 
    //---Trigger---//
    edm::Handle<edm::TriggerResults> triggerBits;
@@ -189,43 +231,79 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
    bool passTauTrig=0;
    
-   std::cout << "\n\n === TRIGGER PATHS === " << std::endl;
+   //   std::cout << "=== TRIGGER PATHS === " << std::endl;
    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-       std::cout << "Trigger " << names.triggerName(i) << 
-     ", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
-     ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") 
-     	       << std::endl;
+     //    std::cout << "Trigger " << names.triggerName(i) << 
+     // ", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
+     // ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") 
+     //	       << std::endl;
      if ( (names.triggerName(i)).find("HLT_LooseIsoPFTau50_Trk30_eta2p1_MET90") != std::string::npos ) {
        passTauTrig=triggerBits->accept(i) ;
      }
    }
    if (!RunOnData) passTauTrig=1;
-   std::cout << "RunOnData=" << RunOnData <<  " ## passTauTrig=" << passTauTrig << std::endl;
+   // std::cout << "RunOnData=" << RunOnData <<  " ## passTauTrig=" << passTauTrig << std::endl;
 
    //---Trigger MET---//
    edm::Handle<edm::TriggerResults> triggerBits_MET;
    iEvent.getByToken(triggerBits_MET_, triggerBits_MET);
    const edm::TriggerNames &names_MET = iEvent.triggerNames(*triggerBits_MET);
+
    bool passHBHENoiseFilter=0;
-   std::cout << "\n\n === TRIGGER PATHS (MET) === " << std::endl;
+   bool passHBHENoiseIsoFilter=0;
+   bool passEcalDeadCellTriggerPrimitiveFilter=0;
+   bool passgoodVertices=0;
+   bool passeeBadScFilter=0;
+   bool passglobalTightHalo2016Filter=0;
+
+   //   std::cout << " === TRIGGER PATHS (MET) === " << std::endl;
    for (unsigned int i = 0, n = triggerBits_MET->size(); i < n; ++i) {
-       std::cout << "Trigger " << names_MET.triggerName(i) << 
-         ": " << (triggerBits_MET->accept(i) ? "PASS" : "fail (or not run)") 
-     	       << std::endl;
+     //std::cout << "Trigger " << names_MET.triggerName(i) << 
+     //  ": " << (triggerBits_MET->accept(i) ? "PASS" : "fail (or not run)") 
+     //	       << std::endl;
         if ( (names_MET.triggerName(i)).find("Flag_HBHENoiseFilter") != std::string::npos ) {
-       passHBHENoiseFilter=triggerBits_MET->accept(i) ;
+	  passHBHENoiseFilter=triggerBits_MET->accept(i) ;
         }
+        if ( (names_MET.triggerName(i)).find("Flag_HBHENoiseIsoFilter") != std::string::npos ) {
+	  passHBHENoiseIsoFilter=triggerBits_MET->accept(i) ;
+        }
+	if ( (names_MET.triggerName(i)).find("Flag_EcalDeadCellTriggerPrimitiveFilter") != std::string::npos ) {
+	  passEcalDeadCellTriggerPrimitiveFilter=triggerBits_MET->accept(i) ;
+        }
+	if ( (names_MET.triggerName(i)).find("Flag_goodVertices") != std::string::npos ) {
+	  passgoodVertices=triggerBits_MET->accept(i) ;
+        }
+	if ( (names_MET.triggerName(i)).find("Flag_eeBadScFilter") != std::string::npos ) {
+	  passeeBadScFilter=triggerBits_MET->accept(i) ;
+        }
+	if ( (names_MET.triggerName(i)).find("Flag_globalTightHalo2016Filter") != std::string::npos ) {
+	  passglobalTightHalo2016Filter=triggerBits_MET->accept(i) ;
+        }
+	
    }
+   /*
+   if (!RunOnData) { 
+     passHBHENoiseFilter=1;
+     passHBHENoiseIsoFilter=1;
+     passEcalDeadCellTriggerPrimitiveFilter=1;
+     passgoodVertices=1;
+     passeeBadScFilter=1;
+     passglobalTightHalo2016Filter=1;
+   }
+   */
    //   if (!RunOnData) passTauTrig=1;
-   std::cout << "RunOnData=" << RunOnData <<  " ## passHBHENoiseFilter=" << passHBHENoiseFilter << std::endl;
-
-
+   //std::cout << "RunOnData=" << RunOnData <<  " ## passHBHENoiseFilter=" << passHBHENoiseFilter 
+   // <<  " ## passHBHENoiseIsoFilter=" << passHBHENoiseIsoFilter 
+   //	     << " ## passEcalDeadCellTriggerPrimitiveFilter=" << passEcalDeadCellTriggerPrimitiveFilter 
+   //	     << " ## passgoodVertices=" << passgoodVertices 
+   //	     << " ## passeeBadScFilter=" << passeeBadScFilter 
+   //	     << " ## passglobalTightHalo2016Filter=" << passglobalTightHalo2016Filter << std::endl;
 
 
    edm::Handle<reco::VertexCollection> vertices;
    iEvent.getByToken(vtxToken_, vertices);
    if (vertices->empty()) return; // skip the event if no PV found
-   std::cout << "Number of vertices " << vertices->size() << std::endl;
+   // std::cout << "Number of vertices " << vertices->size() << std::endl;
    const reco::Vertex &PV = vertices->front();
    reco::VertexCollection vtxs = *vertices;
    
@@ -243,7 +321,7 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
        nvtx++;
      }
    }
-   std::cout << "Number of good vertices " << nvtx << std::endl;
+   //   std::cout << "Number of good vertices " << nvtx << std::endl;
 
 
    edm::Handle<pat::METCollection> mets;
@@ -257,6 +335,7 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
    //	  met.pt(), met.phi(), met.sumEt(),
    //	  met.genMET()->pt(),
    //	  met.shiftedPt(pat::MET::JetEnUp), met.shiftedPt(pat::MET::JetEnDown));
+   // std::cout << "MET=" << met_val << std::endl;
 
 
    int nTightMu=0;
@@ -267,7 +346,8 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
      //       printf("muon with pt %4.1f, dz(PV) %+5.3f, POG loose id %d, tight id %d\n",
      //	    mu.pt(), mu.muonBestTrack()->dz(PV.position()), mu.isLooseMuon(), mu.isTightMuon(PV));
    }
-   std::cout << "nTightMu=" << nTightMu << std::endl;
+   //  std::cout << "nTightMu=" << nTightMu << std::endl;
+
 
    int nLooseEle=0;
    edm::Handle<pat::ElectronCollection> electrons;
@@ -281,69 +361,56 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
      //printf("elec with pt %4.1f, supercluster eta %+5.3f, sigmaIetaIeta %.3f  ", 
      //		 el.pt(), el.superCluster()->eta(), el.sigmaIetaIeta()  );
    }
-   std::cout << "nLooseEle=" << nLooseEle << std::endl;   
+   //  std::cout << "nLooseEle=" << nLooseEle << std::endl;   
 
    edm::Handle<pat::TauCollection> taus;
    int nGoodTau=0;
-   double tau_pt=0;
-   double tau_phi=-999;
+   double tau_pt[10]={0};
+   double tau_phi[10]={0};
+   //  double tau_px=0;
+   //double tau_py=0;
+   //double tau_pz=0;
+   //double tau_E=0;
+   //TLorentzVector tauGoodReco_p4;
+   
    iEvent.getByToken(tauToken_, taus);
+  
    for (const pat::Tau &tau : *taus) {
-     //----pT----//
-     tau_pt=tau.pt();
-     if ( tau.pt() < 80 ) {
-       std::cout << "Do not pass tau pT cut" << std::endl;
-       continue;
+     if (SelectTau(tau)==true) {
+       // std::cout << "Tau selected" << std::endl; 
+       tau_pt[nGoodTau]=tau.pt();
+       tau_phi[nGoodTau]=tau.phi();
+       nGoodTau++;
      }
-     //----phi----//
-     tau_phi=tau.phi();
-     //----Eta----//
-     if ( fabs(tau.eta()) > 2.1 ) {
-       std::cout << "Do not pass tau eta cut" << std::endl;
-       continue;
-     }
-     //----Tau ID----//
-     if ( tau.tauID("decayModeFindingNewDMs") < 0.5 ) {
-       std::cout << "Do not pass tau decay Mode Finding discriminator" << std::endl;
-       continue;
-     }
-     if ( tau.tauID("byMediumIsolationMVArun2v1DBnewDMwLT") < 0.5 ) {
-       std::cout << "Do not pass tau isolation discriminator" << std::endl;
-       continue;
-     } 
-     if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) {
-       std::cout << "Do not pass Electron rejection discriminator of Tau" << std::endl;
-       continue;
-     }
-     if ( tau.tauID("againstMuonLoose3") < 0.5 ) {
-       std::cout << "Do not pass Muon rejection discriminator of Tau" << std::endl;
-       continue;
-     }
-   
-     nGoodTau++;
-     //printf("tau  with pt %4.1f, dxy signif %.1f, ID(byMediumCombinedIsolationDeltaBetaCorr3Hits) %.1f, lead candidate pt %.1f, pdgId %d \n",
-     //	    tau.pt(), tau.dxy_Sig(), tau.tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits"), tau.leadCand()->pt(), tau.leadCand()->pdgId());
    }
-   
-   std::cout << "nGoodTau=" << nGoodTau << std::endl;
-   double dphi_tau_met = deltaPhi(tau_phi,met_phi);
-   
-   if (passTauTrig && (nvtx>0) && (nGoodTau==1) && (met_val>120) && (nTightMu==0) && (nLooseEle==0) ) {
-     double pToverEtMiss=tau_pt/met_val ;
-     if (pToverEtMiss>0.7 && pToverEtMiss<1.3) {
-       if (dphi_tau_met>2.4) {  
-	 std::cout << "Event selected! " << std::endl;
-	 h1_TauPt_Stage1->Fill(tau_pt);
-	 	 double MT=  sqrt(2*tau_pt*met_val*(1- cos(dphi_tau_met)));
-	  std::cout << "MT=" << MT << std::endl;
-	  h1_MT_Stage1->Fill(MT);
+   h1_nGoodTau_Reco->Fill(nGoodTau);
+   // std::cout << "nGoodTau=" << nGoodTau << std::endl;
+
+   //-----//
+
+   //---------------//
+   //---Selection---//
+   //---------------//   
+   if (passTauTrig && passHBHENoiseFilter && passHBHENoiseIsoFilter && passEcalDeadCellTriggerPrimitiveFilter && passgoodVertices && passeeBadScFilter && passglobalTightHalo2016Filter) {
+     if ( (nvtx>0) && (nGoodTau==1) && (met_val>120) && (nTightMu==0) && (nLooseEle==0) ) {
+       double dphi_tau_met = deltaPhi(tau_phi[0],met_phi);
+       double pToverEtMiss=tau_pt[0]/met_val ;
+       if (pToverEtMiss>0.7 && pToverEtMiss<1.3) {
+	 // std::cout << "pToverEtMiss=" << pToverEtMiss << std::endl;
+	 if (dphi_tau_met>2.4) {  
+	   // std::cout << "dphi_tau_met=" << dphi_tau_met << std::endl;
+	   //** Stage1 = final stage (all cuts applied) **//
+	   h1_TauPt_Stage1->Fill(tau_pt[0]);
+	   double MT=  sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1->Fill(MT);
+	 }
        }
      }
    }
    
    mytree->Fill();
    
-
+   
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
    Handle<ExampleData> pIn;
    iEvent.getByLabel("example",pIn);
@@ -355,13 +422,45 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 #endif
 }
 
+bool MiniAODAnalyzer::FindTauIDEfficiency(const edm::Event& iEvent, TLorentzVector gen_p4) {
 
-//bool MiniAODAnalyzer::CutBasedLooseEleID(const pat::Electron ele) {
-//  bool passLooseID=false;
+  edm::Handle<pat::TauCollection> taus;
+  iEvent.getByToken(tauToken_, taus);
+  TLorentzVector tauReco_p4;
+  TLorentzVector tauGoodReco_p4;
+
+  for (const pat::Tau &tau : *taus) {
+    tauReco_p4.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
+    double deltaR_tau_gen_reco = gen_p4.DeltaR(tauReco_p4);
+    if (deltaR_tau_gen_reco<0.4) {
+      h1_TauPt_reco->Fill(tau.pt());
+      if (SelectTau(tau)==true) {
+	h1_TauPt_goodreco->Fill(tau.pt());
+      }
+    }
+  }
+  return true;
+}
+
+bool MiniAODAnalyzer::SelectTau(const pat::Tau &tau)
+{
+
+  bool passTau=true;
   
-//  return passLooseID;
-//}
+  //----pT----//
+  if ( tau.pt() < 80 ) passTau=false;
+  
+  //----Eta----//
+  if ( fabs(tau.eta()) > 2.1 ) passTau=false;
 
+  //----Tau ID----//
+  if ( tau.tauID("decayModeFindingNewDMs") < 0.5 ) passTau=false;
+  if ( tau.tauID("byMediumIsolationMVArun2v1DBnewDMwLT") < 0.5 ) passTau=false;
+  if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTau=false;
+  if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTau=false;
+
+   return passTau;
+}
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
