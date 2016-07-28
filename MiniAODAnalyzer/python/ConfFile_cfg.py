@@ -3,7 +3,9 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Demo")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
@@ -11,7 +13,7 @@ process.source = cms.Source("PoolSource",
 #        '/store/mc/RunIIFall15MiniAODv1/WprimeToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/1AF74AF6-BFA6-E511-96DF-0CC47A1DF7F8.root'
 #        '/store/mc/RunIIFall15MiniAODv1/WprimeToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/26FC919F-C3A6-E511-9A22-0CC47A4D7674.root'
         '/store/mc/RunIISpring16MiniAODv2/WprimeToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/00000/0A8E0285-A92B-E611-A376-00259081ED0A.root'
-#       '/store/data/Run2016B/Tau/MINIAOD/PromptReco-v2/000/273/150/00000/64EFFDF2-D719-E611-A0C3-02163E01421D.root'
+#      '/store/data/Run2016B/Tau/MINIAOD/PromptReco-v2/000/273/150/00000/64EFFDF2-D719-E611-A0C3-02163E01421D.root'
     )
 )
 
@@ -24,11 +26,16 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        electrons = cms.InputTag("slimmedElectrons"),
        mets = cms.InputTag("slimmedMETs"),
        bits = cms.InputTag("TriggerResults","","HLT"),
+#       bits_MET = cms.InputTag("TriggerResults","","RECO"),                       
        bits_MET = cms.InputTag("TriggerResults","","PAT"),                       
        prescales = cms.InputTag("patTrigger"),
        packed = cms.InputTag("packedGenParticles"),
        pruned = cms.InputTag("prunedGenParticles"),
-       objects = cms.InputTag("selectedPatTrigger")
+       objects = cms.InputTag("selectedPatTrigger"),
+       genEventInfoProductMiniAOD = cms.InputTag('generator'),
+       pileupCollection = cms.InputTag("slimmedAddPileupInfo"),
+       PileupMCFile = cms.string("MC_pileup.root"),
+       PileupDataFile = cms.string("Data_pileup_normalized.root"),
 )
 
 process.out = cms.OutputModule("PoolOutputModule",
