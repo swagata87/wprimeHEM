@@ -43,23 +43,23 @@ if __name__ == '__main__':
     #############################################################################################
 
 ## Data ##
-    config.General.requestName = 'Tau_Run2016B_PromptReco_v1'
-    config.Data.inputDataset = '/Tau/Run2016B-PromptReco-v1/MINIAOD'
-    config.Data.unitsPerJob = 15
+#    config.General.requestName = 'Tau_Run2016B_PromptReco_v1'
+#    config.Data.inputDataset = '/Tau/Run2016B-PromptReco-v1/MINIAOD'
+#    config.Data.unitsPerJob = 15
     #config.Data.totalUnits = 4
-    submit(config)
+#    submit(config)
 
-    config.General.requestName = 'Tau_Run2016B_PromptReco_v2'
-    config.Data.inputDataset = '/Tau/Run2016B-PromptReco-v2/MINIAOD'
-    config.Data.unitsPerJob = 15
+#    config.General.requestName = 'Tau_Run2016B_PromptReco_v2'
+#    config.Data.inputDataset = '/Tau/Run2016B-PromptReco-v2/MINIAOD'
+#    config.Data.unitsPerJob = 15
     #config.Data.totalUnits = 4
-    submit(config)
+#    submit(config)
 
-    config.General.requestName = 'Tau_Run2016C_PromptReco_v2'
-    config.Data.inputDataset = '/Tau/Run2016C-PromptReco-v2/MINIAOD'
-    config.Data.unitsPerJob = 15
+#    config.General.requestName = 'Tau_Run2016C_PromptReco_v2'
+#    config.Data.inputDataset = '/Tau/Run2016C-PromptReco-v2/MINIAOD'
+#    config.Data.unitsPerJob = 15
     #config.Data.totalUnits = 4
-    submit(config)
+#    submit(config)
 
     config.General.requestName = 'Tau_Run2016D_PromptReco_v2'
     config.Data.inputDataset = '/Tau/Run2016D-PromptReco-v2/MINIAOD'
@@ -67,10 +67,10 @@ if __name__ == '__main__':
     #config.Data.totalUnits = 4
     submit(config)
 
-    config.General.requestName = 'Tau_Run2016E_PromptReco_v2'
-    config.Data.inputDataset = '/Tau/Run2016E-PromptReco-v2/MINIAOD'
-    config.Data.unitsPerJob = 15
+#    config.General.requestName = 'Tau_Run2016E_PromptReco_v2'
+#    config.Data.inputDataset = '/Tau/Run2016E-PromptReco-v2/MINIAOD'
+#    config.Data.unitsPerJob = 15
     #config.Data.totalUnits = 4
-    submit(config)
+#    submit(config)
 
 
