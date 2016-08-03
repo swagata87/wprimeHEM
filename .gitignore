@@ -5,6 +5,5 @@ __init__.py
 *.o
 *.d
 AutoDict_*
-*.root
 #*
 *.nfs*
