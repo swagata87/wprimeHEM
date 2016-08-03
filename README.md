@@ -74,6 +74,15 @@ Rootfiles containing Histograms-> hist_analysis_*.root
 You need to do 'hadd' to merge rootfiles. A script would be handy. 
 Example :  WPrimeToTau/MiniAODAnalyzer/python/dohadd.sh for merging histogram root files (Can be improved)
 
+####
+How much data you processed?
+####
+- One can do 'crab report DIRNAME' for data and this will give processedLumis.json inside 'results/' folder. 
+- export PATH=$HOME/.local/bin:/afs/cern.ch/cms/lumi/brilconda-1.0.3/bin:$PATH  
+- brilcalc  lumi  -b "STABLE BEAMS" --normtag=/afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i processedLumis.json -u /fb
+- The lumi will be printed
+
+
 For plotting, any plotter script can be used. This is upto user's taste. 
 
 Example plotter for M_T distribution : WPrimeToTau/MiniAODAnalyzer/test/Plot_mT_Stage1.C 
