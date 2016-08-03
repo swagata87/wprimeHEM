@@ -82,11 +82,11 @@ private:
   virtual void endJob() override;
 
     //new additions
-  virtual void MiniAODAnalyzer::Tree_Creater(std::unordered_map< std::string , float > *m, const char * name);
-  virtual void MiniAODAnalyzer::Tree_Filler(const char * name);
-  virtual void MiniAODAnalyzer::Create_Trees();
-  virtual void MiniAODAnalyzer::Fill_Tree();
-  virtual void MiniAODAnalyzer::Fill_QCD_Tree(bool iso);
+  virtual void Tree_Creater(std::unordered_map< std::string , float > *m, const char * name);
+  virtual void Tree_Filler(const char * name);
+  virtual void Create_Trees();
+  virtual void Fill_Tree();
+  virtual void Fill_QCD_Tree(bool iso);
     //end of new additions
 
   bool PassTauID(const pat::Tau &tau);
