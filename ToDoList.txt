@@ -1,0 +1,15 @@
+###
+[Format] 
+
+Task (Who is working on it, Priority): Description (status)
+###
+
+
+- Creating ROOT-tree branches (Marcel, high): Add Branches to the existing code with needed histograms (not started yet)
+
+- DD QCD (Marcel, high): port the exisiting data-driven method into a compatible version (not started yet)
+
+- Reweighting (Marcel, medium): create a reweighting script for the SSM W' samples to reweight to generalized couplings and NUGIM (not started yet)
+
+- PDF uncertainties (Marcel, low): combine pdf uncertainties and reweight the events (not started yet)
+
