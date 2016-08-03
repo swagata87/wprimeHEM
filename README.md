@@ -27,9 +27,7 @@ Some notes about ConfFile_cfg.py
 - You will need to run locally to check if things are working fine or not. For that, change the filenames accordingly. The filenames can be found in DAS or by using das_client.py
 
 - For data : bits_MET = cms.InputTag("TriggerResults","","RECO"),
-and for MC : bits_MET = cms.InputTag("TriggerResults","","PAT"),
-
-I expect that this will change in future.
+and for MC : bits_MET = cms.InputTag("TriggerResults","","PAT"),.  I expect that this will change in future.
 
 The code takes pile-up distributions of data and MC as inputs. The distributions are already made and saved as root files. You might need to re-make them in future. PU distribution for MC can be made using this file ->
 
