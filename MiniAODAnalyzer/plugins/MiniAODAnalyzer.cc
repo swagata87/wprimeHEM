@@ -437,8 +437,6 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   
    int nvtx=0;
    int recoVtx = vertices->size();
-   h1_recoVtx_NoPUWt->Fill(recoVtx,mc_event_weight);
-   h1_recoVtx_WithPUWt->Fill(recoVtx,final_weight);
 
    if( vertices.isValid() ){
      for( reco::VertexCollection::const_iterator vtx = vtxs.begin(); vtx!=vtxs.end(); ++vtx ) {
@@ -627,6 +625,8 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
      if ( (nvtx>0) && (nTightMu==0) && (nLooseEle==0) ) {
        //** Stage1 = final stage (all cuts applied) **//
        if ( (PassFinalCuts(nGoodTau, met_val,met_phi,tau_pt[0],tau_phi[0]) == true) ) {
+	 h1_recoVtx_NoPUWt->Fill(recoVtx,mc_event_weight);
+	 h1_recoVtx_WithPUWt->Fill(recoVtx,final_weight);
 	 h1_TauPt_Stage1->Fill(tau_pt[0],final_weight);
 	 //std::cout << "*Standard* dphi_tau_met=" << dphi_tau_met << std::endl;
 	 double MT=  sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_tau_met)));
