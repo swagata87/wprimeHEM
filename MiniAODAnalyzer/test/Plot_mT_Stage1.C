@@ -37,123 +37,126 @@ int Plot_mT_Stage1() {
   unsigned long long evt_WJetsToLNu=1;
   //  TH1::SetDefaultSumw2(); 
   //  gROOT->SetBatch(kTRUE);
-  //  TFile *file_DYJetsToLL_M50  = new TFile("../python/crab_projects_old/crab_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/results/hist.root");
+  //  TFile *file_DYJetsToLL_M50  = new TFile("../python/crab_projects/crab_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/results/hist.root");
   //double xs_DYJetsToLL_M50=6104000; //--fb--//
 
-  TFile *file_DYJetsToLL_M50  = new TFile("../python/crab_projects_old/crab_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");             
+  TFile *file_DYJetsToLL_M50  = new TFile("../python/crab_projects/crab_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");             
   double xs_DYJetsToLL_M50=4895000;  //--fb--//                                                                                                                    
 
-  //  TFile *file_DYJetsToLL_M5to50  = new TFile("../python/crab_projects_old/crab_DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");    
+  //  TFile *file_DYJetsToLL_M5to50  = new TFile("../python/crab_projects/crab_DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");    
   //  double xs_DYJetsToLL_M5to50=;  //--fb--//                                                                                                                    
 
-  TFile *file_TT              = new TFile("../python/crab_projects_old/crab_TT_TuneCUETP8M1_13TeV-powheg-pythia8/results/hist.root");
+  TFile *file_TT              = new TFile("../python/crab_projects/crab_TT_TuneCUETP8M1_13TeV-powheg-pythia8/results/hist.root");
   double xs_TT=730000; //--fb--//
   double kfact_TT= 1.139;
 
-  //TFile *file_WJetsToLNu      = new TFile("../python/crab_projects_old/crab_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/results/hist.root");
+  //TFile *file_WJetsToLNu      = new TFile("../python/crab_projects/crab_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/results/hist.root");
   //double xs_WJetsToLNu=60290000; //--fb--//
 
-  ////  TFile *file_WJetsToLNu      = new TFile("../python/crab_projects_old/crab_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  ////  TFile *file_WJetsToLNu      = new TFile("../python/crab_projects/crab_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   ////  double xs_WJetsToLNu= 50690000; //--fb--//
 
-  TFile *file_WJetsToLNu_HT100To200  = new TFile("../python/crab_projects_old/crab_WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT100To200  = new TFile("../python/crab_projects/crab_WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT100To200 = 1345000 ; //--fb--//
   double kfact_WJetsToLNu_HT100To200 = 1.21 ; 
 
-  TFile *file_WJetsToLNu_HT200To400  = new TFile("../python/crab_projects_old/crab_WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT200To400  = new TFile("../python/crab_projects/crab_WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT200To400 = 359700 ; //--fb--//
   double kfact_WJetsToLNu_HT200To400 = 1.21 ;
 
-  TFile *file_WJetsToLNu_HT400To600  = new TFile("../python/crab_projects_old/crab_WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT400To600  = new TFile("../python/crab_projects/crab_WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT400To600 = 48910 ; //--fb--//
   double kfact_WJetsToLNu_HT400To600 = 1.21 ;
 
-  TFile *file_WJetsToLNu_HT600To800  = new TFile("../python/crab_projects_old/crab_WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT600To800  = new TFile("../python/crab_projects/crab_WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT600To800 = 12050 ; //--fb--//
   double kfact_WJetsToLNu_HT600To800 = 1.21 ;
 
-  TFile *file_WJetsToLNu_HT800To1200  = new TFile("../python/crab_projects_old/crab_WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT800To1200  = new TFile("../python/crab_projects/crab_WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT800To1200 = 5501 ; //--fb--//
   double kfact_WJetsToLNu_HT800To1200 = 1.21 ;
 
-  TFile *file_WJetsToLNu_HT1200To2500  = new TFile("../python/crab_projects_old/crab_WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT1200To2500  = new TFile("../python/crab_projects/crab_WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT1200To2500 = 1329 ; //--fb--//
   double kfact_WJetsToLNu_HT1200To2500 = 1.21 ;
 
-  TFile *file_WJetsToLNu_HT2500ToInf  = new TFile("../python/crab_projects_old/crab_WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT2500ToInf  = new TFile("../python/crab_projects/crab_WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT2500ToInf = 32.16  ; //--fb--//
   double kfact_WJetsToLNu_HT2500ToInf = 1.21 ;
 
-  TFile *file_ST_tchannel_antitop=new TFile("../python/crab_projects_old/crab_ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
+  TFile *file_ST_tchannel_antitop=new TFile("../python/crab_projects/crab_ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
   double xs_ST_tchannel_antitop = 80950; //--fb--//
   //
-  TFile *file_ST_tchannel_top=new TFile("../python/crab_projects_old/crab_ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
+  TFile *file_ST_tchannel_top=new TFile("../python/crab_projects/crab_ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
   double xs_ST_tchannel_top = 103200; //--fb--//
   //
-  TFile *file_ST_tW_antitop=new TFile("../python/crab_projects_old/crab_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
+  TFile *file_ST_tW_antitop=new TFile("../python/crab_projects/crab_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
   double xs_ST_tW_antitop = 38090; //--fb--//
   //
-  TFile *file_ST_tW_top=new TFile("../python/crab_projects_old/crab_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
+  TFile *file_ST_tW_top=new TFile("../python/crab_projects/crab_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
   double xs_ST_tW_top = 38090; //--fb--//
   //
-  TFile *file_WW=new TFile("../python/crab_projects_old/crab_WW_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
+  TFile *file_WW=new TFile("../python/crab_projects/crab_WW_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
   double xs_WW = 63210; //--fb--//
   //
-  TFile *file_WZ=new TFile("../python/crab_projects_old/crab_WZ_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
+  TFile *file_WZ=new TFile("../python/crab_projects/crab_WZ_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
   double xs_WZ = 22820; //--fb--//
   double kfact_WZ = 2.06; // 47.13/22.82
   //
-  TFile *file_ZZ=new TFile("../python/crab_projects_old/crab_ZZ_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
+  TFile *file_ZZ=new TFile("../python/crab_projects/crab_ZZ_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
   double xs_ZZ = 10320; //--fb--//
   double kfact_ZZ = 1.60 ; //16523/10320
   //
-  TFile *file_QCD_HT200to300=new TFile("../python/crab_projects_old/crab_QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT200to300=new TFile("../python/crab_projects/crab_QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT200to300 = 1717000000; //--fb--//
   //
-  TFile *file_QCD_HT300to500=new TFile("../python/crab_projects_old/crab_QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT300to500=new TFile("../python/crab_projects/crab_QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT300to500 = 351300000; //--fb--//
   //
-  TFile *file_QCD_HT500to700=new TFile("../python/crab_projects_old/crab_QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT500to700=new TFile("../python/crab_projects/crab_QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT500to700 = 31630000 ; //--fb--//
   //
-  TFile *file_QCD_HT700to1000=new TFile("../python/crab_projects_old/crab_QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT700to1000=new TFile("../python/crab_projects/crab_QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT700to1000 = 6802000 ; //--fb--//
   //
-  TFile *file_QCD_HT1000to1500=new TFile("../python/crab_projects_old/crab_QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT1000to1500=new TFile("../python/crab_projects/crab_QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT1000to1500 = 1206000 ; //--fb--//
   //
-  TFile *file_QCD_HT1500to2000=new TFile("../python/crab_projects_old/crab_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT1500to2000=new TFile("../python/crab_projects/crab_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT1500to2000 = 120400 ; //--fb--//
   //
-  TFile *file_QCD_HT2000toInf=new TFile("../python/crab_projects_old/crab_QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT2000toInf=new TFile("../python/crab_projects/crab_QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT2000toInf = 25250 ; //--fb--//
   //
-  TFile *file_ZJetsToNuNu_HT100To200 =new TFile("../python/crab_projects_old/crab_ZJetsToNuNu_HT-100To200_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT100To200 =new TFile("../python/crab_projects/crab_ZJetsToNuNu_HT-100To200_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT100To200 =  280350; //--fb--//
+  double kfact_ZJetsToNuNu_HT100To200 =  1.23 ;
   //
-  TFile *file_ZJetsToNuNu_HT200To400 =new TFile("../python/crab_projects_old/crab_ZJetsToNuNu_HT-200To400_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT200To400 =new TFile("../python/crab_projects/crab_ZJetsToNuNu_HT-200To400_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT200To400 = 77670 ; //--fb--//
+  double kfact_ZJetsToNuNu_HT200To400 = 1.23 ;
   //
-  TFile *file_ZJetsToNuNu_HT400To600 =new TFile("../python/crab_projects_old/crab_ZJetsToNuNu_HT-400To600_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT400To600 =new TFile("../python/crab_projects/crab_ZJetsToNuNu_HT-400To600_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT400To600 = 10730 ; //--fb--//
+  double kfact_ZJetsToNuNu_HT400To600 =  1.23 ;
   //
-  TFile *file_ZJetsToNuNu_HT600To800 =new TFile("../python/crab_projects_old/crab_ZJetsToNuNu_HT-600To800_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT600To800 =new TFile("../python/crab_projects/crab_ZJetsToNuNu_HT-600To800_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT600To800 = 853 ; //--fb--//
   //
-  TFile *file_ZJetsToNuNu_HT800To1200 =new TFile("../python/crab_projects_old/crab_ZJetsToNuNu_HT-800To1200_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT800To1200 =new TFile("../python/crab_projects/crab_ZJetsToNuNu_HT-800To1200_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT800To1200 = 394.2 ; //--fb--//
   //
-  TFile *file_ZJetsToNuNu_HT1200To2500 =new TFile("../python/crab_projects_old/crab_ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT1200To2500 =new TFile("../python/crab_projects/crab_ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT1200To2500 = 97.4 ; //--fb--//
   //
-  TFile *file_ZJetsToNuNu_HT2500ToInf =new TFile("../python/crab_projects_old/crab_ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT2500ToInf =new TFile("../python/crab_projects/crab_ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT2500ToInf = 2.308 ; //--fb--//
 
   /// DATA ///
-  TFile *file_Tau_Run2016D = new TFile("../python/crab_projects_old/crab_Tau_Run2016D_PromptReco_v2/results/hist.root");
+  TFile *file_Tau_Run2016D = new TFile("../python/crab_projects/crab_Tau_Run2016D_PromptReco_v2/results/hist.root");
 
   /// Signal ///
-  TFile *file_Wprime_M1000 = new TFile("../python/crab_projects_old/crab_WprimeToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_Wprime_M1000 = new TFile("../python/crab_projects/crab_WprimeToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_Wprime_M1000= 3060; // --fb-- //
 
   //--//
@@ -164,7 +167,7 @@ int Plot_mT_Stage1() {
   mT_Stage1_DYJetsToLL_M50->Scale(wt_DYJetsToLL_M50);
   mT_Stage1_DYJetsToLL_M50->SetFillColorAlpha(kRed,0.5);
   mT_Stage1_DYJetsToLL_M50->SetLineColor(kBlack);
-  mT_Stage1_DYJetsToLL_M50->Rebin(20);  
+  mT_Stage1_DYJetsToLL_M50->Rebin(40);  
   std::cout << "Selected **DY** weighted nevt=" << mT_Stage1_DYJetsToLL_M50->Integral() << std::endl;
 
   TH1D* h1_evt_TT = (TH1D*)file_TT->Get("demo/eventCount");
@@ -181,7 +184,7 @@ int Plot_mT_Stage1() {
   mT_Stage1_TT->Scale(kfact_TT);
   mT_Stage1_TT->SetFillColor(kBlue-7);
   mT_Stage1_TT->SetLineColor(kBlack);
-  mT_Stage1_TT->Rebin(20);
+  mT_Stage1_TT->Rebin(40);
   std::cout << "**TTbar** weighted nevt=" << mT_Stage1_TT->Integral() << std::endl;
 
   /*
@@ -248,7 +251,7 @@ int Plot_mT_Stage1() {
   total_ST->Add(mT_Stage1_ST_tW_top);
   total_ST->SetFillColorAlpha(kCyan,0.5);
   total_ST->SetLineColor(kBlack);
-  total_ST->Rebin(20);
+  total_ST->Rebin(40);
 
   //file_WJetsToLNu_HT100To200
   TH1D* h1_evt_WJetsToLNu_HT100To200 = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/eventCount");
@@ -346,7 +349,7 @@ int Plot_mT_Stage1() {
   total_WJets->SetLineColor(kBlack);
   std::cout << "Wjets " << total_WJets->GetBinError(300) << std::endl;
 
-  total_WJets->Rebin(20);
+  total_WJets->Rebin(40);
 
 
   //file_WW
@@ -368,6 +371,7 @@ int Plot_mT_Stage1() {
   //mT_Stage1_WZ->Sumw2(kFALSE);
   // mT_Stage1_WZ->SetBinErrorOption(TH1::kPoisson);
   mT_Stage1_WZ->Scale(wt_WZ);
+  mT_Stage1_WZ->Scale(kfact_WZ);
 
   //file_ZZ
   TH1D* h1_evt_ZZ = (TH1D*)file_ZZ->Get("demo/eventCount");
@@ -378,13 +382,14 @@ int Plot_mT_Stage1() {
   //mT_Stage1_ZZ->Sumw2(kFALSE);
   //mT_Stage1_ZZ->SetBinErrorOption(TH1::kPoisson);
   mT_Stage1_ZZ->Scale(wt_ZZ);
- 
+  mT_Stage1_ZZ->Scale(kfact_ZZ);
+
   TH1D* total_diboson = (TH1D*)mT_Stage1_WW->Clone();
   total_diboson->Add(mT_Stage1_WZ);
   total_diboson->Add(mT_Stage1_ZZ);
   total_diboson->SetFillColorAlpha(kOrange+2,0.5);
   total_diboson->SetLineColor(kBlack);
-  total_diboson->Rebin(20);
+  total_diboson->Rebin(40);
 
   //file_QCD_HT200to300
   TH1D* h1_evt_QCD_HT200to300 = (TH1D*)file_QCD_HT200to300->Get("demo/eventCount");
@@ -465,7 +470,7 @@ int Plot_mT_Stage1() {
   total_QCD->Add(mT_Stage1_QCD_HT2000toInf);
   total_QCD->SetFillColorAlpha(kPink+1,0.5);
   total_QCD->SetLineColor(kBlack);
-  total_QCD->Rebin(20);
+  total_QCD->Rebin(40);
 
   //file_ZJetsToNuNu_HT100To200
   TH1D* h1_evt_ZJetsToNuNu_HT100To200 = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/eventCount");
@@ -476,7 +481,8 @@ int Plot_mT_Stage1() {
   // mT_Stage1_ZJetsToNuNu_HT100To200->Sumw2(kFALSE);
   // mT_Stage1_ZJetsToNuNu_HT100To200->SetBinErrorOption(TH1::kPoisson);
   mT_Stage1_ZJetsToNuNu_HT100To200->Scale(wt_ZJetsToNuNu_HT100To200);
-  std::cout << "\n" << mT_Stage1_ZJetsToNuNu_HT100To200->GetBinError(600) << std::endl;
+  mT_Stage1_ZJetsToNuNu_HT100To200->Scale(kfact_ZJetsToNuNu_HT100To200);
+  //std::cout << "\n" << mT_Stage1_ZJetsToNuNu_HT100To200->GetBinError(600) << std::endl;
 
   //file_ZJetsToNuNu_HT200To400
   TH1D* h1_evt_ZJetsToNuNu_HT200To400 = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/eventCount");
@@ -487,7 +493,8 @@ int Plot_mT_Stage1() {
   //mT_Stage1_ZJetsToNuNu_HT200To400->Sumw2(kFALSE);
   //mT_Stage1_ZJetsToNuNu_HT200To400->SetBinErrorOption(TH1::kPoisson);
   mT_Stage1_ZJetsToNuNu_HT200To400->Scale(wt_ZJetsToNuNu_HT200To400);
-  std::cout << mT_Stage1_ZJetsToNuNu_HT200To400->GetBinError(600) << std::endl;
+  mT_Stage1_ZJetsToNuNu_HT200To400->Scale(kfact_ZJetsToNuNu_HT200To400);
+  //std::cout << mT_Stage1_ZJetsToNuNu_HT200To400->GetBinError(600) << std::endl;
 
   //file_ZJetsToNuNu_HT400To600
   TH1D* h1_evt_ZJetsToNuNu_HT400To600 = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/eventCount");
@@ -498,7 +505,8 @@ int Plot_mT_Stage1() {
   // mT_Stage1_ZJetsToNuNu_HT400To600->Sumw2(kFALSE);
   // mT_Stage1_ZJetsToNuNu_HT400To600->SetBinErrorOption(TH1::kPoisson);
   mT_Stage1_ZJetsToNuNu_HT400To600->Scale(wt_ZJetsToNuNu_HT400To600);
-  std::cout << mT_Stage1_ZJetsToNuNu_HT400To600->GetBinError(600) << std::endl;
+  mT_Stage1_ZJetsToNuNu_HT400To600->Scale(kfact_ZJetsToNuNu_HT400To600);
+  //  std::cout << mT_Stage1_ZJetsToNuNu_HT400To600->GetBinError(600) << std::endl;
 
   //file_ZJetsToNuNu_HT600To800
   TH1D* h1_evt_ZJetsToNuNu_HT600To800 = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/eventCount");
@@ -555,7 +563,7 @@ int Plot_mT_Stage1() {
   total_ZJets->SetLineColor(kBlack);
   std::cout << "total=" <<  total_ZJets->GetBinError(600) << std::endl;
 
-  total_ZJets->Rebin(20);
+  total_ZJets->Rebin(40);
 
   //--Data--//
   TH1D* mT_Stage1_Run2016D  = (TH1D*)file_Tau_Run2016D->Get("demo/mT_Stage1");
@@ -565,7 +573,7 @@ int Plot_mT_Stage1() {
   mT_Stage1_Run2016D->SetMarkerStyle(20);
   mT_Stage1_Run2016D->SetMarkerColor(kBlack);
   mT_Stage1_Run2016D->SetLineColor(kBlack);
-  mT_Stage1_Run2016D->Rebin(20);
+  mT_Stage1_Run2016D->Rebin(40);
 
   //--Signal--//
   TH1D* h1_evt_Wprime_M1000 = (TH1D*)file_Wprime_M1000->Get("demo/eventCount");
@@ -578,7 +586,7 @@ int Plot_mT_Stage1() {
   mT_Stage1_Wprime_M1000->SetLineColor(kMagenta);
   mT_Stage1_Wprime_M1000->SetLineWidth(2);
   mT_Stage1_Wprime_M1000->SetLineStyle(5);
-  mT_Stage1_Wprime_M1000->Rebin(20);
+  mT_Stage1_Wprime_M1000->Rebin(40);
  
   //--Plotting Styles//
   gStyle->SetPadLeftMargin(0.15);
