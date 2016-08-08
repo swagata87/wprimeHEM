@@ -84,6 +84,15 @@ private:
   virtual void beginJob() override;
   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
   virtual void endJob() override;
+
+    //new additions
+  virtual void Tree_Creater(std::unordered_map< std::string , float > *m, const char * name);
+  virtual void Tree_Filler(const char * name);
+  virtual void Create_Trees();
+  virtual void Fill_Tree();
+  virtual void Fill_QCD_Tree(bool iso);
+    //end of new additions
+
   bool PassTauID(const pat::Tau &tau);
   bool PassTauID_NonIsolated(const pat::Tau &tau);
   bool PassTauAcceptance(TLorentzVector tau);
@@ -640,8 +649,11 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
      if ( (nvtx>0) && (nTightMu==0) && (nLooseEle==0) ) {
        //** Stage1 = final stage (all cuts applied) **//
        if ( (PassFinalCuts(nGoodTau, met_val,met_phi,tau_pt[0],tau_phi[0]) == true) ) {
+<<<<<<< HEAD
      h1_recoVtx_NoPUWt->Fill(recoVtx,mc_event_weight);
      h1_recoVtx_WithPUWt->Fill(recoVtx,final_weight);
+=======
+>>>>>>> 9f01efe5f20f1a37c3845c671fc1b209c328d83d
      h1_TauPt_Stage1->Fill(tau_pt[0],final_weight);
      //std::cout << "*Standard* dphi_tau_met=" << dphi_tau_met << std::endl;
      double MT=  sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_tau_met)));
@@ -923,14 +935,18 @@ void
 MiniAODAnalyzer::beginJob()
 {
   rootFile_->cd();
-  mytree  = new TTree("tree","tr");
+  //mytree  = new TTree("tree","tr");
 
   //----
-  mytree->Branch("event_runNo",  &Run,   "event_runNo/I");
-  mytree->Branch("event_evtNo",  &Event, "event_evtNo/I");
+  //mytree->Branch("event_runNo",  &Run,   "event_runNo/I");
+  //mytree->Branch("event_evtNo",  &Event, "event_evtNo/I");
   //mytree->Branch("num_PU_vertices",&num_PU_vertices,"num_PU_vertices/I");
 
 
+  std::unordered_map<std::string, TTree * > mLeptonTree;
+  std::unordered_map<std::string, TTree * > mQCDTree;
+
+  Create_Trees();
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -953,12 +969,29 @@ MiniAODAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) 
   descriptions.addDefault(desc);
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f01efe5f20f1a37c3845c671fc1b209c328d83d
 /*
  *   Intoduce a map of trees, instead of a tree
  *   Has the advantage of not initialising the tree 3 times,
  *   modeled after the exisiting TAPAS code in HistClass.hh and WPrime's specialAna
 */
     //create a function that creates a Tree on a map (argument 1) with a given name (argument 2)
+<<<<<<< HEAD
+=======
+void MiniAODAnalyzer::Tree_Creater(std::unordered_map< std::string , float > *m, const char * name) {
+    trees[name] = new TTree(name, name);
+    for (std::unordered_map< std::string , float >::iterator it = m->begin(); it != m->end(); it++) {
+        trees[name]->Branch(it->first.c_str(), &(it->second), Form("%s/F", it->first.c_str()));
+    }
+}
+     //create a function that fills the Tree
+void MiniAODAnalyzer::Tree_Filler(const char * name) {
+        trees[name]->Fill();
+}
+>>>>>>> 9f01efe5f20f1a37c3845c671fc1b209c328d83d
 
 void MiniAODAnalyzer::Create_Trees(){
         //Kinematics
@@ -990,7 +1023,11 @@ void MiniAODAnalyzer::Create_Trees(){
         mLeptonTree["ThisWeight"]=0;
         mLeptonTree["lepton_type"]=0;
 
+<<<<<<< HEAD
         helper.Tree_Creater( &mLeptonTree, "slimtree");
+=======
+        MiniAODAnalyzer::Tree_Creater( &mLeptonTree, "slimtree");
+>>>>>>> 9f01efe5f20f1a37c3845c671fc1b209c328d83d
 
         mQCDTree["lepton_n"]=0;
         mQCDTree["pt"]=0;
@@ -1008,17 +1045,28 @@ void MiniAODAnalyzer::Create_Trees(){
         mQCDTree["decay_mode"]=0;
         mQCDTree["metTriggerd"]=0;
 
+<<<<<<< HEAD
 /*        if(m_do_complicated_tau_stuff){
+=======
+        if(m_do_complicated_tau_stuff){
+>>>>>>> 9f01efe5f20f1a37c3845c671fc1b209c328d83d
             for(auto idisc : d_mydisc){
                 mQCDTree[idisc]=0;
             }
         }
+<<<<<<< HEAD
 */
         helper.Tree_Creater( &mQCDTree, "qcdtree");
 }
 
 void MiniAODAnalyzer::Fill_Tree(){
     /*
+=======
+
+        MiniAODAnalyzer::Tree_Creater( &mQCDTree, "qcdtree");
+}
+void MiniAODAnalyzer::Fill_Tree(){
+>>>>>>> 9f01efe5f20f1a37c3845c671fc1b209c328d83d
     mLeptonTree["bjet1"]=0;
     mLeptonTree["mt"]=MT(sel_lepton,sel_met);
     mLeptonTree["delta_phi"]=DeltaPhi(sel_lepton,sel_met);
@@ -1057,10 +1105,17 @@ void MiniAODAnalyzer::Fill_Tree(){
         mLeptonTree["highEtEleTrig"]=highEtTriggStored;
     }else{
         mLeptonTree["highEtEleTrig"]=0;
+<<<<<<< HEAD
     }*/
     //helper.Tree_Filler("slimtree");
 }
 void MiniAODAnalyzer::Fill_QCD_Tree(bool iso){/*
+=======
+    }
+    MiniAODAnalyzer::Tree_Filler("slimtree");
+}
+void MiniAODAnalyzer::Fill_QCD_Tree(bool iso){
+>>>>>>> 9f01efe5f20f1a37c3845c671fc1b209c328d83d
 
     if(iso){
         mQCDTree["lepton_n"]=0;
@@ -1141,11 +1196,18 @@ void MiniAODAnalyzer::Fill_QCD_Tree(bool iso){/*
                     mQCDTree[idisc]=thisQCDlepton->getUserRecord(idisc).toDouble();
                 }
             }
+<<<<<<< HEAD
             helper.Tree_Filler("qcdtree");
         }
     }
 */}
 
+=======
+            MiniAODAnalyzer::Tree_Filler("qcdtree");
+        }
+    }
+}
+>>>>>>> 9f01efe5f20f1a37c3845c671fc1b209c328d83d
 
 
 
