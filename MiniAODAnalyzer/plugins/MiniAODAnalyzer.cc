@@ -203,44 +203,49 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   rootFile_   = TFile::Open(outputFile_.c_str(),"RECREATE"); // open output file to store histograms
   TFileDirectory histoDir = fs->mkdir("histoDir");
 
-  //h1_EventCount = fs->make<TH1I>("eventCount", "EventCount", 10, 0, 10);
-  //h1_nGenTau = fs->make<TH1I>("nGenTau", "nGenTau", 5, -0.5, 4.5);
-  //h1_nGoodTau_Reco = fs->make<TH1I>("nGoodTauReco", "nGoodTauReco", 5, -0.5, 4.5);
-  //h1_TauPt_Gen = fs->make<TH1D>("tauPt_Gen", "TauPt_Gen", 100, 0, 1000);
-  //h1_TauPt_reco = fs->make<TH1D>("tauPt_reco", "TauPt_reco", 50, 0, 1000);
-  //h1_TauPt_goodreco = fs->make<TH1D>("tauPt_goodreco", "TauPt_goodreco", 50, 0, 1000);
-  //h1_TauEta_reco = fs->make<TH1D>("tauEta_reco", "TauEta_reco", 48, -2.4, 2.4);
-  //h1_TauEta_goodreco = fs->make<TH1D>("tauEta_goodreco", "TauEta_goodreco", 48, -2.4, 2.4);
-  //h1_TauPt_Stage1 = fs->make<TH1D>("tauPt_Stage1", "TauPt_Stage1", 100, 0, 1000);
-  //h1_TauPt_RegA_Stage1 = fs->make<TH1D>("tauPt_RegA_Stage1", "TauPt_RegA_Stage1", 100, 0, 1000);
-  //h1_TauPt_RegC_Stage1 = fs->make<TH1D>("tauPt_RegC_Stage1", "TauPt_RegC_Stage1", 100, 0, 1000);
-  //h1_TauPt_GenMatchedTau_RegC_Stage1 = fs->make<TH1D>("tauPt_GenMatchedTau_RegC_Stage1", "TauPt_GenMatchedTau_RegC_Stage1", 100, 0, 1000);
-  //h1_TauPt_RegD_Stage1 = fs->make<TH1D>("tauPt_RegD_Stage1", "TauPt_RegD_Stage1", 100, 0, 1000);
-  //h1_TauPt_GenMatchedTau_RegD_Stage1 = fs->make<TH1D>("tauPt_GenMatchedTau_RegD_Stage1", "TauPt_GenMatchedTau_RegD_Stage1", 100, 0, 1000);
-  //h1_MT_Stage1 = fs->make<TH1D>("mT_Stage1", "MT_Stage1", 2000, 0, 2000);
-  //h1_MT_RegA_Stage1 = fs->make<TH1D>("mT_RegA_Stage1", "MT_RegA_Stage1", 2000, 0, 2000);
-  //h1_MT_RegC_Stage1 = fs->make<TH1D>("mT_RegC_Stage1", "MT_RegC_Stage1", 2000, 0, 2000);
-  //h1_MT_GenMatchedTau_RegC_Stage1 = fs->make<TH1D>("mT_GenMatchedTau_RegC_Stage1", "MT_GenMatchedTau_RegC_Stage1", 2000, 0, 2000);
-  //h1_MT_RegD_Stage1 = fs->make<TH1D>("mT_RegD_Stage1", "MT_RegD_Stage1", 2000, 0, 2000);
-  //h1_MT_GenMatchedTau_RegD_Stage1 = fs->make<TH1D>("mT_GenMatchedTau_RegD_Stage1", "MT_GenMatchedTau_RegD_Stage1", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_JetEnUp = fs->make<TH1D>("mT_Stage1_metUncert_JetEnUp", "MT_Stage1_metUncert_JetEnUp", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_JetEnDown = fs->make<TH1D>("mT_Stage1_metUncert_JetEnDown", "MT_Stage1_metUncert_JetEnDown", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_JetResUp = fs->make<TH1D>("mT_Stage1_metUncert_JetResUp", "MT_Stage1_metUncert_JetResUp", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_JetResDown = fs->make<TH1D>("mT_Stage1_metUncert_JetResDown", "MT_Stage1_metUncert_JetResDown", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_MuonEnUp = fs->make<TH1D>("mT_Stage1_metUncert_MuonEnUp", "MT_Stage1_metUncert_MuonEnUp", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_MuonEnDown = fs->make<TH1D>("mT_Stage1_metUncert_MuonEnDown", "MT_Stage1_metUncert_MuonEnDown", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_ElectronEnUp = fs->make<TH1D>("mT_Stage1_metUncert_ElectronEnUp", "MT_Stage1_metUncert_ElectronEnUp", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_ElectronEnDown = fs->make<TH1D>("mT_Stage1_metUncert_ElectronEnDown", "MT_Stage1_metUncert_ElectronEnDown", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_TauEnUp = fs->make<TH1D>("mT_Stage1_metUncert_TauEnUp", "MT_Stage1_metUncert_TauEnUp", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_TauEnDown = fs->make<TH1D>("mT_Stage1_metUncert_TauEnDown", "MT_Stage1_metUncert_TauEnDown", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_PhotonEnUp = fs->make<TH1D>("mT_Stage1_metUncert_PhotonEnUp", "MT_Stage1_metUncert_PhotonEnUp", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_PhotonEnDown = fs->make<TH1D>("mT_Stage1_metUncert_PhotonEnDown", "MT_Stage1_metUncert_PhotonEnDown", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_UnclusteredEnUp = fs->make<TH1D>("mT_Stage1_metUncert_UnclusteredEnUp", "MT_Stage1_metUncert_UnclusteredEnUp", 2000, 0, 2000);
-  //h1_MT_Stage1_metUncert_UnclusteredEnDown = fs->make<TH1D>("mT_Stage1_metUncert_UnclusteredEnDown", "MT_Stage1_metUncert_UnclusteredEnDown", 2000, 0, 2000);
-  //h1_MT_Stage1_TauScaleUp = fs->make<TH1D>("mT_Stage1_TauScaleUp", "MT_Stage1_TauScaleUp", 2000, 0, 2000);
-  //h1_MT_Stage1_TauScaleDown = fs->make<TH1D>("mT_Stage1_TauScaleDown", "MT_Stage1_TauScaleDown", 2000, 0, 2000);
-  //h1_recoVtx_NoPUWt = fs->make<TH1D>("recoVtx_NoPUWt", "RecoVtx_NoPUWt", 100, 0, 100);
-  //h1_recoVtx_WithPUWt = fs->make<TH1D>("recoVtx_WithPUWt", "RecoVtx_WithPUWt", 100, 0, 100);
+
+/*
+ * this is a bit messy atm, if we are fine with a histoDir
+ * remove this part
+ *
+  h1_EventCount = fs->make<TH1I>("eventCount", "EventCount", 10, 0, 10);
+  h1_nGenTau = fs->make<TH1I>("nGenTau", "nGenTau", 5, -0.5, 4.5);
+  h1_nGoodTau_Reco = fs->make<TH1I>("nGoodTauReco", "nGoodTauReco", 5, -0.5, 4.5);
+  h1_TauPt_Gen = fs->make<TH1D>("tauPt_Gen", "TauPt_Gen", 100, 0, 1000);
+  h1_TauPt_reco = fs->make<TH1D>("tauPt_reco", "TauPt_reco", 50, 0, 1000);
+  h1_TauPt_goodreco = fs->make<TH1D>("tauPt_goodreco", "TauPt_goodreco", 50, 0, 1000);
+  h1_TauEta_reco = fs->make<TH1D>("tauEta_reco", "TauEta_reco", 48, -2.4, 2.4);
+  h1_TauEta_goodreco = fs->make<TH1D>("tauEta_goodreco", "TauEta_goodreco", 48, -2.4, 2.4);
+  h1_TauPt_Stage1 = fs->make<TH1D>("tauPt_Stage1", "TauPt_Stage1", 100, 0, 1000);
+  h1_TauPt_RegA_Stage1 = fs->make<TH1D>("tauPt_RegA_Stage1", "TauPt_RegA_Stage1", 100, 0, 1000);
+  h1_TauPt_RegC_Stage1 = fs->make<TH1D>("tauPt_RegC_Stage1", "TauPt_RegC_Stage1", 100, 0, 1000);
+  h1_TauPt_GenMatchedTau_RegC_Stage1 = fs->make<TH1D>("tauPt_GenMatchedTau_RegC_Stage1", "TauPt_GenMatchedTau_RegC_Stage1", 100, 0, 1000);
+  h1_TauPt_RegD_Stage1 = fs->make<TH1D>("tauPt_RegD_Stage1", "TauPt_RegD_Stage1", 100, 0, 1000);
+  h1_TauPt_GenMatchedTau_RegD_Stage1 = fs->make<TH1D>("tauPt_GenMatchedTau_RegD_Stage1", "TauPt_GenMatchedTau_RegD_Stage1", 100, 0, 1000);
+  h1_MT_Stage1 = fs->make<TH1D>("mT_Stage1", "MT_Stage1", 2000, 0, 2000);
+  h1_MT_RegA_Stage1 = fs->make<TH1D>("mT_RegA_Stage1", "MT_RegA_Stage1", 2000, 0, 2000);
+  h1_MT_RegC_Stage1 = fs->make<TH1D>("mT_RegC_Stage1", "MT_RegC_Stage1", 2000, 0, 2000);
+  h1_MT_GenMatchedTau_RegC_Stage1 = fs->make<TH1D>("mT_GenMatchedTau_RegC_Stage1", "MT_GenMatchedTau_RegC_Stage1", 2000, 0, 2000);
+  h1_MT_RegD_Stage1 = fs->make<TH1D>("mT_RegD_Stage1", "MT_RegD_Stage1", 2000, 0, 2000);
+  h1_MT_GenMatchedTau_RegD_Stage1 = fs->make<TH1D>("mT_GenMatchedTau_RegD_Stage1", "MT_GenMatchedTau_RegD_Stage1", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_JetEnUp = fs->make<TH1D>("mT_Stage1_metUncert_JetEnUp", "MT_Stage1_metUncert_JetEnUp", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_JetEnDown = fs->make<TH1D>("mT_Stage1_metUncert_JetEnDown", "MT_Stage1_metUncert_JetEnDown", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_JetResUp = fs->make<TH1D>("mT_Stage1_metUncert_JetResUp", "MT_Stage1_metUncert_JetResUp", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_JetResDown = fs->make<TH1D>("mT_Stage1_metUncert_JetResDown", "MT_Stage1_metUncert_JetResDown", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_MuonEnUp = fs->make<TH1D>("mT_Stage1_metUncert_MuonEnUp", "MT_Stage1_metUncert_MuonEnUp", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_MuonEnDown = fs->make<TH1D>("mT_Stage1_metUncert_MuonEnDown", "MT_Stage1_metUncert_MuonEnDown", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_ElectronEnUp = fs->make<TH1D>("mT_Stage1_metUncert_ElectronEnUp", "MT_Stage1_metUncert_ElectronEnUp", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_ElectronEnDown = fs->make<TH1D>("mT_Stage1_metUncert_ElectronEnDown", "MT_Stage1_metUncert_ElectronEnDown", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_TauEnUp = fs->make<TH1D>("mT_Stage1_metUncert_TauEnUp", "MT_Stage1_metUncert_TauEnUp", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_TauEnDown = fs->make<TH1D>("mT_Stage1_metUncert_TauEnDown", "MT_Stage1_metUncert_TauEnDown", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_PhotonEnUp = fs->make<TH1D>("mT_Stage1_metUncert_PhotonEnUp", "MT_Stage1_metUncert_PhotonEnUp", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_PhotonEnDown = fs->make<TH1D>("mT_Stage1_metUncert_PhotonEnDown", "MT_Stage1_metUncert_PhotonEnDown", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_UnclusteredEnUp = fs->make<TH1D>("mT_Stage1_metUncert_UnclusteredEnUp", "MT_Stage1_metUncert_UnclusteredEnUp", 2000, 0, 2000);
+  h1_MT_Stage1_metUncert_UnclusteredEnDown = fs->make<TH1D>("mT_Stage1_metUncert_UnclusteredEnDown", "MT_Stage1_metUncert_UnclusteredEnDown", 2000, 0, 2000);
+  h1_MT_Stage1_TauScaleUp = fs->make<TH1D>("mT_Stage1_TauScaleUp", "MT_Stage1_TauScaleUp", 2000, 0, 2000);
+  h1_MT_Stage1_TauScaleDown = fs->make<TH1D>("mT_Stage1_TauScaleDown", "MT_Stage1_TauScaleDown", 2000, 0, 2000);
+  h1_recoVtx_NoPUWt = fs->make<TH1D>("recoVtx_NoPUWt", "RecoVtx_NoPUWt", 100, 0, 100);
+  h1_recoVtx_WithPUWt = fs->make<TH1D>("recoVtx_WithPUWt", "RecoVtx_WithPUWt", 100, 0, 100);*/
   h1_EventCount = histoDir.make<TH1I>("eventCount", "EventCount", 10, 0, 10);
   h1_nGenTau = histoDir.make<TH1I>("nGenTau", "nGenTau", 5, -0.5, 4.5);
   h1_nGoodTau_Reco = histoDir.make<TH1I>("nGoodTauReco", "nGoodTauReco", 5, -0.5, 4.5);
@@ -375,6 +380,7 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   if (!RunOnData) {
     //--GenParticles--//
     Handle<edm::View<reco::GenParticle> > pruned;
+    std::cout << pruned <<
     iEvent.getByToken(prunedGenToken_,pruned);
 
     Handle<edm::View<pat::PackedGenParticle> > packed;
@@ -973,28 +979,31 @@ MiniAODAnalyzer::beginJob()
   Create_Trees();
 
   helper->CreateHistoUnchangedName("h_counters", 10, 0, 11, "N_{events}");
-  //helper.CreateHistoUnchangedName("h_counters", 10, 0, 11, "N_{events}");
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void
 MiniAODAnalyzer::endJob()
 {
+
+  /*
+   * this part can be removed, if we want to
+   * "mytree" as to be reintroduced in the TFileService then
+   * via mytree = fs->make<TTree>("tree", "tr");
+  */
   rootFile_->cd();
   rootFile_->mkdir("mukherjee");
   rootFile_->cd("mukherjee");
   mytree->Write();
   rootFile_->cd("..");
-  rootFile_->mkdir("materok");
+  rootFile_->mkdir("materok");// used for testing purposes
   rootFile_->cd("materok");
   helper->WriteAll("h_");
   helper->WriteTree("qcdtree");
-  //helper.WriteAll("h_");
-  //helper.WriteTree("qcdtree");
 
   rootFile_->Close();
 
-  //TFileDirectory subDir = fs->mkdir( "mySubDirectory" );
+  //TFileDirectory subDir = fs->mkdir( "mySubDirectory" ); //testing
   //subDir.cd();
   //helper.WriteTree("qcdtree");
 }
@@ -1017,53 +1026,54 @@ MiniAODAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) 
     //create a function that creates a Tree on a map (argument 1) with a given name (argument 2)
 
 void MiniAODAnalyzer::Create_Trees(){
-        //Kinematics
-        mLeptonTree["mt"]=0;
-        mLeptonTree["delta_phi"]=0;
-        mLeptonTree["pt"]=0;
-        mLeptonTree["met"]=0;
-        mLeptonTree["lepton_phi"]=0;
-        mLeptonTree["lepton_eta"]=0;
-        mLeptonTree["met_phi"]=0;
-        mLeptonTree["jet1_et"]=0;
-        mLeptonTree["jet1_phi"]=0;
-        mLeptonTree["jet1_eta"]=0;
+  //these are the variables used in the tree of the old analysis
 
-        mLeptonTree["bjet1"]=0;
-        mLeptonTree["highEtEleTrig"]=0;
-        mLeptonTree["kfak"]=0;
+  //Kinematics
+  mLeptonTree["mt"]=0;
+  mLeptonTree["delta_phi"]=0;
+  mLeptonTree["pt"]=0;
+  mLeptonTree["met"]=0;
+  mLeptonTree["lepton_phi"]=0;
+  mLeptonTree["lepton_eta"]=0;
+  mLeptonTree["met_phi"]=0;
+  mLeptonTree["jet1_et"]=0;
+  mLeptonTree["jet1_phi"]=0;
+  mLeptonTree["jet1_eta"]=0;
+
+  mLeptonTree["bjet1"]=0;
+  mLeptonTree["highEtEleTrig"]=0;
+  mLeptonTree["kfak"]=0;
 
 
 
-        //PDF
-        mLeptonTree["id1"]=999;
-        mLeptonTree["id2"]=999;
-        mLeptonTree["x1"]=999;
-        mLeptonTree["x2"]=999;
-        mLeptonTree["qscale"]=-1;
+  //PDF
+  mLeptonTree["id1"]=999;
+  mLeptonTree["id2"]=999;
+  mLeptonTree["x1"]=999;
+  mLeptonTree["x2"]=999;
+  mLeptonTree["qscale"]=-1;
 
-        //general
-        mLeptonTree["ThisWeight"]=0;
-        mLeptonTree["lepton_type"]=0;
+  //general
+  mLeptonTree["ThisWeight"]=0;
+  mLeptonTree["lepton_type"]=0;
 
-        helper->Tree_Creater( &mLeptonTree, "slimtree");
-        //helper.Tree_Creater( &mLeptonTree, "slimtree");
+  helper->Tree_Creater( &mLeptonTree, "slimtree");
 
-        mQCDTree["lepton_n"]=0;
-        mQCDTree["pt"]=0;
-        mQCDTree["mt"]=0;
-        mQCDTree["eta"]=0;
-        mQCDTree["met"]=0;
-        mQCDTree["iso"]=0;
-        mQCDTree["nvert"]=0;
-        mQCDTree["mtpos"]=0;
-        mQCDTree["mtneg"]=0;
-        mQCDTree["delta_phi"]=0;
-        mQCDTree["ThisWeight"]=0;
-        mQCDTree["QCDWeight"]=0;
-        mQCDTree["lepton_type"]=0;
-        mQCDTree["decay_mode"]=0;
-        mQCDTree["metTriggerd"]=0;
+  mQCDTree["lepton_n"]=0;
+  mQCDTree["pt"]=0;
+  mQCDTree["mt"]=0;
+  mQCDTree["eta"]=0;
+  mQCDTree["met"]=0;
+  mQCDTree["iso"]=0;
+  mQCDTree["nvert"]=0;
+  mQCDTree["mtpos"]=0;
+  mQCDTree["mtneg"]=0;
+  mQCDTree["delta_phi"]=0;
+  mQCDTree["ThisWeight"]=0;
+  mQCDTree["QCDWeight"]=0;
+  mQCDTree["lepton_type"]=0;
+  mQCDTree["decay_mode"]=0;
+  mQCDTree["metTriggerd"]=0;
 
 /*        if(m_do_complicated_tau_stuff){
             for(auto idisc : d_mydisc){
@@ -1071,8 +1081,7 @@ void MiniAODAnalyzer::Create_Trees(){
             }
         }
 */
-        helper->Tree_Creater( &mQCDTree, "qcdtree");
-        //helper.Tree_Creater( &mQCDTree, "qcdtree");
+  helper->Tree_Creater( &mQCDTree, "qcdtree");
 }
 
 void MiniAODAnalyzer::Fill_Tree(){
@@ -1120,14 +1129,14 @@ void MiniAODAnalyzer::Fill_Tree(){
 }
 void MiniAODAnalyzer::Fill_QCD_Tree(bool iso){
 
+    // testing stuff
     if(iso){
-        mQCDTree["lepton_n"]=1;
+        mQCDTree["lepton_n"]=3;
     }
     else{
         mQCDTree["lepton_n"]=2;
     }
     helper->Tree_Filler("qcdtree");
-    //helper.Tree_Filler("qcdtree");
 
 
     /*
@@ -1217,6 +1226,19 @@ void MiniAODAnalyzer::Fill_QCD_Tree(bool iso){
 */}
 
 
+//double specialAna::MT(pxl::Particle* lepton, pxl::Particle* met) {
+    //double mm = 2 * lepton->getPt() * met->getPt() * ( 1. - cos(lepton->getPhi() - met->getPhi()) );
+    //return sqrt(mm);
+//}
+/*
+ * get gen variables from LHE header of miniAOD
+ * gen mass of  w, save in variable,
+ * so you can go as often through the event as you like,
+ * without losing time
+ * ht: gen level
+ * ht: reco level
+ *
+ * */
 
 
 
