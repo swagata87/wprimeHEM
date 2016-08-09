@@ -25,7 +25,8 @@ process.source = cms.Source("PoolSource",
 )
 
 process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
-       outputFile = cms.string('analysis.root'), 
+#process.ana = cms.EDAnalyzer('MiniAODAnalyzer',  #to rename, change "demo" to e.g. "ana"
+       outputFile = cms.string('analysis.root'),
        RunOnData_ = cms.bool(True),
        vertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
        taus = cms.InputTag("slimmedTaus"),
@@ -33,8 +34,8 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        electrons = cms.InputTag("slimmedElectrons"),
        mets = cms.InputTag("slimmedMETs"),
        bits = cms.InputTag("TriggerResults","","HLT"),
-       bits_MET = cms.InputTag("TriggerResults","","RECO"),                       
-#       bits_MET = cms.InputTag("TriggerResults","","PAT"),                       
+       bits_MET = cms.InputTag("TriggerResults","","RECO"),
+#       bits_MET = cms.InputTag("TriggerResults","","PAT"),
        prescales = cms.InputTag("patTrigger"),
        packed = cms.InputTag("packedGenParticles"),
        pruned = cms.InputTag("prunedGenParticles"),
@@ -54,3 +55,4 @@ process.TFileService = cms.Service("TFileService",
 )
 
 process.p = cms.Path(process.demo)
+#process.p = cms.Path(process.ana)
