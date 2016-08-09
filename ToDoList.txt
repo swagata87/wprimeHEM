@@ -5,7 +5,7 @@ Task (Who is working on it, Priority): Description (status)
 ###
 
 
-- Creating ROOT-tree branches (Marcel, high): Add Branches to the existing code with needed histograms (not started yet)
+- Creating ROOT-tree branches (Marcel, high): Add Branches to the existing code with needed histograms (Trees are working, filling has to be done)
 
 - DD QCD (Marcel, high): port the exisiting data-driven method into a compatible version (not started yet)
 
