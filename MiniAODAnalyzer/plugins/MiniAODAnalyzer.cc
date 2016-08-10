@@ -380,7 +380,7 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   if (!RunOnData) {
     //--GenParticles--//
     Handle<edm::View<reco::GenParticle> > pruned;
-    std::cout << pruned <<
+    //std::cout << pruned <<
     iEvent.getByToken(prunedGenToken_,pruned);
 
     Handle<edm::View<pat::PackedGenParticle> > packed;
