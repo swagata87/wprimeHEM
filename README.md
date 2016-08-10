@@ -1,8 +1,16 @@
 # WPrimeToTau
 
-CMSSW version currenty used : CMSSW_8_0_6
+--------------------------------------------
+For Bad Charged Hadron and Bad Muon Filters
+--------------------------------------------
+cmsrel CMSSW_8_0_11
+cd CMSSW_8_0_11/src/
+cmsenv
+git cms-init
+git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate
+---------------------------------------------
 
-Go to CMSSW_8_0_6/src/ and do 'cmsenv' and then get the package from github.
+Go to CMSSW_8_X_Y/src/ and do 'cmsenv' and then get the package from github.
 
 To get the package :
 git clone https://github.com/swagata87/WPrimeToTau

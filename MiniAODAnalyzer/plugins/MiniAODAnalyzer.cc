@@ -24,6 +24,7 @@
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
+#include "FWCore/Framework/interface/global/EDFilter.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "DataFormats/Common/interface/RefToPtr.h"
@@ -52,6 +53,8 @@
 #include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
 #include <vector>
 #include "TTree.h"
 #include "TFile.h"
@@ -119,6 +122,8 @@ private:
   edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
   edm::EDGetTokenT<GenEventInfoProduct> genEventInfoProductTagToken_;
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > puCollection_;
+  edm::EDGetTokenT<bool> BadChCandFilterToken_;
+  edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
 
   //------//
   TFile*  rootFile_;
@@ -193,6 +198,8 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
   genEventInfoProductTagToken_(consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("genEventInfoProductMiniAOD"))),
   puCollection_(consumes<std::vector<PileupSummaryInfo> >(iConfig.getParameter<edm::InputTag>("pileupCollection"))),
+  BadChCandFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadChargedCandidateFilter"))),
+  BadPFMuonFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadPFMuonFilter"))),
   outputFile_(iConfig.getParameter<std::string>("outputFile")),
   RunOnData(iConfig.getParameter<bool>("RunOnData_"))
 {
@@ -438,6 +445,7 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
    iEvent.getByToken(triggerBits_MET_, triggerBits_MET);
    const edm::TriggerNames &names_MET = iEvent.triggerNames(*triggerBits_MET);
 
+   bool passAllMETFilters=0;
    bool passHBHENoiseFilter=0;
    bool passHBHENoiseIsoFilter=0;
    bool passEcalDeadCellTriggerPrimitiveFilter=0;
@@ -481,14 +489,31 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
    }
    */
    //   if (!RunOnData) passTauTrig=1;
-   //std::cout << "RunOnData=" << RunOnData <<  " ## passHBHENoiseFilter=" << passHBHENoiseFilter
-   // <<  " ## passHBHENoiseIsoFilter=" << passHBHENoiseIsoFilter
-   //        << " ## passEcalDeadCellTriggerPrimitiveFilter=" << passEcalDeadCellTriggerPrimitiveFilter
-   //        << " ## passgoodVertices=" << passgoodVertices
-   //        << " ## passeeBadScFilter=" << passeeBadScFilter
-   //        << " ## passglobalTightHalo2016Filter=" << passglobalTightHalo2016Filter << std::endl;
+   //  std::cout << "RunOnData=" << RunOnData <<  " ## passHBHENoiseFilter=" << passHBHENoiseFilter
+   //	     <<  " ## passHBHENoiseIsoFilter=" << passHBHENoiseIsoFilter
+   //	     << " ## passEcalDeadCellTriggerPrimitiveFilter=" << passEcalDeadCellTriggerPrimitiveFilter
+   //	     << " ## passgoodVertices=" << passgoodVertices
+   //	     << " ## passeeBadScFilter=" << passeeBadScFilter
+   //	     << " ## passglobalTightHalo2016Filter=" << passglobalTightHalo2016Filter << std::endl;
+   
 
-
+   //---MET FILTERS THAT ARE UNAVAILABLE IN MINIAOD AS FLAG---//
+   edm::Handle<bool> ifilterbadChCand;
+   iEvent.getByToken(BadChCandFilterToken_, ifilterbadChCand);
+   bool  filterbadChCandidate = *ifilterbadChCand;
+   //   if (filterbadChCandidate<1)   std::cout << "filterbadChCandidate=" << filterbadChCandidate << std::endl;
+   
+   edm::Handle<bool> ifilterbadPFMuon;
+   iEvent.getByToken(BadPFMuonFilterToken_, ifilterbadPFMuon);
+   bool filterbadPFMuon = *ifilterbadPFMuon;
+   //  if (filterbadPFMuon<1)   std::cout << "filterbadPFMuon=" << filterbadPFMuon << std::endl;
+   
+   //Pass All MET Filters? //
+   passAllMETFilters =  passHBHENoiseFilter * passHBHENoiseIsoFilter * passEcalDeadCellTriggerPrimitiveFilter * passgoodVertices * passeeBadScFilter * passglobalTightHalo2016Filter * filterbadChCandidate * filterbadPFMuon ; 
+   
+   std::cout << "passAllMETFilters=" << passAllMETFilters << std::endl;
+   
+   ///-- VERTEX --///
    edm::Handle<reco::VertexCollection> vertices;
    iEvent.getByToken(vtxToken_, vertices);
    if (vertices->empty()) return; // skip the event if no PV found
@@ -682,7 +707,7 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
    //---Selection---//
    //---------------//
 
-   if (passTauTrig && passHBHENoiseFilter && passHBHENoiseIsoFilter && passEcalDeadCellTriggerPrimitiveFilter && passgoodVertices && passeeBadScFilter && passglobalTightHalo2016Filter) {
+   if (passTauTrig && passAllMETFilters ) {
      if ( (nvtx>0) && (nTightMu==0) && (nLooseEle==0) ) {
        //** Stage1 = final stage (all cuts applied) **//
        if ( (PassFinalCuts(nGoodTau, met_val,met_phi,tau_pt[0],tau_phi[0]) == true) ) {
@@ -796,7 +821,7 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
    //--------------//
    //-- Region A --// Only one non-isolated tau //
    //--------------//
-   if (passTauTrig && passHBHENoiseFilter && passHBHENoiseIsoFilter && passEcalDeadCellTriggerPrimitiveFilter && passgoodVertices && passeeBadScFilter && passglobalTightHalo2016Filter) {
+   if (passTauTrig && passAllMETFilters ) {
      if ( (nvtx>0) && (nTightMu==0) && (nLooseEle==0) ) {
        //** Stage1 = final stage (all cuts applied) **//
        if ( (PassFinalCuts(nGoodNonIsoTau,met_val,met_phi,tau_pt_nonIso[0],tau_phi_nonIso[0]) == true) ) {
@@ -814,7 +839,7 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
    //--------------//
    //-- Region C --// One non-isolated tau + one isolated e/mu
    //--------------//
-   if (passTauTrig && passHBHENoiseFilter && passHBHENoiseIsoFilter && passEcalDeadCellTriggerPrimitiveFilter && passgoodVertices && passeeBadScFilter && passglobalTightHalo2016Filter) {
+   if (passTauTrig && passAllMETFilters ) {
      if ( (nvtx>0)  &&  ((nTightMu+nLooseEle)==1)  ) {
        if ( (PassFinalCuts(nGoodNonIsoTau,met_val,met_phi,tau_pt_nonIso[0],tau_phi_nonIso[0]) == true) ) {
          h1_TauPt_RegC_Stage1->Fill(tau_pt_nonIso[0],final_weight);
@@ -842,7 +867,7 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
    //--------------//
    //-- Region D --// One isolated tau + one isolated e/mu
    //--------------//
-   if (passTauTrig && passHBHENoiseFilter && passHBHENoiseIsoFilter && passEcalDeadCellTriggerPrimitiveFilter && passgoodVertices && passeeBadScFilter && passglobalTightHalo2016Filter) {
+   if (passTauTrig && passAllMETFilters ) {
      if ( (nvtx>0)  &&  ((nTightMu+nLooseEle)==1)  ) {
        if ( (PassFinalCuts(nGoodTau,met_val,met_phi,tau_pt[0],tau_phi[0]) == true) ) {
          h1_TauPt_RegD_Stage1->Fill(tau_pt[0],final_weight);
