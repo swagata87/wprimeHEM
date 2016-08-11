@@ -4,13 +4,18 @@
 For Bad Charged Hadron and Bad Muon Filters
 --------------------------------------------
 cmsrel CMSSW_8_0_11
-cd CMSSW_8_0_11/src/
-cmsenv
-git cms-init
-git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate
----------------------------------------------
 
-Go to CMSSW_8_X_Y/src/ and do 'cmsenv' and then get the package from github.
+cd CMSSW_8_0_11/src/
+
+cmsenv
+
+git cms-init
+
+git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate
+
+
+
+Go to CMSSW_8_X_Y/src/ and do 'cmsenv' and then get the analysis package from github.
 
 To get the package :
 git clone https://github.com/swagata87/WPrimeToTau
@@ -53,6 +58,8 @@ https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions
 
 Once you make the data PU distribution, you can normalize it using this script ->
 WPrimeToTau/MiniAODAnalyzer/python/NormalizeDataPUHist.C (check the path and filename before running).
+
+twiki for PU reweighting : https://twiki.cern.ch/twiki/bin/view/CMS/PileupJSONFileforData#Pileup_JSON_Files_For_Run_II
 
 Once you have compiled and tested your code locally, you will need to submit crab jobs to run on data and MC. 
 
