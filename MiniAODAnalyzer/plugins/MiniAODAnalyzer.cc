@@ -25,6 +25,10 @@
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/global/EDFilter.h"
+#include "FWCore/Framework/interface/EDProducer.h"
+//#include "PhysicsTools/HepMCCandAlgos/interface/PDFWeightsHelper.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "DataFormats/Common/interface/RefToPtr.h"
@@ -61,7 +65,11 @@
 #include <string>
 #include "TH1.h"
 #include "TLorentzVector.h"
-
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 // new includes
 #include <unordered_map>
 #include <unordered_set>
@@ -77,7 +85,8 @@
 // constructor "usesResource("TFileService");"
 // This will improve performance in multithreaded jobs.
 
-class MiniAODAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+//class MiniAODAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+class MiniAODAnalyzer : public edm::EDAnalyzer {
 public:
   explicit MiniAODAnalyzer(const edm::ParameterSet&);
   ~MiniAODAnalyzer();
@@ -88,13 +97,15 @@ private:
   virtual void beginJob() override;
   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
   virtual void endJob() override;
+  virtual void beginRun( edm::Run const &iRun, edm::EventSetup const &iSetup ) override;
   bool PassTauID(const pat::Tau &tau);
   bool PassTauID_NonIsolated(const pat::Tau &tau);
   bool PassTauAcceptance(TLorentzVector tau);
-
   bool FindTauIDEfficiency(const edm::Event&,TLorentzVector gen_p4);
   bool PassFinalCuts(int nGoodTau_, double met_val_, double met_phi_, double tau_pt_, double ptau_phi_);
 
+  std::vector<int> pdf_indices;
+  std::vector<double> inpdfweights;
 
   //new additions
   virtual void Create_Trees();
@@ -126,14 +137,27 @@ private:
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > puCollection_;
   edm::EDGetTokenT<bool> BadChCandFilterToken_;
   edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
+  edm::EDGetTokenT<LHEEventProduct> LHEEventToken_;
+  edm::EDGetTokenT<LHERunInfoProduct> LHERunInfoToken_;
+
 
   //------//
   TFile*  rootFile_;
   std::string outputFile_; // output file
+  std::string pdfName_;
+  //  std::string lheString = "source" ; //  "externalLHEProducer" ;
+  std::string lheString =  "externalLHEProducer" ;
   std::string pileupMC_ ;
   std::string pileupData_ ;
   std::string pileupData_UP_ ;
   std::string pileupData_DOWN_ ;
+  std::string pdfid_1;
+  std::string pdfid_2;
+  std::string tag_;
+
+  bool RunOnData;
+  std::string generatorName_;
+  int debugLevel;
   TTree* mytree;
   TH1I *h1_EventCount;
   TH1I *h1_EventCount2;
@@ -176,8 +200,6 @@ private:
   TH1D *h1_MT_Stage1_pileupUncertDown;
   TH1D *h1_recoVtx_NoPUWt;
   TH1D *h1_recoVtx_WithPUWt;
-
-  bool RunOnData;
   int Run;
   double final_weight=1;
   double final_weight_PUweight_UP=1;
@@ -208,8 +230,15 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   puCollection_(consumes<std::vector<PileupSummaryInfo> >(iConfig.getParameter<edm::InputTag>("pileupCollection"))),
   BadChCandFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadChargedCandidateFilter"))),
   BadPFMuonFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadPFMuonFilter"))),
+  LHEEventToken_( consumes<LHEEventProduct>( iConfig.getParameter<edm::InputTag>( "LHEEventTag" ))),
+  //  LHERunInfoToken_( consumes<LHERunInfoProduct,edm::InRun> ( iConfig.getParameter<edm::InputTag>( "LHEEventTag" ))),
+  LHERunInfoToken_( consumes<LHERunInfoProduct,edm::InRun> (edm::InputTag("externalLHEProducer"))),
   outputFile_(iConfig.getParameter<std::string>("outputFile")),
-  RunOnData(iConfig.getParameter<bool>("RunOnData_"))
+  pdfName_(iConfig.getParameter<std::string>("pdfName")),
+  tag_(iConfig.getUntrackedParameter<std::string>( "tag", "initrwgt" )),
+  RunOnData(iConfig.getParameter<bool>("RunOnData_")),
+  generatorName_(iConfig.getParameter<std::string>("generatorName")),
+  debugLevel(iConfig.getParameter<int>("debugLevel_"))
 {
    //now do what ever initialization is needed
   //usesResource("TFileService");
@@ -217,11 +246,10 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   pileupData_ = iConfig.getParameter<std::string>("PileupDataFile") ;
   pileupData_UP_ = iConfig.getParameter<std::string>("PileupDataFile_UP") ;
   pileupData_DOWN_ = iConfig.getParameter<std::string>("PileupDataFile_DOWN") ;
-
   rootFile_   = TFile::Open(outputFile_.c_str(),"RECREATE"); // open output file to store histograms
   TFileDirectory histoDir = fs->mkdir("histoDir");
 
-
+  /////  if (isPowheg) lheString = "source" ;
 /*
  * this is a bit messy atm, if we are fine with a histoDir
  * remove this part
@@ -326,9 +354,103 @@ MiniAODAnalyzer::~MiniAODAnalyzer()
 // member functions
 //
 
+void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSetup ) {
+
+  pdf_indices.clear();
+
+  edm::Handle<LHERunInfoProduct> run; 
+  typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
+
+  
+  iRun.getByLabel( lheString , run );
+  LHERunInfoProduct myLHERunInfoProduct = *(run.product());
+  std::vector<std::string> weight_lines;
+  /////  std::cout << "header size = " << myLHERunInfoProduct.size() << std::endl;
+  for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
+    //   std::cout << iter << std::endl;
+    // if (debugLevel<1) std::cout << "TAG " << iter->tag() << std::endl;
+    std::vector<std::string> lines = iter->lines();
+    if( ( iter->tag() ).compare( tag_ ) == 0 ) {
+      std::cout << "MATCHED !" << std::endl;
+      std::cout << iter->tag() << std::endl;
+      weight_lines = iter->lines();
+      // std::cout << iter->lines() << std::endl;
+    }
+    if (debugLevel>3) {
+      for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
+	std::cout   << "LINE " << lines.at(iLine);
+      } 
+    }
+  }
+  int pdfidx = 0;
+  pdfidx = run->heprup().PDFSUP.first;
+  if (generatorName_=="powheg" && pdfidx==-1) pdfidx=260000;
+  std::cout << "This sample was generated with the following PDFs : "   << pdfidx <<   std::endl;
+
+  pdfid_1 = boost::lexical_cast<std::string>(pdfidx + 1);
+  pdfid_2 = boost::lexical_cast<std::string>(pdfidx + 100);
+
+  std::cout << "PDF min and max id for MC replicas: " << pdfid_1 << "   " << pdfid_2 << std::endl;
+  std::cout << "size=" << weight_lines.size() << std::endl;
+  std::stringstream ss;
+  std::copy(weight_lines.begin(), weight_lines.end(),std::ostream_iterator<std::string>(ss,""));
+  //cout << ss.str()<<endl;
+  boost::property_tree::ptree pt;
+  read_xml( ss , pt);
+            
+  // --- Name of the weightgroup
+  //  string scalevar = "scale_variation";
+  std::string pdfvar="";
+  if (generatorName_=="powheg") {
+    pdfvar = "PDF_variation";
+  }
+  else if (generatorName_=="madgraphMLM") {
+    pdfvar = pdfName_;
+  }
+
+  std::cout << "generatorName_=" << generatorName_ << " pdfvar=" << pdfvar << std::endl;
+
+  BOOST_FOREACH( boost::property_tree::ptree::value_type const& v, pt.get_child("") ) {
+    std::cout << "v.first=" << v.first  << std::endl;
+    
+    if (v.first == "weightgroup"){
+      boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second ;
+                
+      boost::optional<std::string> weightgroupname1 = v.second.get_optional<std::string>("<xmlattr>.name");
+      boost::optional<std::string> weightgroupname2 = v.second.get_optional<std::string>("<xmlattr>.type");
+      std::cout << "weightgroupname1=" << weightgroupname1 << " weightgroupname2=" << weightgroupname2 << std::endl;
+      if ( (weightgroupname1 && weightgroupname1.get() == pdfvar)  || (weightgroupname2 && weightgroupname2.get() == pdfvar)) {               
+	BOOST_FOREACH(boost::property_tree::ptree::value_type &vs,subtree) {
+	  //	  std::cout << "vs.first=" << vs.first << " vs.second="  << vs.second << std::endl;
+	  if (vs.first == "weight") {
+	    std::cout << vs.first <<  "   " << vs.second.get<std::string>("<xmlattr>.id")  << "  " << vs.second.data()<< std::endl;
+	    std::string strwid  = vs.second.get<std::string>("<xmlattr>.id");
+	    std::string strw    = vs.second.data();
+	    int id = stoi(strwid);
+	    std::vector<std::string> strs;
+	    if (generatorName_=="madgraphMLM") boost::split(strs, strw, boost::is_any_of(" "));
+	    if (generatorName_=="powheg") boost::split(strs, strw, boost::is_any_of("="));
+	    int pdf_wt_index  = 999; 
+            if (generatorName_=="powheg") {
+	     pdf_wt_index = stoi(strs.back());
+	    }
+	    else if (generatorName_=="madgraphMLM") { 
+	      pdf_wt_index = pdfidx+ (stoi(strs.back())) +1 ;
+	    }
+	    std::cout << "id=" << id  << "  pdf_wt_index = " << pdf_wt_index << std::endl;
+	    if ( (pdf_wt_index >= stoi(pdfid_1) ) && (pdf_wt_index <= stoi(pdfid_2)) ){
+	      pdf_indices.push_back( id );
+	    }
+	  }
+	}
+      }
+    }         
+  }
+}
+
+
 // ------------ method called for each event  ------------
-void
-MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
   using namespace std;
@@ -343,7 +465,7 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  //std::cout << "\n --EVENT-- " << Event << std::endl;
+  std::cout << "\n --EVENT-- " << Event << std::endl;
 
   //-- probValue --//
   //-- https://github.com/cms-sw/cmssw/blob/CMSSW_8_1_X/SimGeneral/MixingModule/python/mix_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU_cfi.py --//
@@ -385,6 +507,33 @@ MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     mc_event_weight = genEvtInfo->weight();
   }
   //  std::cout << "RunOnData=" << RunOnData << " mc_event_weight=" << mc_event_weight << std::endl;
+
+  ///--PDF weight--///
+  edm::Handle<LHEEventProduct> EvtHandle ;
+  iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
+
+  inpdfweights.clear(); 
+
+
+  // std::cout << "\n\n wt for this evt :" <<  EvtHandle->originalXWGTUP() << " vect_size=" << EvtHandle->weights().size()  << std::endl ; // PDF weight of this event !
+  //  std::string whichWeightId = "20";
+  for (unsigned int i=0; i<EvtHandle->weights().size(); i++) {
+    int id_i = stoi( EvtHandle->weights()[i].id );
+    for( unsigned int j = 0; j<pdf_indices.size(); j++ ) {
+      int id_j = pdf_indices[j];
+      if( id_i == id_j ){
+	float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
+	std::cout << "pdf_weight=" << pdf_weight  << std::endl;
+	inpdfweights.push_back( pdf_weight );
+      }
+    }
+            
+    // for (unsigned int i=0; i<101; i++) {
+    //  std::cout << "id=" << EvtHandle->weights()[i].id  <<  " wt=" << EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP() << std::endl;
+    //if (EvtHandle->weights()[i].id == whichWeightId) std::cout << "id="  << EvtHandle->weights()[i].id << " wt=" << EvtHandle->weights()[i].wgt  << std::endl;
+    // if (EvtHandle->weights()[i].id == "YYY") theWeight *= EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP(); 
+  }  
+
 
   //----------------//
   //--Final Weight--//
@@ -1059,6 +1208,8 @@ MiniAODAnalyzer::endJob()
   //subDir.cd();
   //helper.WriteTree("qcdtree");
 }
+
+
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
