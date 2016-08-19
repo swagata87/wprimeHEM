@@ -399,25 +399,16 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
       
       //std::cout << "RunOnData=" << RunOnData << std::endl;
       edm::Handle<LHERunInfoProduct> run; 
-      //    std::cout << "run.isValid() = " << run.isValid() << std::endl;
-      // if ( run.isValid()) {
-      // std::cout << "edm::Handle<LHERunInfoProduct> run IS VALID" << std::endl;
-      
       typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
-      
       iRun.getByLabel( lheString , run );
       if ( run.isValid()) {
-	//std::cout << "run.isValid()=" << run.isValid() << std::endl;
+	std::cout << "Take pdf weights from CMSSW" << std::endl;
 	LHERunInfoProduct myLHERunInfoProduct = *(run.product());
-	
         std::vector<std::string> weight_lines;
 	for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
-	  //   std::cout << iter << std::endl;
 	  // if (debugLevel<1) std::cout << "TAG " << iter->tag() << std::endl;
 	  std::vector<std::string> lines = iter->lines();
 	  if( ( iter->tag() ).compare( tag_ ) == 0 ) {
-	    //std::cout << "MATCHED !" << std::endl;
-	    //std::cout << iter->tag() << std::endl;
 	    weight_lines = iter->lines();
 	    //  std::cout << iter->lines() << std::endl;
 	  }
@@ -431,10 +422,8 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
 	pdfidx = run->heprup().PDFSUP.first;
 	if (generatorName_=="powheg" && pdfidx==-1) pdfidx=260000;
 	//std::cout << "This sample was generated with the following PDFs : "   << pdfidx <<   std::endl;
-	
 	pdfid_1 = boost::lexical_cast<std::string>(pdfidx + 1);
 	pdfid_2 = boost::lexical_cast<std::string>(pdfidx + 100);
-	
 	//      std::cout << "PDF min and max id for MC replicas: " << pdfid_1 << "   " << pdfid_2 << std::endl;
 	//std::cout << "size=" << weight_lines.size() << std::endl;
 	std::stringstream ss;
@@ -460,7 +449,6 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
 	if( (generatorName_=="madgraphMLM") && (pdfidx != 263000) && (pdfvar == "NNPDF30_lo_as_0130.LHgrid") )
 	  throw cms::Exception("WrongPDFname")
 	    << "Wrong pdf name provided. ID=" << pdfidx << " NAME=" << pdfvar   ;
-
 	//      std::cout << "generatorName_=" << generatorName_ << " pdfvar=" << pdfvar << std::endl;
 	
 	BOOST_FOREACH( boost::property_tree::ptree::value_type const& v, pt.get_child("") ) {
@@ -499,6 +487,9 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
 	    }
 	  }         
 	}
+      }
+      else {
+	if (debugLevel>3)	std::cout << "PDF weights not saved in CMSSW. Do post-facto reweighting" << std::endl;
       }
     }
   }
@@ -569,7 +560,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     if  ( !(RunOnData) ) {
       iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
       if  ( (EvtHandle.isValid()) ) {
-	
+	std::cout << "Take pdf weights from CMSSW" << std::endl;
 	inpdfweights.clear(); 
 	
 	//  if  ( !(RunOnData) && (EvtHandle.isValid()) ) {
@@ -591,6 +582,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	  //if (EvtHandle->weights()[i].id == whichWeightId) std::cout << "id="  << EvtHandle->weights()[i].id << " wt=" << EvtHandle->weights()[i].wgt  << std::endl;
 	  // if (EvtHandle->weights()[i].id == "YYY") theWeight *= EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP(); 
 	}  
+      }
+      else {
+	if (debugLevel)	std::cout << "PDF weights not saved in CMSSW. Do post-facto reweighting" << std::endl;
       }
     }
   }
@@ -1275,7 +1269,7 @@ MiniAODAnalyzer::endJob()
 	if (array[nh2]<temp2) temp2=array[nh2];
       }
       
-      double nominal=h1_MT_Stage1->GetBinContent(nb);
+      //      double nominal=h1_MT_Stage1->GetBinContent(nb);
       //      std::cout << "Nominal= "<< nominal <<  " up= " << temp << " down=" << temp2 << std::endl;
       h1_MT_Stage1_pdfUncertUp->SetBinContent(nb,temp);
       h1_MT_Stage1_pdfUncertDown->SetBinContent(nb,temp2);
