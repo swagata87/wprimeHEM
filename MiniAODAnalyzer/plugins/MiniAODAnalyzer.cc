@@ -156,6 +156,7 @@ private:
   std::string tag_;
 
   bool RunOnData;
+  bool doPDFuncertainty;
   std::string generatorName_;
   int debugLevel;
   TTree* mytree;
@@ -198,8 +199,19 @@ private:
   TH1D *h1_MT_Stage1_TauScaleDown;
   TH1D *h1_MT_Stage1_pileupUncertUp;
   TH1D *h1_MT_Stage1_pileupUncertDown;
+  TH1D *h1_MT_Stage1_pdfUncertUp;
+  TH1D *h1_MT_Stage1_pdfUncertDown;
+  
   TH1D *h1_recoVtx_NoPUWt;
   TH1D *h1_recoVtx_WithPUWt;
+  //
+  //-- These 100 histograms needed for PDF uncertainty --//
+  TH1F *h1_MT_Stage1_pdfWt[100];
+  char *histname_MT = new char[60];
+  int nbinMT=2000;
+  int xlowMT=0;
+  int xupMT=2000;
+  //
   int Run;
   double final_weight=1;
   double final_weight_PUweight_UP=1;
@@ -233,10 +245,12 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   LHEEventToken_( consumes<LHEEventProduct>( iConfig.getParameter<edm::InputTag>( "LHEEventTag" ))),
   //  LHERunInfoToken_( consumes<LHERunInfoProduct,edm::InRun> ( iConfig.getParameter<edm::InputTag>( "LHEEventTag" ))),
   LHERunInfoToken_( consumes<LHERunInfoProduct,edm::InRun> (edm::InputTag("externalLHEProducer"))),
+  //  LHERunInfoToken_( consumes<LHERunInfoProduct,edm::InRun> (edm::InputTag("source"))),
   outputFile_(iConfig.getParameter<std::string>("outputFile")),
   pdfName_(iConfig.getParameter<std::string>("pdfName")),
   tag_(iConfig.getUntrackedParameter<std::string>( "tag", "initrwgt" )),
   RunOnData(iConfig.getParameter<bool>("RunOnData_")),
+  doPDFuncertainty(iConfig.getParameter<bool>("doPDFuncertainty_")),
   generatorName_(iConfig.getParameter<std::string>("generatorName")),
   debugLevel(iConfig.getParameter<int>("debugLevel_"))
 {
@@ -306,32 +320,49 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_TauPt_GenMatchedTau_RegC_Stage1 = histoDir.make<TH1D>("tauPt_GenMatchedTau_RegC_Stage1", "TauPt_GenMatchedTau_RegC_Stage1", 100, 0, 1000);
   h1_TauPt_RegD_Stage1 = histoDir.make<TH1D>("tauPt_RegD_Stage1", "TauPt_RegD_Stage1", 100, 0, 1000);
   h1_TauPt_GenMatchedTau_RegD_Stage1 = histoDir.make<TH1D>("tauPt_GenMatchedTau_RegD_Stage1", "TauPt_GenMatchedTau_RegD_Stage1", 100, 0, 1000);
-  h1_MT_Stage1 = histoDir.make<TH1D>("mT_Stage1", "MT_Stage1", 2000, 0, 2000);
-  h1_MT_RegA_Stage1 = histoDir.make<TH1D>("mT_RegA_Stage1", "MT_RegA_Stage1", 2000, 0, 2000);
-  h1_MT_RegC_Stage1 = histoDir.make<TH1D>("mT_RegC_Stage1", "MT_RegC_Stage1", 2000, 0, 2000);
-  h1_MT_GenMatchedTau_RegC_Stage1 = histoDir.make<TH1D>("mT_GenMatchedTau_RegC_Stage1", "MT_GenMatchedTau_RegC_Stage1", 2000, 0, 2000);
-  h1_MT_RegD_Stage1 = histoDir.make<TH1D>("mT_RegD_Stage1", "MT_RegD_Stage1", 2000, 0, 2000);
-  h1_MT_GenMatchedTau_RegD_Stage1 = histoDir.make<TH1D>("mT_GenMatchedTau_RegD_Stage1", "MT_GenMatchedTau_RegD_Stage1", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_JetEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_JetEnUp", "MT_Stage1_metUncert_JetEnUp", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_JetEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_JetEnDown", "MT_Stage1_metUncert_JetEnDown", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_JetResUp = histoDir.make<TH1D>("mT_Stage1_metUncert_JetResUp", "MT_Stage1_metUncert_JetResUp", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_JetResDown = histoDir.make<TH1D>("mT_Stage1_metUncert_JetResDown", "MT_Stage1_metUncert_JetResDown", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_MuonEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_MuonEnUp", "MT_Stage1_metUncert_MuonEnUp", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_MuonEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_MuonEnDown", "MT_Stage1_metUncert_MuonEnDown", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_ElectronEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_ElectronEnUp", "MT_Stage1_metUncert_ElectronEnUp", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_ElectronEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_ElectronEnDown", "MT_Stage1_metUncert_ElectronEnDown", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_TauEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_TauEnUp", "MT_Stage1_metUncert_TauEnUp", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_TauEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_TauEnDown", "MT_Stage1_metUncert_TauEnDown", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_PhotonEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_PhotonEnUp", "MT_Stage1_metUncert_PhotonEnUp", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_PhotonEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_PhotonEnDown", "MT_Stage1_metUncert_PhotonEnDown", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_UnclusteredEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_UnclusteredEnUp", "MT_Stage1_metUncert_UnclusteredEnUp", 2000, 0, 2000);
-  h1_MT_Stage1_metUncert_UnclusteredEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_UnclusteredEnDown", "MT_Stage1_metUncert_UnclusteredEnDown", 2000, 0, 2000);
-  h1_MT_Stage1_TauScaleUp = histoDir.make<TH1D>("mT_Stage1_TauScaleUp", "MT_Stage1_TauScaleUp", 2000, 0, 2000);
-  h1_MT_Stage1_TauScaleDown = histoDir.make<TH1D>("mT_Stage1_TauScaleDown", "MT_Stage1_TauScaleDown", 2000, 0, 2000);
-  h1_MT_Stage1_pileupUncertUp = histoDir.make<TH1D>("mT_Stage1_pileupUncertUp", "MT_Stage1_pileupUncertUp", 2000, 0, 2000);
-  h1_MT_Stage1_pileupUncertDown =histoDir.make<TH1D>("mT_Stage1_pileupUncertDown", "MT_Stage1_pileupUncertDown", 2000, 0, 2000); 
+  h1_MT_Stage1 = histoDir.make<TH1D>("mT_Stage1", "MT_Stage1", nbinMT, xlowMT, xupMT);
+  h1_MT_RegA_Stage1 = histoDir.make<TH1D>("mT_RegA_Stage1", "MT_RegA_Stage1", nbinMT, xlowMT, xupMT);
+  h1_MT_RegC_Stage1 = histoDir.make<TH1D>("mT_RegC_Stage1", "MT_RegC_Stage1", nbinMT, xlowMT, xupMT);
+  h1_MT_GenMatchedTau_RegC_Stage1 = histoDir.make<TH1D>("mT_GenMatchedTau_RegC_Stage1", "MT_GenMatchedTau_RegC_Stage1", nbinMT, xlowMT, xupMT);
+  h1_MT_RegD_Stage1 = histoDir.make<TH1D>("mT_RegD_Stage1", "MT_RegD_Stage1", nbinMT, xlowMT, xupMT);
+  h1_MT_GenMatchedTau_RegD_Stage1 = histoDir.make<TH1D>("mT_GenMatchedTau_RegD_Stage1", "MT_GenMatchedTau_RegD_Stage1", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_JetEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_JetEnUp", "MT_Stage1_metUncert_JetEnUp", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_JetEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_JetEnDown", "MT_Stage1_metUncert_JetEnDown", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_JetResUp = histoDir.make<TH1D>("mT_Stage1_metUncert_JetResUp", "MT_Stage1_metUncert_JetResUp", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_JetResDown = histoDir.make<TH1D>("mT_Stage1_metUncert_JetResDown", "MT_Stage1_metUncert_JetResDown", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_MuonEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_MuonEnUp", "MT_Stage1_metUncert_MuonEnUp", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_MuonEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_MuonEnDown", "MT_Stage1_metUncert_MuonEnDown", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_ElectronEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_ElectronEnUp", "MT_Stage1_metUncert_ElectronEnUp", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_ElectronEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_ElectronEnDown", "MT_Stage1_metUncert_ElectronEnDown", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_TauEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_TauEnUp", "MT_Stage1_metUncert_TauEnUp", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_TauEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_TauEnDown", "MT_Stage1_metUncert_TauEnDown", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_PhotonEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_PhotonEnUp", "MT_Stage1_metUncert_PhotonEnUp", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_PhotonEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_PhotonEnDown", "MT_Stage1_metUncert_PhotonEnDown", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_UnclusteredEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_UnclusteredEnUp", "MT_Stage1_metUncert_UnclusteredEnUp", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_metUncert_UnclusteredEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_UnclusteredEnDown", "MT_Stage1_metUncert_UnclusteredEnDown", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_TauScaleUp = histoDir.make<TH1D>("mT_Stage1_TauScaleUp", "MT_Stage1_TauScaleUp", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_TauScaleDown = histoDir.make<TH1D>("mT_Stage1_TauScaleDown", "MT_Stage1_TauScaleDown", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_pileupUncertUp = histoDir.make<TH1D>("mT_Stage1_pileupUncertUp", "MT_Stage1_pileupUncertUp", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_pileupUncertDown =histoDir.make<TH1D>("mT_Stage1_pileupUncertDown", "MT_Stage1_pileupUncertDown", nbinMT, xlowMT, xupMT); 
+  if ( doPDFuncertainty ) {
+    h1_MT_Stage1_pdfUncertUp = histoDir.make<TH1D>("mT_Stage1_pdfUncertUp", "MT_Stage1_pdfUncertUp", nbinMT, xlowMT, xupMT);
+    h1_MT_Stage1_pdfUncertDown =histoDir.make<TH1D>("mT_Stage1_pdfUncertDown", "MT_Stage1_pdfUncertDown", nbinMT, xlowMT, xupMT); 
+  }
   h1_recoVtx_NoPUWt = histoDir.make<TH1D>("recoVtx_NoPUWt", "RecoVtx_NoPUWt", 100, 0, 100);
   h1_recoVtx_WithPUWt = histoDir.make<TH1D>("recoVtx_WithPUWt", "RecoVtx_WithPUWt", 100, 0, 100);
+
+  //
+  if ( doPDFuncertainty ) {
+    //  std::cout << "Will initialize 100 MT histograms for different pdf weights " << std::endl;
+    for (int i=0; i<100; i++) {
+      //std::cout << "Initialize hist " << i << std::endl;
+      sprintf(histname_MT,"mT_Stage1_pdfWt_%d",i);
+      h1_MT_Stage1_pdfWt[i] = new TH1F(histname_MT,"",nbinMT, xlowMT, xupMT);
+    }
+  }
+  //
+
+  //
 
   if (!RunOnData) {
     LumiWeights_ = edm::LumiReWeighting(pileupMC_, pileupData_, "pileup", "pileup");
@@ -348,6 +379,11 @@ MiniAODAnalyzer::~MiniAODAnalyzer()
    // (e.g. close files, deallocate resources etc.)
   delete rootFile_;
 
+  if ( doPDFuncertainty ) {
+    for (unsigned int i=0; i<100; i++) {
+      delete h1_MT_Stage1_pdfWt[i];
+    }
+  }
 }
 
 //
@@ -355,99 +391,118 @@ MiniAODAnalyzer::~MiniAODAnalyzer()
 //
 
 void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSetup ) {
-
+  //std::cout << "Inside beginRun()" << std::endl;
   pdf_indices.clear();
-
-  edm::Handle<LHERunInfoProduct> run; 
-  typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
-
   
-  iRun.getByLabel( lheString , run );
-  LHERunInfoProduct myLHERunInfoProduct = *(run.product());
-  std::vector<std::string> weight_lines;
-  /////  std::cout << "header size = " << myLHERunInfoProduct.size() << std::endl;
-  for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
-    //   std::cout << iter << std::endl;
-    // if (debugLevel<1) std::cout << "TAG " << iter->tag() << std::endl;
-    std::vector<std::string> lines = iter->lines();
-    if( ( iter->tag() ).compare( tag_ ) == 0 ) {
-      std::cout << "MATCHED !" << std::endl;
-      std::cout << iter->tag() << std::endl;
-      weight_lines = iter->lines();
-      // std::cout << iter->lines() << std::endl;
-    }
-    if (debugLevel>3) {
-      for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
-	std::cout   << "LINE " << lines.at(iLine);
-      } 
-    }
-  }
-  int pdfidx = 0;
-  pdfidx = run->heprup().PDFSUP.first;
-  if (generatorName_=="powheg" && pdfidx==-1) pdfidx=260000;
-  std::cout << "This sample was generated with the following PDFs : "   << pdfidx <<   std::endl;
-
-  pdfid_1 = boost::lexical_cast<std::string>(pdfidx + 1);
-  pdfid_2 = boost::lexical_cast<std::string>(pdfidx + 100);
-
-  std::cout << "PDF min and max id for MC replicas: " << pdfid_1 << "   " << pdfid_2 << std::endl;
-  std::cout << "size=" << weight_lines.size() << std::endl;
-  std::stringstream ss;
-  std::copy(weight_lines.begin(), weight_lines.end(),std::ostream_iterator<std::string>(ss,""));
-  //cout << ss.str()<<endl;
-  boost::property_tree::ptree pt;
-  read_xml( ss , pt);
-            
-  // --- Name of the weightgroup
-  //  string scalevar = "scale_variation";
-  std::string pdfvar="";
-  if (generatorName_=="powheg") {
-    pdfvar = "PDF_variation";
-  }
-  else if (generatorName_=="madgraphMLM") {
-    pdfvar = pdfName_;
-  }
-
-  std::cout << "generatorName_=" << generatorName_ << " pdfvar=" << pdfvar << std::endl;
-
-  BOOST_FOREACH( boost::property_tree::ptree::value_type const& v, pt.get_child("") ) {
-    std::cout << "v.first=" << v.first  << std::endl;
-    
-    if (v.first == "weightgroup"){
-      boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second ;
-                
-      boost::optional<std::string> weightgroupname1 = v.second.get_optional<std::string>("<xmlattr>.name");
-      boost::optional<std::string> weightgroupname2 = v.second.get_optional<std::string>("<xmlattr>.type");
-      std::cout << "weightgroupname1=" << weightgroupname1 << " weightgroupname2=" << weightgroupname2 << std::endl;
-      if ( (weightgroupname1 && weightgroupname1.get() == pdfvar)  || (weightgroupname2 && weightgroupname2.get() == pdfvar)) {               
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &vs,subtree) {
-	  //	  std::cout << "vs.first=" << vs.first << " vs.second="  << vs.second << std::endl;
-	  if (vs.first == "weight") {
-	    std::cout << vs.first <<  "   " << vs.second.get<std::string>("<xmlattr>.id")  << "  " << vs.second.data()<< std::endl;
-	    std::string strwid  = vs.second.get<std::string>("<xmlattr>.id");
-	    std::string strw    = vs.second.data();
-	    int id = stoi(strwid);
-	    std::vector<std::string> strs;
-	    if (generatorName_=="madgraphMLM") boost::split(strs, strw, boost::is_any_of(" "));
-	    if (generatorName_=="powheg") boost::split(strs, strw, boost::is_any_of("="));
-	    int pdf_wt_index  = 999; 
-            if (generatorName_=="powheg") {
-	     pdf_wt_index = stoi(strs.back());
-	    }
-	    else if (generatorName_=="madgraphMLM") { 
-	      pdf_wt_index = pdfidx+ (stoi(strs.back())) +1 ;
-	    }
-	    std::cout << "id=" << id  << "  pdf_wt_index = " << pdf_wt_index << std::endl;
-	    if ( (pdf_wt_index >= stoi(pdfid_1) ) && (pdf_wt_index <= stoi(pdfid_2)) ){
-	      pdf_indices.push_back( id );
-	    }
+  if (!RunOnData ) {
+    if ( doPDFuncertainty) {
+      
+      //std::cout << "RunOnData=" << RunOnData << std::endl;
+      edm::Handle<LHERunInfoProduct> run; 
+      //    std::cout << "run.isValid() = " << run.isValid() << std::endl;
+      // if ( run.isValid()) {
+      // std::cout << "edm::Handle<LHERunInfoProduct> run IS VALID" << std::endl;
+      
+      typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
+      
+      iRun.getByLabel( lheString , run );
+      if ( run.isValid()) {
+	//std::cout << "run.isValid()=" << run.isValid() << std::endl;
+	LHERunInfoProduct myLHERunInfoProduct = *(run.product());
+	
+        std::vector<std::string> weight_lines;
+	for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
+	  //   std::cout << iter << std::endl;
+	  // if (debugLevel<1) std::cout << "TAG " << iter->tag() << std::endl;
+	  std::vector<std::string> lines = iter->lines();
+	  if( ( iter->tag() ).compare( tag_ ) == 0 ) {
+	    //std::cout << "MATCHED !" << std::endl;
+	    //std::cout << iter->tag() << std::endl;
+	    weight_lines = iter->lines();
+	    //  std::cout << iter->lines() << std::endl;
+	  }
+	  if (debugLevel>3) {
+	    for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
+	      std::cout   << "LINE " << lines.at(iLine);
+	    } 
 	  }
 	}
+	int pdfidx = 0;
+	pdfidx = run->heprup().PDFSUP.first;
+	if (generatorName_=="powheg" && pdfidx==-1) pdfidx=260000;
+	//std::cout << "This sample was generated with the following PDFs : "   << pdfidx <<   std::endl;
+	
+	pdfid_1 = boost::lexical_cast<std::string>(pdfidx + 1);
+	pdfid_2 = boost::lexical_cast<std::string>(pdfidx + 100);
+	
+	//      std::cout << "PDF min and max id for MC replicas: " << pdfid_1 << "   " << pdfid_2 << std::endl;
+	//std::cout << "size=" << weight_lines.size() << std::endl;
+	std::stringstream ss;
+	std::copy(weight_lines.begin(), weight_lines.end(),std::ostream_iterator<std::string>(ss,""));
+	//cout << ss.str()<<endl;
+	boost::property_tree::ptree pt;
+	read_xml( ss , pt);
+	
+	// --- Name of the weightgroup
+	//  string scalevar = "scale_variation";
+	std::string pdfvar="";
+	if (generatorName_=="powheg") {
+	  pdfvar = "PDF_variation";
+	}
+	else if (generatorName_=="madgraphMLM") {
+	  pdfvar = pdfName_;
+	}
+	
+	if( (generatorName_=="madgraphMLM") && (pdfidx==263000) && (pdfvar != "NNPDF30_lo_as_0130.LHgrid") )
+	  throw cms::Exception("WrongPDFname")
+	    << "Wrong pdf name provided. ID=" << pdfidx << " NAME=" << pdfvar   ;
+
+	if( (generatorName_=="madgraphMLM") && (pdfidx != 263000) && (pdfvar == "NNPDF30_lo_as_0130.LHgrid") )
+	  throw cms::Exception("WrongPDFname")
+	    << "Wrong pdf name provided. ID=" << pdfidx << " NAME=" << pdfvar   ;
+
+	//      std::cout << "generatorName_=" << generatorName_ << " pdfvar=" << pdfvar << std::endl;
+	
+	BOOST_FOREACH( boost::property_tree::ptree::value_type const& v, pt.get_child("") ) {
+	  //std::cout << "v.first=" << v.first  << std::endl;
+	  
+	  if (v.first == "weightgroup"){
+	    boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second ;
+	    
+	    boost::optional<std::string> weightgroupname1 = v.second.get_optional<std::string>("<xmlattr>.name");
+	    boost::optional<std::string> weightgroupname2 = v.second.get_optional<std::string>("<xmlattr>.type");
+	    //std::cout << "weightgroupname1=" << weightgroupname1 << " weightgroupname2=" << weightgroupname2 << std::endl;
+	    if ( (weightgroupname1 && weightgroupname1.get() == pdfvar)  || (weightgroupname2 && weightgroupname2.get() == pdfvar)) {               
+	      BOOST_FOREACH(boost::property_tree::ptree::value_type &vs,subtree) {
+		//	  std::cout << "vs.first=" << vs.first << " vs.second="  << vs.second << std::endl;
+		if (vs.first == "weight") {
+		  //std::cout << vs.first <<  "   " << vs.second.get<std::string>("<xmlattr>.id")  << "  " << vs.second.data()<< std::endl;
+		  std::string strwid  = vs.second.get<std::string>("<xmlattr>.id");
+		  std::string strw    = vs.second.data();
+		  int id = stoi(strwid);
+		  std::vector<std::string> strs;
+		  if (generatorName_=="madgraphMLM") boost::split(strs, strw, boost::is_any_of(" "));
+		  if (generatorName_=="powheg") boost::split(strs, strw, boost::is_any_of("="));
+		  int pdf_wt_index  = 999; 
+		  if (generatorName_=="powheg") {
+		    pdf_wt_index = stoi(strs.back());
+		  }
+		  else if (generatorName_=="madgraphMLM") { 
+		    pdf_wt_index = pdfidx+ (stoi(strs.back())) +1 ;
+		  }
+		  //		std::cout << "id=" << id  << "  pdf_wt_index = " << pdf_wt_index << std::endl;
+		  if ( (pdf_wt_index >= stoi(pdfid_1) ) && (pdf_wt_index <= stoi(pdfid_2)) ){
+		    pdf_indices.push_back( id );
+		  }
+		}
+	      }
+	    }
+	  }         
+	}
       }
-    }         
+    }
   }
 }
-
 
 // ------------ method called for each event  ------------
 void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
@@ -465,7 +520,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  std::cout << "\n --EVENT-- " << Event << std::endl;
+  ////std::cout << "\n --EVENT-- " << Event << std::endl;
 
   //-- probValue --//
   //-- https://github.com/cms-sw/cmssw/blob/CMSSW_8_1_X/SimGeneral/MixingModule/python/mix_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU_cfi.py --//
@@ -508,33 +563,37 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   }
   //  std::cout << "RunOnData=" << RunOnData << " mc_event_weight=" << mc_event_weight << std::endl;
 
-  ///--PDF weight--///
-  edm::Handle<LHEEventProduct> EvtHandle ;
-  iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
-
-  inpdfweights.clear(); 
-
-
-  // std::cout << "\n\n wt for this evt :" <<  EvtHandle->originalXWGTUP() << " vect_size=" << EvtHandle->weights().size()  << std::endl ; // PDF weight of this event !
-  //  std::string whichWeightId = "20";
-  for (unsigned int i=0; i<EvtHandle->weights().size(); i++) {
-    int id_i = stoi( EvtHandle->weights()[i].id );
-    for( unsigned int j = 0; j<pdf_indices.size(); j++ ) {
-      int id_j = pdf_indices[j];
-      if( id_i == id_j ){
-	float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
-	std::cout << "pdf_weight=" << pdf_weight  << std::endl;
-	inpdfweights.push_back( pdf_weight );
+  if ( doPDFuncertainty) {
+    ///--PDF weight--///
+    edm::Handle<LHEEventProduct> EvtHandle ;
+    if  ( !(RunOnData) ) {
+      iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
+      if  ( (EvtHandle.isValid()) ) {
+	
+	inpdfweights.clear(); 
+	
+	//  if  ( !(RunOnData) && (EvtHandle.isValid()) ) {
+	// std::cout << "\n\n wt for this evt :" <<  EvtHandle->originalXWGTUP() << " vect_size=" << EvtHandle->weights().size()  << std::endl ; // PDF weight of this event !
+	//  std::string whichWeightId = "20";
+	for (unsigned int i=0; i<EvtHandle->weights().size(); i++) {
+	  int id_i = stoi( EvtHandle->weights()[i].id );
+	  for( unsigned int j = 0; j<pdf_indices.size(); j++ ) {
+	    int id_j = pdf_indices[j];
+	    if( id_i == id_j ){
+	      float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
+	      //   std::cout << "pdf_weight=" << pdf_weight  << std::endl;
+	      inpdfweights.push_back( pdf_weight );
+	    }
+	  }
+	  
+	  // for (unsigned int i=0; i<101; i++) {
+	  //  std::cout << "id=" << EvtHandle->weights()[i].id  <<  " wt=" << EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP() << std::endl;
+	  //if (EvtHandle->weights()[i].id == whichWeightId) std::cout << "id="  << EvtHandle->weights()[i].id << " wt=" << EvtHandle->weights()[i].wgt  << std::endl;
+	  // if (EvtHandle->weights()[i].id == "YYY") theWeight *= EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP(); 
+	}  
       }
     }
-            
-    // for (unsigned int i=0; i<101; i++) {
-    //  std::cout << "id=" << EvtHandle->weights()[i].id  <<  " wt=" << EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP() << std::endl;
-    //if (EvtHandle->weights()[i].id == whichWeightId) std::cout << "id="  << EvtHandle->weights()[i].id << " wt=" << EvtHandle->weights()[i].wgt  << std::endl;
-    // if (EvtHandle->weights()[i].id == "YYY") theWeight *= EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP(); 
-  }  
-
-
+  }
   //----------------//
   //--Final Weight--//
   //----------------//
@@ -542,7 +601,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     final_weight               =Lumi_Wt*mc_event_weight;
     final_weight_PUweight_UP   =Lumi_Wt_UP*mc_event_weight;
     final_weight_PUweight_DOWN =Lumi_Wt_DOWN*mc_event_weight;
-
+    
   }
   else {
     final_weight=1;
@@ -893,6 +952,19 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 //--PU Systematics--//
 	 h1_MT_Stage1_pileupUncertUp->Fill(MT,final_weight_PUweight_UP);
 	 h1_MT_Stage1_pileupUncertDown->Fill(MT,final_weight_PUweight_DOWN);
+
+	 if ( doPDFuncertainty) {
+	   //--PDF Systematics--//
+	   // std::cout << "Evt selected. Size of inpdfweights = " << inpdfweights.size() << std::endl; 
+	   int imem=0;
+	   for (std::vector<double>::iterator it = inpdfweights.begin() ; it != inpdfweights.end(); ++it) {
+	     //std::cout << "weight = " << *it << std::endl;
+	     double final_wt_with_pdf = (*it)*final_weight;
+	     h1_MT_Stage1_pdfWt[imem]->Fill(MT,final_wt_with_pdf);	     
+	   //	   std::cout << "final_wt_with_pdf " << final_wt_with_pdf << std::endl ;
+	     imem++;
+	   }
+	 }
        }
        //--Systematics--//
        if ( (PassFinalCuts(nGoodTau, met_val_JetEnUp,met_phi_JetEnUp,tau_pt[0],tau_phi[0] ) == true) ) {
@@ -1187,6 +1259,49 @@ void
 MiniAODAnalyzer::endJob()
 {
 
+  //  std::cout << "In endJob()" << std::endl;
+   if ( doPDFuncertainty) { 
+    for (int nb=0; nb<nbinMT; nb++) { 
+      double array[100] = {0.} ;
+      double temp=0.0;
+      double temp2=9.0e+100;
+      for (int nh=0; nh<100; nh++) { 
+	double binCon = h1_MT_Stage1_pdfWt[nh]->GetBinContent(nb);
+	array[nh]=binCon;
+      }
+
+      for(int nh2=0;nh2<100;nh2++) {
+	if (array[nh2]>temp)  temp=array[nh2];
+	if (array[nh2]<temp2) temp2=array[nh2];
+      }
+      
+      double nominal=h1_MT_Stage1->GetBinContent(nb);
+      //      std::cout << "Nominal= "<< nominal <<  " up= " << temp << " down=" << temp2 << std::endl;
+      h1_MT_Stage1_pdfUncertUp->SetBinContent(nb,temp);
+      h1_MT_Stage1_pdfUncertDown->SetBinContent(nb,temp2);
+ 
+    }
+  }
+
+  /*    ///-- nominal +/- RMS did not work. down always 0 --///
+  if ( doPDFuncertainty) {
+    for (int nb=0; nb<nbinMT; nb++) {
+      double val=0.0;
+      for (int nh=0; nh<100; nh++) {
+	double binCon = h1_MT_Stage1_pdfWt[nh]->GetBinContent(nb);
+	val=val + (binCon*binCon) ;
+      }
+      double rms= sqrt((val/100));
+      double nominal=h1_MT_Stage1->GetBinContent(nb);
+      double up= (nominal+rms);
+      double down = (nominal-rms);
+      //    std::cout << "nbin=" << nb << " nominal=" << nominal  << " rms=" << rms << " up/down=" << up << " / " << down << std::endl;
+      if (down<0.0) down=0.0;
+      h1_MT_Stage1_pdfUncertUp->SetBinContent(nb,up);
+      h1_MT_Stage1_pdfUncertDown->SetBinContent(nb,down);
+    }
+  }
+*/
   /*
    * this part can be removed, if we want to
    * "mytree" as to be reintroduced in the TFileService then

@@ -16,7 +16,7 @@ process.load("WPrimeToTau.MiniAODAnalyzer.METFilters_cff")
 #process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
 ##
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
@@ -41,12 +41,13 @@ process.source = cms.Source("PoolSource",
 )
 
 process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
-#process.ana = cms.EDAnalyzer('MiniAODAnalyzer',  #to rename, change "demo" to e.g. "ana"
        outputFile = cms.string('analysis.root'),
        RunOnData_ = cms.bool(False),
 #       RunOnData_ = cms.bool(True),
+### generatorName required only for madgraph and powheg. For other cases one can just write "default"
        generatorName = cms.string("madgraphMLM"),
 #       generatorName = cms.string("powheg"),
+### correct pdfName required only for madgraph, for other cases one can just write "default"
        pdfName = cms.string("NNPDF30_lo_as_0130.LHgrid"),   # madgraphMLM                    
 #       pdfName = cms.string("default"),   # powheg                    
        debugLevel_ = cms.int32(0),                       
@@ -56,8 +57,8 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        electrons = cms.InputTag("slimmedElectrons"),
        mets = cms.InputTag("slimmedMETs"),
        bits = cms.InputTag("TriggerResults","","HLT"),
-#       bits_MET = cms.InputTag("TriggerResults","","RECO"),
-       bits_MET = cms.InputTag("TriggerResults","","PAT"),
+#       bits_MET = cms.InputTag("TriggerResults","","RECO"),  ##for data
+       bits_MET = cms.InputTag("TriggerResults","","PAT"),  ##for MC
        prescales = cms.InputTag("patTrigger"),
        packed = cms.InputTag("packedGenParticles"),
        pruned = cms.InputTag("prunedGenParticles"),
@@ -73,7 +74,7 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        LHEEventTag = cms.InputTag("externalLHEProducer","","LHE"),
 #       LHEEventTag = cms.InputTag("source","","LHEFile")
        tag = cms.untracked.string("initrwgt"),
-
+       doPDFuncertainty_ = cms.bool(True),
 
 )
 
