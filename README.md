@@ -35,6 +35,8 @@ cmsRun ConfFile_cfg.py
 ####
 Some notes about ConfFile_cfg.py
 ####
+- If you decide to calculate pdf uncertainty, then give sensible inputs for generator name and pdf name 
+
 - Depending on whether you are running on data or on MC, change this line -> RunOnData_ = cms.bool(True),
 
 - You will need to run locally to check if things are working fine or not. For that, change the filenames accordingly. The filenames can be found in DAS or by using das_client.py
@@ -63,7 +65,7 @@ twiki for PU reweighting : https://twiki.cern.ch/twiki/bin/view/CMS/PileupJSONFi
 
 Once you have compiled and tested your code locally, you will need to submit crab jobs to run on data and MC. 
 
-Crab config file for MC -> crabConfig.py
+Crab config file for MC -> crabConfig_MC_madgraphMLM.py OR crabConfig_MC_powhegAndOthers.py
 
 Crab config file for data -> crabConfig_data.py
 
@@ -72,7 +74,7 @@ Modify the dataset names if you want to run on different datasets.
 To submit jobs->
 - source /cvmfs/cms.cern.ch/crab3/crab.sh
 - Invoke your grid proxy and enter your grid-password
-- python crabConfig.py
+- python crabConfig_*.py
 
 cd crab_projects/ 
 
