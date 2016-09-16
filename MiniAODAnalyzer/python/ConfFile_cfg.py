@@ -6,7 +6,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.load("WPrimeToTau.MiniAODAnalyzer.METFilters_cff")
 
-## MET filter ## 
+## MET filter ##
 #process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
 #process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
 #process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
@@ -49,9 +49,9 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
 #       generatorName = cms.string("default"),
        generatorName = cms.string("powheg"),
 ### correct pdfName required only for madgraph, for other cases one can just write "default"
-#       pdfName = cms.string("NNPDF30_lo_as_0130.LHgrid"),   # madgraphMLM                    
-       pdfName = cms.string("default"),   # powheg and others                    
-       debugLevel_ = cms.int32(0),                       
+#       pdfName = cms.string("NNPDF30_lo_as_0130.LHgrid"),   # madgraphMLM
+       pdfName = cms.string("default"),   # powheg and others
+       debugLevel_ = cms.int32(0),
        vertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
        taus = cms.InputTag("slimmedTaus"),
        muons = cms.InputTag("slimmedMuons"),
@@ -66,11 +66,14 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        objects = cms.InputTag("selectedPatTrigger"),
        genEventInfoProductMiniAOD = cms.InputTag('generator'),
        pileupCollection = cms.InputTag("slimmedAddPileupInfo"),
-       PileupMCFile = cms.string("MC_pileup.root"),
-       PileupDataFile = cms.string("Data_pileup_normalized.root"),
-       PileupDataFile_UP = cms.string("Data_pileup_normalized_UP.root"),
-       PileupDataFile_DOWN = cms.string("Data_pileup_normalized_DOWN.root"),                       
-       BadChargedCandidateFilter = cms.InputTag("BadChargedCandidateFilter"), 
+       PileupMCFile = cms.string("configFiles/MC_pileup.root"),
+       PileupDataFile = cms.string("configFiles/Data_pileup_normalized.root"),
+       PileupDataFile_UP = cms.string("configFiles/Data_pileup_normalized_UP.root"),
+       PileupDataFile_DOWN = cms.string("configFiles/Data_pileup_normalized_DOWN.root"),
+       KFactorE = cms.string("configFiles/k_faktors_ele.root"),
+       KFactorMu = cms.string("configFiles/k_faktors_mu.root"),
+       KFactorTau = cms.string("configFiles/k_faktors_tau.root"),
+       BadChargedCandidateFilter = cms.InputTag("BadChargedCandidateFilter"),
        BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
        LHEEventTag = cms.InputTag("externalLHEProducer","","LHE"),
 #       LHEEventTag = cms.InputTag("source","","LHEFile")
@@ -89,6 +92,6 @@ process.TFileService = cms.Service("TFileService",
 
 #process.run = cms.Path(process.BadPFMuonFilter *process.BadChargedCandidateFilter)
 
-process.p = cms.Path(process.METFiltersSequence*process.demo) 
+process.p = cms.Path(process.METFiltersSequence*process.demo)
 #process.demo)
 #process.p = cms.Path(process.demo)
