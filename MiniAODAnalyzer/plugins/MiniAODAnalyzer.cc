@@ -2917,6 +2917,3 @@ pxl::Particle* specialAna::Get_Truth_match_all_flavor(pxl::Particle* lepton) {
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(MiniAODAnalyzer);
-
-
-
