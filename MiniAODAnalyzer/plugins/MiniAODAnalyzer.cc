@@ -71,6 +71,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+//#include "stdlib.h"
 // cant set lorentzvetor branch without this
 #ifdef __CINT__
 #pragma link C++ class std::vector<TLorentzVector>+;
@@ -504,6 +505,8 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_MT_Stage1_TauScaleDown = histoDir.make<TH1D>("mT_Stage1_TauScaleDown", "MT_Stage1_TauScaleDown", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_pileupUncertUp = histoDir.make<TH1D>("mT_Stage1_pileupUncertUp", "MT_Stage1_pileupUncertUp", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_pileupUncertDown =histoDir.make<TH1D>("mT_Stage1_pileupUncertDown", "MT_Stage1_pileupUncertDown", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_kFactorUp =histoDir.make<TH1D>("mT_Stage1_pileupUncertDown", "MT_Stage1_pileupUncertDown", 2000, -1, 20);
+  h1_MT_Stage1_kFactorDown =histoDir.make<TH1D>("mT_Stage1_pileupUncertDown", "MT_Stage1_pileupUncertDown", 2000, -1, 20);
   if ( doPDFuncertainty ) {
     h1_MT_Stage1_pdfUncertUp = histoDir.make<TH1D>("mT_Stage1_pdfUncertUp", "MT_Stage1_pdfUncertUp", nbinMT, xlowMT, xupMT);
     h1_MT_Stage1_pdfUncertDown =histoDir.make<TH1D>("mT_Stage1_pdfUncertDown", "MT_Stage1_pdfUncertDown", nbinMT, xlowMT, xupMT);
@@ -802,7 +805,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     if  ( !(RunOnData) ) {
       iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
       if  ( (EvtHandle.isValid()) ) {
-    std::cout << "Take pdf weights from CMSSW" << std::endl;
+    //std::cout << "Take pdf weights from CMSSW" << std::endl;
     inpdfweights.clear();
 
     //  if  ( !(RunOnData) && (EvtHandle.isValid()) ) {
@@ -1205,7 +1208,6 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        }
      }
    }
-
    h1_nGoodTau_Reco->Fill(nGoodTau,final_weight);
    //std::cout << "nGoodTau=" << nGoodTau << ",nGoodTau_ScaleUp=" << nGoodTau_ScaleUp << ",nGoodTau_ScaleDown=" << nGoodTau_ScaleDown << std::endl;
 
@@ -1356,6 +1358,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
                 double kFactorShift=1.;
                 if (i==15){ kFactorShift=1.05;}
                 else if (i==16){ kFactorShift=0.95;}
+
                 if ( (PassFinalCuts(tau_NoShift,met) == true) ) {
                  //std::cout << "*metUncert_JetEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
                  mSystHist[std::to_string(i)]->Fill(calcMT(tau_NoShift,met),final_weight*kFactorShift);
@@ -1462,7 +1465,6 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    //QCDAnalyse();
    //if (not RunOnData)
    QCDAnalyseTau(met,final_weight,pruned);
-   //QCDAnalyseTau(met,final_weight);
 
     //if(tau_NoShift.Pt()>80 && calcMT(tau_NoShift,met)>50){
        Fill_QCD_Tree(true,tau_NoShift,met,final_weight);
@@ -1655,13 +1657,14 @@ MiniAODAnalyzer::endJob()
   rootFile_->cd("..");
   rootFile_->mkdir("materok");// used for testing purposes
   rootFile_->cd("materok");
-  helper->WriteAll("h_");
-  helper->WriteTree("qcdtree");
+  //helper->WriteAll("h_");
+  //helper->WriteTree("qcdtree");
 
   rootFile_->Close();
 
 
   ///crosscheck
+  /*
   h1_MT_Stage1_metUncert_JetEnUp_diff->Add(h1_MT_Stage1_metUncert_JetEnUp_new,1);
   h1_MT_Stage1_metUncert_JetEnUp_diff->Add(h1_MT_Stage1_metUncert_JetEnUp,-1);
   h1_MT_Stage1_metUncert_JetEnDown_diff->Add(h1_MT_Stage1_metUncert_JetEnDown_new,1);
@@ -1694,7 +1697,7 @@ MiniAODAnalyzer::endJob()
   h1_MT_Stage1_TauScaleUp_diff->Add(h1_MT_Stage1_TauScaleUp,-1);
   h1_MT_Stage1_TauScaleDown_diff->Add(h1_MT_Stage1_TauScaleDown_new,1);
   h1_MT_Stage1_TauScaleDown_diff->Add(h1_MT_Stage1_TauScaleDown,-1);
-
+*/
   //TFileDirectory subDir = fs->mkdir( "mySubDirectory" ); //testing
   //subDir.cd();
   //helper.WriteTree("qcdtree");
