@@ -17,68 +17,70 @@
 
 
 class Helper{
-    public:
-        Helper(edm::Service<TFileService> fileService);
-        virtual void Tree_Creater(std::unordered_map< std::string , float > *m, const char * name);
-        virtual void Tree_Creater(std::unordered_map< std::string , std::vector<float> > *m, const char * name);
-        virtual void Tree_Filler(const char * name);
-        virtual void WriteAll(const char * name);
-        virtual void CreateHistoUnchangedName(const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle);
-        virtual void WriteTree(const char * name);
-        virtual void SetFakeBranches(const char * name, const char * branchName, std::vector<float> *vector);
-        virtual void SetFakeBranches(const char * name, const char * branchName, std::vector<double> *vector);
-        virtual void SetFakeBranches(const char * name, const char * branchName, std::vector<TLorentzVector> *vector);
-        virtual void CreateHisto(Int_t n_histos, const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle);
-        virtual void CreateHisto(Int_t n_histos, const char* name, const char* particle, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle );
-        virtual void CreateHisto(const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle);
-        virtual void CreateHisto(const char* name, const char* particle, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle);
-        //virtual void CreateHisto(boost::basic_format<char> name, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle);
-        virtual void CreateHisto(const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, Int_t nbinsy, Double_t ylow, Double_t yup, TString xtitle, TString ytitle);
-        virtual void CreateHisto(Int_t n_histos, const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, Int_t nbinsy, Double_t ylow, Double_t yup, TString xtitle, TString ytitle);
-        virtual void CreateHisto(const char* name, Int_t nbinsx, const Double_t * xbins,  Int_t nbinsy, Double_t ylow, Double_t yup, TString xtitle, TString ytitle);
-        virtual void CreateHisto(const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, Int_t nbinsy, const Double_t * ybins, TString xtitle, TString ytitle);
-        virtual void CreateHisto(const char* name, Int_t nbinsx, const Double_t * xbins, Int_t nbinsy, const Double_t * ybins, TString xtitle, TString ytitle);
-
-
-        virtual void Fill(Int_t n_histo, const char * name, double value, double weight);
-        virtual void Fill(Int_t n_histo, std::string name, double value, double weight);
-        virtual void Fill(const char * name, double value, double weight);
-        virtual void Fill(const char * name, double valuex, double valuey, double weight);
-        virtual void Fill(Int_t n_histo, const char * name, double valuex, double valuey, double weight);
-    private:
-        edm::Service<TFileService> fs2;
-        TFileDirectory treeDir;
-        TFileDirectory fakeDir;
-        std::unordered_map<std::string, TTree * > trees; /*!< Map of a string and a TTree histogram, for easy tree handling. */
-        std::unordered_map<std::string, TH1D * > histo; /*!< Map of a string and a TH1D histogram, for easy 1D histogram handling. */
-        std::unordered_map<std::string, TH2D * > histo2; /*!< Map of a string and a TH2D histogram, for easy 2D histogram handling. */
+public:
+  Helper(edm::Service<TFileService> fileService);
+  // Destructor.
+  //  ~Helper() {  } ;
+  virtual void Tree_Creater(std::unordered_map< std::string , float > *m, const char * name);
+  virtual void Tree_Creater(std::unordered_map< std::string , std::vector<float> > *m, const char * name);
+  virtual void Tree_Filler(const char * name);
+  virtual void WriteAll(const char * name);
+  virtual void CreateHistoUnchangedName(const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle);
+  virtual void WriteTree(const char * name);
+  virtual void SetFakeBranches(const char * name, const char * branchName, std::vector<float> *vector);
+  virtual void SetFakeBranches(const char * name, const char * branchName, std::vector<double> *vector);
+  virtual void SetFakeBranches(const char * name, const char * branchName, std::vector<TLorentzVector> *vector);
+  virtual void CreateHisto(Int_t n_histos, const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle);
+  virtual void CreateHisto(Int_t n_histos, const char* name, const char* particle, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle );
+  virtual void CreateHisto(const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle);
+  virtual void CreateHisto(const char* name, const char* particle, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle);
+  //virtual void CreateHisto(boost::basic_format<char> name, Int_t nbinsx, Double_t xlow, Double_t xup, TString xtitle);
+  virtual void CreateHisto(const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, Int_t nbinsy, Double_t ylow, Double_t yup, TString xtitle, TString ytitle);
+  virtual void CreateHisto(Int_t n_histos, const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, Int_t nbinsy, Double_t ylow, Double_t yup, TString xtitle, TString ytitle);
+  virtual void CreateHisto(const char* name, Int_t nbinsx, const Double_t * xbins,  Int_t nbinsy, Double_t ylow, Double_t yup, TString xtitle, TString ytitle);
+  virtual void CreateHisto(const char* name, Int_t nbinsx, Double_t xlow, Double_t xup, Int_t nbinsy, const Double_t * ybins, TString xtitle, TString ytitle);
+  virtual void CreateHisto(const char* name, Int_t nbinsx, const Double_t * xbins, Int_t nbinsy, const Double_t * ybins, TString xtitle, TString ytitle);
+  
+  
+  virtual void Fill(Int_t n_histo, const char * name, double value, double weight);
+  virtual void Fill(Int_t n_histo, std::string name, double value, double weight);
+  virtual void Fill(const char * name, double value, double weight);
+  virtual void Fill(const char * name, double valuex, double valuey, double weight);
+  virtual void Fill(Int_t n_histo, const char * name, double valuex, double valuey, double weight);
+private:
+  edm::Service<TFileService> fs2;
+  TFileDirectory treeDir;
+  TFileDirectory fakeDir;
+  std::unordered_map<std::string, TTree * > trees; /*!< Map of a string and a TTree histogram, for easy tree handling. */
+  std::unordered_map<std::string, TH1D * > histo; /*!< Map of a string and a TH1D histogram, for easy 1D histogram handling. */
+  std::unordered_map<std::string, TH2D * > histo2; /*!< Map of a string and a TH2D histogram, for easy 2D histogram handling. */
 };
 
 Helper::Helper(edm::Service<TFileService> fileService){
-    fs2 = fileService;
-    treeDir = fs2->mkdir( "treeDir" );
-    fakeDir = fs2->mkdir( "fakeDir" );
+  fs2 = fileService;
+  treeDir = fs2->mkdir( "treeDir" );
+  fakeDir = fs2->mkdir( "fakeDir" );
 }
 void Helper::Tree_Creater(std::unordered_map< std::string , float > *m, const char * name) {
-    trees[name] = treeDir.make<TTree>(name, name);
-    for (std::unordered_map< std::string , float >::iterator it = m->begin(); it != m->end(); it++) {
-        trees[name]->Branch(it->first.c_str(), &(it->second), Form("%s/F", it->first.c_str()));
-    }
+  trees[name] = treeDir.make<TTree>(name, name);
+  for (std::unordered_map< std::string , float >::iterator it = m->begin(); it != m->end(); it++) {
+    trees[name]->Branch(it->first.c_str(), &(it->second), Form("%s/F", it->first.c_str()));
+  }
 }
 void Helper::Tree_Creater(std::unordered_map< std::string , std::vector<float> > *m, const char * name) {
-    trees[name] = treeDir.make<TTree>(name, name);
-    for (std::unordered_map< std::string , std::vector<float> >::iterator it = m->begin(); it != m->end(); it++) {
-        trees[name]->Branch(it->first.c_str(), &(it->second), Form("%s/F", it->first.c_str()));
-    }
+  trees[name] = treeDir.make<TTree>(name, name);
+  for (std::unordered_map< std::string , std::vector<float> >::iterator it = m->begin(); it != m->end(); it++) {
+    trees[name]->Branch(it->first.c_str(), &(it->second), Form("%s/F", it->first.c_str()));
+  }
 }
 void Helper::Tree_Filler(const char * name) {
-    trees[name]->Fill();
+  trees[name]->Fill();
 }
 void Helper::SetFakeBranches(const char * name,const char * branchName, std::vector<float> *vector) {
-    trees[name]->Branch(branchName,vector);
+  trees[name]->Branch(branchName,vector);
 }
 void Helper::SetFakeBranches(const char * name,const char * branchName, std::vector<double> *vector) {
-    trees[name]->Branch(branchName,vector);
+  trees[name]->Branch(branchName,vector);
 }
 void Helper::SetFakeBranches(const char * name,const char * branchName, std::vector<TLorentzVector> *vector) {
     trees[name]->Branch(branchName,vector);

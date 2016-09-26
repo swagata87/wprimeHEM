@@ -118,8 +118,11 @@ private:
   bool PassFinalCuts(int nGoodTau_,TLorentzVector part1, const pat::MET part2);
 
 
-  std::vector<int> pdf_indices;
-  std::vector<double> inpdfweights;
+  //  std::vector<int> pdf_indices;
+  //  std::vector<double> inpdfweights;
+
+  std::vector<int> *pdf_indices = new std::vector<int>;
+  std::vector<double> *inpdfweights = new std::vector<double>;
 
   //new additions
   virtual void Create_Trees();
@@ -127,6 +130,7 @@ private:
   virtual void Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, const pat::MET sel_met, double weight);
 
   std::unordered_map< std::string,float > mLeptonTree;
+  //  std::unordered_map< std::string,float > *mLeptonTree = new std::unordered_map< std::string,float >;
   std::unordered_map< std::string,float > mReweightTree;
   std::unordered_map< std::string,float > mQCDTree;
   std::unordered_map< std::string,float > mFakeTree;
@@ -179,7 +183,8 @@ private:
   double k_fak_stored;
 
   //discriminators
-  std::vector<std::string> d_mydisc;
+  //  std::vector<std::string> d_mydisc;
+  std::vector<std::string> *d_mydisc = new std::vector<std::string> ;
   //QCD stuff
   void QCDAnalyse();
   //void QCDAnalyseTau(edm::Handle<std::vector<pat::Muon> >*list, edm::Handle<std::vector<pat::Tau> >*tauList);
@@ -204,6 +209,8 @@ private:
   int vetoNumberEle(double ptTreshold,double vetoConeSize);
   int vetoNumberMuon(double ptTreshold,double vetoConeSize);
   int vetoNumberTau(double ptTreshold);
+
+  /*
   std::vector<int> EleIDPassed;
   std::vector<int> MuonIDPassed;
   std::vector<float> FakeCandPt;
@@ -224,8 +231,32 @@ private:
   std::vector<float> FakeCandLeptonEta;
   std::vector<float> FakeCandLeptonPhi;
   std::vector<float> FakeCandLeptonTrigger;
-
   std::vector<TLorentzVector> FakeCandLorentz;
+  */
+
+  std::vector<int> *EleIDPassed = new std::vector<int> ;
+  std::vector<int> *MuonIDPassed = new std::vector<int>;
+  std::vector<float> *FakeCandPt = new std::vector<float>;
+  std::vector<float> *FakeCandPhi = new std::vector<float>;
+  std::vector<float> *FakeCandEta = new std::vector<float>;
+  std::vector<float> *FakeCandMt = new std::vector<float>;
+  std::vector<float> *FakeCandDeltaPhi = new std::vector<float>;
+  std::vector<float> *FakeCandMET = new std::vector<float>;
+  std::vector<float> *FakeCandMETPhi = new std::vector<float>;
+  std::vector<float> *FakeCandIso = new std::vector<float>;
+  std::vector<float> *FakeCandNoIso = new std::vector<float>;
+  std::vector<float> *FakeCandVetoNum = new std::vector<float>;
+  std::vector<float> *FakeCandDecayMode = new std::vector<float>;
+  std::vector<float> *FakeCandLeptonType = new std::vector<float>;
+  std::vector<float> *FakeCandLeptonMt = new std::vector<float>;
+  std::vector<float> *FakeCandLeptonDeltaPhi = new std::vector<float>;
+  std::vector<float> *FakeCandLeptonPt = new std::vector<float>;
+  std::vector<float> *FakeCandLeptonEta = new std::vector<float>;
+  std::vector<float> *FakeCandLeptonPhi = new std::vector<float>;
+  std::vector<float> *FakeCandLeptonTrigger = new std::vector<float>;
+  std::vector<TLorentzVector> *FakeCandLorentz = new std::vector<TLorentzVector>;
+
+
   //trigger for ele + muon
   bool passEleTrig;
   bool passMuonTrig;
@@ -594,12 +625,20 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   m_kfactorHist_tau[2] = (TH1D*) m_kfactorFile_tau->Get("k_fac_mean");
 
   // discriminators
-  d_mydisc= {
+  d_mydisc->clear();
+  /* 
+ d_mydisc= {
         "byLooseCombinedIsolationDeltaBetaCorr3Hits",
         "byMediumCombinedIsolationDeltaBetaCorr3Hits",
         "byPhotonPtSumOutsideSignalCone",
         "byTightCombinedIsolationDeltaBetaCorr3Hits",
     };
+  */
+
+  d_mydisc->push_back("byLooseCombinedIsolationDeltaBetaCorr3Hits");
+  d_mydisc->push_back("byMediumCombinedIsolationDeltaBetaCorr3Hits");
+  d_mydisc->push_back("byPhotonPtSumOutsideSignalCone");
+  d_mydisc->push_back("byTightCombinedIsolationDeltaBetaCorr3Hits");
 
   h1_recoVtx_NoPUWt = histoDir.make<TH1D>("recoVtx_NoPUWt", "RecoVtx_NoPUWt", 100, 0, 100);
   h1_recoVtx_WithPUWt = histoDir.make<TH1D>("recoVtx_WithPUWt", "RecoVtx_WithPUWt", 100, 0, 100);
@@ -627,6 +666,31 @@ MiniAODAnalyzer::~MiniAODAnalyzer()
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
   // delete rootFile_;
+  // delete  mLeptonTree;
+  delete  pdf_indices;
+  delete  inpdfweights;
+  delete  d_mydisc;
+  delete  EleIDPassed;
+  delete  MuonIDPassed;
+  delete  FakeCandPt;
+  delete  FakeCandPhi;
+  delete  FakeCandEta;
+  delete  FakeCandMt;
+  delete  FakeCandDeltaPhi;
+  delete  FakeCandMET;
+  delete  FakeCandMETPhi;
+  delete  FakeCandIso;
+  delete  FakeCandNoIso;
+  delete  FakeCandVetoNum;
+  delete  FakeCandDecayMode;
+  delete  FakeCandLeptonType;
+  delete  FakeCandLeptonMt;
+  delete  FakeCandLeptonDeltaPhi;
+  delete  FakeCandLeptonPt;
+  delete  FakeCandLeptonEta;
+  delete  FakeCandLeptonPhi;
+  delete  FakeCandLeptonTrigger;
+  delete   FakeCandLorentz;
 
   if ( doPDFuncertainty ) {
     for (unsigned int i=0; i<100; i++) {
@@ -641,7 +705,7 @@ MiniAODAnalyzer::~MiniAODAnalyzer()
 
 void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSetup ) {
   //std::cout << "Inside beginRun()" << std::endl;
-  pdf_indices.clear();
+  pdf_indices->clear();
 
   if (!RunOnData ) {
     if ( doPDFuncertainty) {
@@ -729,7 +793,7 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
           }
           //        std::cout << "id=" << id  << "  pdf_wt_index = " << pdf_wt_index << std::endl;
           if ( (pdf_wt_index >= stoi(pdfid_1) ) && (pdf_wt_index <= stoi(pdfid_2)) ){
-            pdf_indices.push_back( id );
+            pdf_indices->push_back( id );
           }
         }
           }
@@ -757,6 +821,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //---Clear---//
   Run=0;
   Event=0;
+  EleIDPassed->clear();
+  MuonIDPassed->clear();
+
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
@@ -813,19 +880,19 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
       iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
       if  ( (EvtHandle.isValid()) ) {
     //std::cout << "Take pdf weights from CMSSW" << std::endl;
-    inpdfweights.clear();
+    inpdfweights->clear();
 
     //  if  ( !(RunOnData) && (EvtHandle.isValid()) ) {
     // std::cout << "\n\n wt for this evt :" <<  EvtHandle->originalXWGTUP() << " vect_size=" << EvtHandle->weights().size()  << std::endl ; // PDF weight of this event !
     //  std::string whichWeightId = "20";
     for (unsigned int i=0; i<EvtHandle->weights().size(); i++) {
       int id_i = stoi( EvtHandle->weights()[i].id );
-      for( unsigned int j = 0; j<pdf_indices.size(); j++ ) {
-        int id_j = pdf_indices[j];
+      for( unsigned int j = 0; j<pdf_indices->size(); j++ ) {
+        int id_j = pdf_indices->at(j);
         if( id_i == id_j ){
           float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
           //   std::cout << "pdf_weight=" << pdf_weight  << std::endl;
-          inpdfweights.push_back( pdf_weight );
+          inpdfweights->push_back( pdf_weight );
         }
       }
 
@@ -1114,8 +1181,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2#Tight_Muon
      if ( (mu.pt()>20.0) &&  (abs(mu.eta())<2.4) && (mu.isTightMuon(PV)) &&  ((mu.isolationR03().sumPt/mu.pt())<0.10) ) {
          nTightMu++;
-         MuonIDPassed.push_back(1);}
-     else {MuonIDPassed.push_back(0);}
+         MuonIDPassed->push_back(1);}
+     else {MuonIDPassed->push_back(0);}
      //std::cout << "mu.pt()=" << mu.pt() << " abs(mu.eta())=" << abs(mu.eta()) << " mu.isolationR03().sumPt/mu.pt()=" << mu.isolationR03().sumPt/mu.pt() << std::endl;
      //       printf("muon with pt %4.1f, dz(PV) %+5.3f, POG loose id %d, tight id %d\n",
      //     mu.pt(), mu.muonBestTrack()->dz(PV.position()), mu.isLooseMuon(), mu.isTightMuon(PV));
@@ -1136,8 +1203,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      if ( (el.pt()>20) &&  ( abs(el.eta())<2.5 )  && (el.electronID("cutBasedElectronID-Spring15-25ns-V1-standalone-loose")>6) ){
      //if ( (el.pt()>20) &&  ( abs(el.eta())<2.5 )  && (el.electronID("cutBasedElectronID-Summer16-80X-V1-loose")>6) ){
          nLooseEle++;
-         EleIDPassed.push_back(1);}
-     else {EleIDPassed.push_back(0);}
+         EleIDPassed->push_back(1);}
+     else {EleIDPassed->push_back(0);}
      //printf("elec with pt %4.1f, supercluster eta %+5.3f, sigmaIetaIeta %.3f  ",
      //      el.pt(), el.superCluster()->eta(), el.sigmaIetaIeta()  );
    }
@@ -1250,7 +1317,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        //--PDF Systematics--//
        // std::cout << "Evt selected. Size of inpdfweights = " << inpdfweights.size() << std::endl;
        int imem=0;
-       for (std::vector<double>::iterator it = inpdfweights.begin() ; it != inpdfweights.end(); ++it) {
+       for (std::vector<double>::iterator it = inpdfweights->begin() ; it != inpdfweights->end(); ++it) {
          //std::cout << "weight = " << *it << std::endl;
          double final_wt_with_pdf = (*it)*final_weight;
          h1_MT_Stage1_pdfWt[imem]->Fill(MT,final_wt_with_pdf);
@@ -1873,23 +1940,23 @@ void MiniAODAnalyzer::Create_Trees(){
   //for (size_t i=0;i<str.size();i++) helper->SetFakeBranches("fakeVectorTree","FakeCandPt",&vecOfVec[i]);
   //for (size_t i=0;i<str.size();i++) helper->SetFakeBranches("fakeVectorTree","FakeCandPt",&FakeCandPt);
 
-  helper->SetFakeBranches("fakeVectorTree","FakeCandPt",&FakeCandPt);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandPhi",&FakeCandPhi);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandEta",&FakeCandEta);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandDeltaPhi",&FakeCandDeltaPhi);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandMET",&FakeCandMET);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandMETPhi",&FakeCandMETPhi);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandIso",&FakeCandIso);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandNoIso",&FakeCandNoIso);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandVetoNum",&FakeCandVetoNum);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandDecayMode",&FakeCandDecayMode);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonType",&FakeCandLeptonType);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonMt",&FakeCandLeptonMt);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonDeltaPhi",&FakeCandLeptonDeltaPhi);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonPt",&FakeCandLeptonPt);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonEta",&FakeCandLeptonEta);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonPhi",&FakeCandLeptonPhi);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonTrigger",&FakeCandLeptonTrigger);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandPt",FakeCandPt);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandPhi",FakeCandPhi);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandEta",FakeCandEta);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandDeltaPhi",FakeCandDeltaPhi);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandMET",FakeCandMET);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandMETPhi",FakeCandMETPhi);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandIso",FakeCandIso);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandNoIso",FakeCandNoIso);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandVetoNum",FakeCandVetoNum);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandDecayMode",FakeCandDecayMode);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonType",FakeCandLeptonType);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonMt",FakeCandLeptonMt);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonDeltaPhi",FakeCandLeptonDeltaPhi);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonPt",FakeCandLeptonPt);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonEta",FakeCandLeptonEta);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonPhi",FakeCandLeptonPhi);
+  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonTrigger",FakeCandLeptonTrigger);
 
   //helper->SetFakeBranches("fakeVectorTree","FakeCandLorentz",&FakeCandLorentz);
 }
@@ -2500,7 +2567,7 @@ int MiniAODAnalyzer::vetoNumberEle(double ptTreshold,double vetoConeSize){
     int numVeto=0;
     int posi=0;
     for( auto part: *electrons) {
-        if( part.pt()>ptTreshold && (EleIDPassed[posi]==1) ){
+      if( part.pt()>ptTreshold && (EleIDPassed->at(posi)==1) ){
             bool veto_tau=false; //if particle is used as tau
             int i=0;
             for( auto tau : *taus ){
@@ -2526,7 +2593,7 @@ int MiniAODAnalyzer::vetoNumberMuon(double ptTreshold,double vetoConeSize){
     int numVeto=0;
     int posi=0;
     for( auto part: *muons) {
-        if( part.pt()>ptTreshold && (MuonIDPassed[posi]==1) ){
+      if( part.pt()>ptTreshold && (MuonIDPassed->at(posi)==1) ){
             bool veto_tau=false; //if particle is used as tau
             int i=0;
             for( auto tau : *taus ){
@@ -2585,7 +2652,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
         int i=0;
         bool eleBool=false;
         for( auto part: *electrons) {
-            if( part.pt()>m_leptonVetoPt && EleIDPassed[i]==1 ){
+	  if( part.pt()>m_leptonVetoPt && EleIDPassed->at(i)==1 ){
                 eleCandi=(part);
                 eleBool=true;
                 break;
@@ -2597,7 +2664,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
         bool muonBool=false;
         //for( auto part: MuonList) {
         for( auto part: *muons) {
-            if( part.pt()>m_leptonVetoPt && MuonIDPassed[i]==1 ){
+	  if( part.pt()>m_leptonVetoPt && MuonIDPassed->at(i)==1 ){
                 muoCandi=(part);
                 muonBool=true;
                 break;
@@ -2608,24 +2675,24 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
             return;
         }
         /// make it shorter
-        FakeCandPt.clear();
-        FakeCandPhi.clear();
-        FakeCandEta.clear();
-        FakeCandMET.clear();
-        FakeCandMETPhi.clear();
-        FakeCandDeltaPhi.clear();
-        FakeCandIso.clear();
-        FakeCandNoIso.clear();
-        FakeCandVetoNum.clear();
-        FakeCandLorentz.clear();
-        FakeCandDecayMode.clear();
-        FakeCandLeptonType.clear();
-        FakeCandLeptonMt.clear();
-        FakeCandLeptonDeltaPhi.clear();
-        FakeCandLeptonPt.clear();
-        FakeCandLeptonEta.clear();
-        FakeCandLeptonPhi.clear();
-        FakeCandLeptonTrigger.clear();
+        FakeCandPt->clear();
+        FakeCandPhi->clear();
+        FakeCandEta->clear();
+        FakeCandMET->clear();
+        FakeCandMETPhi->clear();
+        FakeCandDeltaPhi->clear();
+        FakeCandIso->clear();
+        FakeCandNoIso->clear();
+        FakeCandVetoNum->clear();
+        FakeCandLorentz->clear();
+        FakeCandDecayMode->clear();
+        FakeCandLeptonType->clear();
+        FakeCandLeptonMt->clear();
+        FakeCandLeptonDeltaPhi->clear();
+        FakeCandLeptonPt->clear();
+        FakeCandLeptonEta->clear();
+        FakeCandLeptonPhi->clear();
+        FakeCandLeptonTrigger->clear();
         for( auto tau: *taus ) {
             if(muonBool && DeltaR(muoCandi,tau)<vetoConeSize){
                 continue;
@@ -2645,27 +2712,27 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
 
 
                 mFakeTree["mt"]=calcMT(tau,sel_met);
-                FakeCandMt.push_back(calcMT(tau,sel_met));
+                FakeCandMt->push_back(calcMT(tau,sel_met));
                 mFakeTree["delta_phi"]=DeltaPhi(tau,sel_met);
-                FakeCandDeltaPhi.push_back(DeltaPhi(tau,sel_met));
+                FakeCandDeltaPhi->push_back(DeltaPhi(tau,sel_met));
                 mFakeTree["pt"]=tau.pt();
-                FakeCandPt.push_back(tau.pt());
+                FakeCandPt->push_back(tau.pt());
                 mFakeTree["met"]=sel_met.pt();
-                FakeCandMET.push_back(sel_met.pt());
+                FakeCandMET->push_back(sel_met.pt());
                 mFakeTree["phi"]=tau.phi();
-                FakeCandPhi.push_back(tau.phi());
+                FakeCandPhi->push_back(tau.phi());
                 mFakeTree["eta"]=tau.eta();
-                FakeCandEta.push_back(tau.eta());
+                FakeCandEta->push_back(tau.eta());
                 mFakeTree["met_phi"]=sel_met.phi();
-                FakeCandMETPhi.push_back(sel_met.phi());
+                FakeCandMETPhi->push_back(sel_met.phi());
                 mFakeTree["iso"]=PassTauID(tau);
-                FakeCandIso.push_back(PassTauID(tau));
+                FakeCandIso->push_back(PassTauID(tau));
                 mFakeTree["noiso"]=PassTauID(tau);
-                FakeCandNoIso.push_back(PassTauID(tau));
+                FakeCandNoIso->push_back(PassTauID(tau));
                 mFakeTree["tau_n"]=numVetoTau;
-                FakeCandVetoNum.push_back(numVetoTau);
+                FakeCandVetoNum->push_back(numVetoTau);
                 mFakeTree["decay_mode"]=tau.decayMode();
-                FakeCandDecayMode.push_back(tau.decayMode());
+                FakeCandDecayMode->push_back(tau.decayMode());
 
 
 
@@ -2677,35 +2744,35 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
                 }
                 */if(muonBool){
                     mFakeTree["lepton_type"]=13;
-                    FakeCandLeptonType.push_back(13);
+                    FakeCandLeptonType->push_back(13);
                     mFakeTree["lepton_mt"]=calcMT(muoCandi,sel_met);
-                    FakeCandLeptonMt.push_back(calcMT(muoCandi,sel_met));
+                    FakeCandLeptonMt->push_back(calcMT(muoCandi,sel_met));
                     mFakeTree["lepton_delta_phi"]=DeltaPhi(muoCandi,sel_met);
-                    FakeCandLeptonDeltaPhi.push_back(DeltaPhi(muoCandi,sel_met));
+                    FakeCandLeptonDeltaPhi->push_back(DeltaPhi(muoCandi,sel_met));
                     mFakeTree["lepton_pt"]=muoCandi.pt();
-                    FakeCandLeptonPt.push_back(muoCandi.pt());
+                    FakeCandLeptonPt->push_back(muoCandi.pt());
                     mFakeTree["lepton_eta"]=muoCandi.eta();
-                    FakeCandLeptonEta.push_back(muoCandi.eta());
+                    FakeCandLeptonEta->push_back(muoCandi.eta());
                     mFakeTree["lepton_phi"]=muoCandi.phi();
-                    FakeCandLeptonPhi.push_back(muoCandi.phi());
+                    FakeCandLeptonPhi->push_back(muoCandi.phi());
                     mFakeTree["lepton_trigger"]=passMuonTrig;
-                    FakeCandLeptonTrigger.push_back(passMuonTrig);
+                    FakeCandLeptonTrigger->push_back(passMuonTrig);
                 }
                 if (eleBool){
                     mFakeTree["lepton_type"]=11;
-                    FakeCandLeptonType.push_back(11);
+                    FakeCandLeptonType->push_back(11);
                     mFakeTree["lepton_mt"]=calcMT(eleCandi,sel_met);
-                    FakeCandLeptonMt.push_back(calcMT(eleCandi,sel_met));
+                    FakeCandLeptonMt->push_back(calcMT(eleCandi,sel_met));
                     mFakeTree["lepton_delta_phi"]=DeltaPhi(eleCandi,sel_met);
-                    FakeCandLeptonDeltaPhi.push_back(DeltaPhi(eleCandi,sel_met));
+                    FakeCandLeptonDeltaPhi->push_back(DeltaPhi(eleCandi,sel_met));
                     mFakeTree["lepton_pt"]=eleCandi.pt();
-                    FakeCandLeptonPt.push_back(eleCandi.pt());
+                    FakeCandLeptonPt->push_back(eleCandi.pt());
                     mFakeTree["lepton_eta"]=eleCandi.eta();
-                    FakeCandLeptonEta.push_back(eleCandi.eta());
+                    FakeCandLeptonEta->push_back(eleCandi.eta());
                     mFakeTree["lepton_phi"]=eleCandi.phi();
-                    FakeCandLeptonPhi.push_back(eleCandi.phi());
+                    FakeCandLeptonPhi->push_back(eleCandi.phi());
                     mFakeTree["lepton_trigger"]=passEleTrig;
-                    FakeCandLeptonTrigger.push_back(passEleTrig);
+                    FakeCandLeptonTrigger->push_back(passEleTrig);
                 }
 
                 //general
