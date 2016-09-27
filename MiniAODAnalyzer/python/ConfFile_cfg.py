@@ -5,6 +5,12 @@ process = cms.Process("Demo")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.load("WPrimeToTau.MiniAODAnalyzer.METFilters_cff")
+process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+
+process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",
+    ignoreTotal = cms.untracked.int32(1),
+    moduleMemorySummary = cms.untracked.bool(True),                                        
+)
 
 ## MET filter ##
 #process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
@@ -45,12 +51,12 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        RunOnData_ = cms.bool(False),
 #       RunOnData_ = cms.bool(True),
 ### generatorName required only for madgraph and powheg. For other cases one can just write "default"
-       generatorName = cms.string("madgraphMLM"),
+#       generatorName = cms.string("madgraphMLM"),
 #       generatorName = cms.string("default"),
-#       generatorName = cms.string("powheg"),
+       generatorName = cms.string("powheg"),
 ### correct pdfName required only for madgraph, for other cases one can just write "default"
-       pdfName = cms.string("NNPDF30_lo_as_0130.LHgrid"),   # madgraphMLM
-#       pdfName = cms.string("default"),   # powheg and others
+#       pdfName = cms.string("NNPDF30_lo_as_0130.LHgrid"),   # madgraphMLM
+       pdfName = cms.string("default"),   # powheg and others
        debugLevel_ = cms.int32(0),
        vertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
        taus = cms.InputTag("slimmedTaus"),
@@ -66,15 +72,15 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        objects = cms.InputTag("selectedPatTrigger"),
        genEventInfoProductMiniAOD = cms.InputTag('generator'),
        pileupCollection = cms.InputTag("slimmedAddPileupInfo"),
-       PileupMCFile = cms.string("configFiles/MC_pileup.root"),
-       PileupDataFile = cms.string("configFiles/Data_pileup_normalized.root"),
-       PileupDataFile_UP = cms.string("configFiles/Data_pileup_normalized_UP.root"),
-       PileupDataFile_DOWN = cms.string("configFiles/Data_pileup_normalized_DOWN.root"),
-       KFactorE = cms.string("configFiles/k_faktors_ele.root"),
-       KFactorMu = cms.string("configFiles/k_faktors_mu.root"),
-       KFactorTau = cms.string("configFiles/k_faktors_tau.root"),
+       PileupMCFile = cms.string("MC_pileup.root"),
+       PileupDataFile = cms.string("Data_pileup_normalized.root"),
+       PileupDataFile_UP = cms.string("Data_pileup_normalized_UP.root"),
+       PileupDataFile_DOWN = cms.string("Data_pileup_normalized_DOWN.root"),
+       KFactorE = cms.string("k_faktors_ele.root"),
+       KFactorMu = cms.string("k_faktors_mu.root"),
+       KFactorTau = cms.string("k_faktors_tau.root"),
        sourceFileString = cms.string(process.source_().dumpConfig().split('\n')[2].split("/")[4]),
-       useReweighting = cms.bool(True),
+       useReweighting = cms.bool(False),
        BadChargedCandidateFilter = cms.InputTag("BadChargedCandidateFilter"),
        BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
        LHEEventTag = cms.InputTag("externalLHEProducer","","LHE"),
