@@ -9,15 +9,15 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'ConfFile_cfg.py'
 #config.JobType.outputFiles = ['analysis.root','hist_analysis.root']
 config.JobType.outputFiles = ['hist_analysis.root']
-config.JobType.inputFiles = ['configFiles/MC_pileup.root','configFiles/Data_pileup_normalized.root','configFiles/Data_pileup_normalized_UP.root','configFiles/Data_pileup_normalized_DOWN.root', 'configFiles/k_faktors_ele.root', 'configFiles/k_faktors_mu.root', 'configFiles/k_faktors_tau.root']
+config.JobType.inputFiles = ['MC_pileup.root','Data_pileup_normalized.root','Data_pileup_normalized_UP.root','Data_pileup_normalized_DOWN.root', 'k_faktors_ele.root', 'k_faktors_mu.root', 'k_faktors_tau.root']
 
 config.Data.inputDataset = ''
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 #config.Data.unitsPerJob = 10
-config.Data.outLFNDirBase = '/store/user/%s/crab_Wprime_Sept19/' % (getUsernameFromSiteDB())
+config.Data.outLFNDirBase = '/store/user/%s/crab_Wprime_Sept29/' % (getUsernameFromSiteDB())
 config.Data.publication = False
-config.Data.outputDatasetTag = 'WPrimeToTaus_Sept19'
+config.Data.outputDatasetTag = 'WPrimeToTaus_Sept29'
 config.Site.storageSite = 'T2_DE_RWTH'
 
 if __name__ == '__main__':
@@ -46,20 +46,20 @@ if __name__ == '__main__':
 ##
 ## ZJets
 ##
-#    config.General.requestName = 'ZJetsToNuNu_HT-100To200_13TeV-madgraph'
-#    config.Data.inputDataset = '/ZJetsToNuNu_HT-100To200_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-#    config.Data.unitsPerJob = 5
-#    submit(config)
+    config.General.requestName = 'ZJetsToNuNu_HT-100To200_13TeV-madgraph'
+    config.Data.inputDataset = '/ZJetsToNuNu_HT-100To200_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
+    config.Data.unitsPerJob = 5
+    submit(config)
 
-#    config.General.requestName = 'ZJetsToNuNu_HT-200To400_13TeV-madgraph'
-#    config.Data.inputDataset = '/ZJetsToNuNu_HT-200To400_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-#    config.Data.unitsPerJob = 5
-#    submit(config)
+    config.General.requestName = 'ZJetsToNuNu_HT-200To400_13TeV-madgraph'
+    config.Data.inputDataset = '/ZJetsToNuNu_HT-200To400_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
+    config.Data.unitsPerJob = 5
+    submit(config)
 
-#    config.General.requestName = 'ZJetsToNuNu_HT-400To600_13TeV-madgraph'
-#    config.Data.inputDataset = '/ZJetsToNuNu_HT-400To600_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-#    config.Data.unitsPerJob = 5
-#    submit(config)
+    config.General.requestName = 'ZJetsToNuNu_HT-400To600_13TeV-madgraph'
+    config.Data.inputDataset = '/ZJetsToNuNu_HT-400To600_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
+    config.Data.unitsPerJob = 5
+    submit(config)
 
     config.General.requestName = 'ZJetsToNuNu_HT-600To800_13TeV-madgraph'
     config.Data.inputDataset = '/ZJetsToNuNu_HT-600To800_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'

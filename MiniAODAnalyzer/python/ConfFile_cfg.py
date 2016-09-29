@@ -7,10 +7,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.load("WPrimeToTau.MiniAODAnalyzer.METFilters_cff")
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",
-    ignoreTotal = cms.untracked.int32(1),
-    moduleMemorySummary = cms.untracked.bool(True),                                        
-)
+#process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",
+#    ignoreTotal = cms.untracked.int32(1),
+#    moduleMemorySummary = cms.untracked.bool(True),                                        
+#)
 
 ## MET filter ##
 #process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
@@ -52,8 +52,8 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
 #       RunOnData_ = cms.bool(True),
 ### generatorName required only for madgraph and powheg. For other cases one can just write "default"
 #       generatorName = cms.string("madgraphMLM"),
-#       generatorName = cms.string("default"),
-       generatorName = cms.string("powheg"),
+       generatorName = cms.string("default"),
+#       generatorName = cms.string("powheg"),
 ### correct pdfName required only for madgraph, for other cases one can just write "default"
 #       pdfName = cms.string("NNPDF30_lo_as_0130.LHgrid"),   # madgraphMLM
        pdfName = cms.string("default"),   # powheg and others
@@ -80,7 +80,7 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        KFactorMu = cms.string("k_faktors_mu.root"),
        KFactorTau = cms.string("k_faktors_tau.root"),
        sourceFileString = cms.string(process.source_().dumpConfig().split('\n')[2].split("/")[4]),
-       useReweighting = cms.bool(False),
+       useReweighting = cms.bool(True),
        BadChargedCandidateFilter = cms.InputTag("BadChargedCandidateFilter"),
        BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
        LHEEventTag = cms.InputTag("externalLHEProducer","","LHE"),
@@ -95,7 +95,8 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
 #)
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string('hist_analysis.root')
+                                   fileName = cms.string('hist_analysis.root'),
+ #                                  closeFileFast = cms.untracked.bool(True)
 )
 
 #process.run = cms.Path(process.BadPFMuonFilter *process.BadChargedCandidateFilter)
