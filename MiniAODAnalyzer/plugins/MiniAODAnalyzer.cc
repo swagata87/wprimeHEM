@@ -391,6 +391,11 @@ private:
   TH1D *h1_MT_Stage1_TauScaleDown_diff;
   ///crosscheck end
 
+  //TH2D *Tau_nofake_pt_met_true;
+  //TH2D *Tau_fake_pt_met_true;
+  //TH2D *Tau_nofake_pt_met;
+  //TH2D *Tau_fake_pt_met;
+
   TH1D *h1_recoVtx_NoPUWt;
   TH1D *h1_recoVtx_WithPUWt;
   //
@@ -457,6 +462,7 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   // rootFile_   = TFile::Open(outputFile_.c_str(),"RECREATE"); // open output file to store histograms
   TFileDirectory histoDir = fs->mkdir("histoDir");
   TFileDirectory crossDir = fs->mkdir("crossDir");
+  //TFileDirectory testDir = fs->mkdir("testDir");
 
   /////  if (isPowheg) lheString = "source" ;
 /*
@@ -591,16 +597,20 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   helper->CreateHisto("Tau_nofake_pt_decay", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
   helper->CreateHisto("Tau_fake_pt_eta", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
   helper->CreateHisto("Tau_nofake_pt_eta", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
-  helper->CreateHisto("Tau_fake_pt_met", 4000, 0, 8000, 4000, 0, 8000, "p_{T} [GeV]", "MET");
-  helper->CreateHisto("Tau_nofake_pt_met", 4000, 0, 8000, 4000, 0, 8000, "p_{T} [GeV]", "MET");
+  //Tau_nofake_pt_met = testDir.make<TH2D>("Tau_nofake_pt_met", "Tau_nofake_pt_met", 8000, 0, 8000, 8000, 0, 8000 );
+  //Tau_fake_pt_met = testDir.make<TH2D>("Tau_fake_pt_met", "Tau_fake_pt_met", 8000, 0, 8000, 8000, 0, 8000 );
+  helper->CreateHisto("Tau_fake_pt_met", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
+  helper->CreateHisto("Tau_nofake_pt_met", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
   helper->CreateHisto(nstages,"Tau_fake_pt_true",  8000, 0, 8000, "p_{T} [GeV]");
   helper->CreateHisto(nstages,"Tau_nofake_pt_true",  8000, 0, 8000, "p_{T} [GeV]");
   helper->CreateHisto("Tau_fake_pt_decay_true", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
   helper->CreateHisto("Tau_nofake_pt_decay_true", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
   helper->CreateHisto("Tau_fake_pt_eta_true", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
   helper->CreateHisto("Tau_nofake_pt_eta_true", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
-  helper->CreateHisto("Tau_fake_pt_met_true", 4000, 0, 8000, 4000, 0, 8000, "p_{T} [GeV]", "MET");
-  helper->CreateHisto("Tau_nofake_pt_met_true", 4000, 0, 8000, 4000, 0, 8000, "p_{T} [GeV]", "MET");
+  //Tau_fake_pt_met_true = testDir.make<TH2D>("Tau_fake_pt_met_true", "Tau_fake_pt_met_true", 8000, 0, 8000, 8000, 0, 8000);
+  //Tau_nofake_pt_met_true = testDir.make<TH2D>("Tau_nofake_pt_met_true", "Tau_nofake_pt_met_true", 8000, 0, 8000, 8000, 0, 8000);
+  helper->CreateHisto("Tau_fake_pt_met_true", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
+  helper->CreateHisto("Tau_nofake_pt_met_true", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
   if(not RunOnData){
       for(std::string gen : {"lightquark","gluon","bquark","lightlepton","unmatched"}){
           helper->CreateHisto(nstages,Form("Tau_fake_pt_%s",gen.c_str()),  8000, 0, 8000, "p_{T} [GeV]");
