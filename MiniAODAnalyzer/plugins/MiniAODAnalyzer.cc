@@ -591,16 +591,16 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   helper->CreateHisto("Tau_nofake_pt_decay", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
   helper->CreateHisto("Tau_fake_pt_eta", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
   helper->CreateHisto("Tau_nofake_pt_eta", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
-  helper->CreateHisto("Tau_fake_pt_met", 8000, 0, 8000, 8000, 0, 8000, "p_{T} [GeV]", "MET");
-  helper->CreateHisto("Tau_nofake_pt_met", 8000, 0, 8000, 8000, 0, 8000, "p_{T} [GeV]", "MET");
+  helper->CreateHisto("Tau_fake_pt_met", 4000, 0, 8000, 4000, 0, 8000, "p_{T} [GeV]", "MET");
+  helper->CreateHisto("Tau_nofake_pt_met", 4000, 0, 8000, 4000, 0, 8000, "p_{T} [GeV]", "MET");
   helper->CreateHisto(nstages,"Tau_fake_pt_true",  8000, 0, 8000, "p_{T} [GeV]");
   helper->CreateHisto(nstages,"Tau_nofake_pt_true",  8000, 0, 8000, "p_{T} [GeV]");
   helper->CreateHisto("Tau_fake_pt_decay_true", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
   helper->CreateHisto("Tau_nofake_pt_decay_true", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
   helper->CreateHisto("Tau_fake_pt_eta_true", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
   helper->CreateHisto("Tau_nofake_pt_eta_true", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
-  helper->CreateHisto("Tau_fake_pt_met_true", 8000, 0, 8000, 8000, 0, 8000, "p_{T} [GeV]", "MET");
-  helper->CreateHisto("Tau_nofake_pt_met_true", 8000, 0, 8000, 8000, 0, 8000, "p_{T} [GeV]", "MET");
+  helper->CreateHisto("Tau_fake_pt_met_true", 4000, 0, 8000, 4000, 0, 8000, "p_{T} [GeV]", "MET");
+  helper->CreateHisto("Tau_nofake_pt_met_true", 4000, 0, 8000, 4000, 0, 8000, "p_{T} [GeV]", "MET");
   if(not RunOnData){
       for(std::string gen : {"lightquark","gluon","bquark","lightlepton","unmatched"}){
           helper->CreateHisto(nstages,Form("Tau_fake_pt_%s",gen.c_str()),  8000, 0, 8000, "p_{T} [GeV]");
@@ -626,7 +626,7 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
 
   // discriminators
   d_mydisc->clear();
-  /* 
+  /*
  d_mydisc= {
         "byLooseCombinedIsolationDeltaBetaCorr3Hits",
         "byMediumCombinedIsolationDeltaBetaCorr3Hits",
@@ -715,7 +715,7 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
       typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
       iRun.getByLabel( lheString , run );
       if ( run.isValid()) {
-	// std::cout << "Take pdf weights from CMSSW" << std::endl;
+    // std::cout << "Take pdf weights from CMSSW" << std::endl;
     LHERunInfoProduct myLHERunInfoProduct = *(run.product());
         std::vector<std::string> weight_lines;
     for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
@@ -2652,7 +2652,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
         int i=0;
         bool eleBool=false;
         for( auto part: *electrons) {
-	  if( part.pt()>m_leptonVetoPt && EleIDPassed->at(i)==1 ){
+      if( part.pt()>m_leptonVetoPt && EleIDPassed->at(i)==1 ){
                 eleCandi=(part);
                 eleBool=true;
                 break;
@@ -2664,7 +2664,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
         bool muonBool=false;
         //for( auto part: MuonList) {
         for( auto part: *muons) {
-	  if( part.pt()>m_leptonVetoPt && MuonIDPassed->at(i)==1 ){
+      if( part.pt()>m_leptonVetoPt && MuonIDPassed->at(i)==1 ){
                 muoCandi=(part);
                 muonBool=true;
                 break;
