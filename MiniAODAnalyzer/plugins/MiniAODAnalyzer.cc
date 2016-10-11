@@ -117,6 +117,7 @@ private:
   bool PassFinalCuts(TLorentzVector part1, const pat::MET part2);
   bool PassFinalCuts(int nGoodTau_,TLorentzVector part1, const pat::MET part2);
   double GetTauIDScaleFactor(double tau_pt, std::string mode);
+  bool Overlap(edm::Handle<edm::View<reco::GenParticle>>);
 
   std::vector<int> *pdf_indices = new std::vector<int>;
   std::vector<double> *inpdfweights = new std::vector<double>;
@@ -683,10 +684,59 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  //std::cout << "\n --EVENT-- " << Event << std::endl;
+  std::cout << "\n --EVENT-- " << Event << std::endl;
 
   //-- kfactor --//
   wmass_stored=0;
+
+  ///----///
+  int nGenTau=0;
+  TLorentzVector tauGen_p4[10];
+  const Candidate * MyTau;
+  // const Candidate * MyTauSel=0;
+  double TauPt_Gen=0;
+
+  k_fak_stored=1;
+  if (!RunOnData) {
+    //--GenParticles--//
+    iEvent.getByToken(prunedGenToken_,pruned);
+    //    Handle<edm::View<pat::PackedGenParticle> > packed;
+    //    iEvent.getByToken(packedGenToken_,packed);
+    if ( Overlap(pruned) ) {
+      std::cout << "Reject! Wmass = " << getWmass(pruned) << " sample = " << sourceFileString  << std::endl ;
+      return;
+    }
+    ///-- W k-factor --///
+    k_fak_stored=applyWKfactor(1,pruned); 
+    if (k_fak_stored != 100) {
+      k_fak = k_fak_stored;
+      k_fak_up = k_fak_stored + (k_fak_stored*(5.0/100.0));
+      k_fak_down = k_fak_stored - (k_fak_stored*(5.0/100.0));
+      if (k_fak_down<0) k_fak_down=k_fak ;
+      //  std::cout << "k-fact / up / down : " << k_fak_stored << " / " << k_fak_stored_up << " / " << k_fak_stored_down << std::endl;
+    }
+ 
+    for(size_t i=0; i<pruned->size();i++){
+      if(   (abs((*pruned)[i].pdgId())==15) && ( ((*pruned)[i].status()==2) )) {
+	MyTau = &(*pruned)[i];
+	if ( (MyTau->pt()>20.0)  &&  (fabs(MyTau->eta())<2.3)  )  {
+	  // MyTauSel=MyTau;
+	  TauPt_Gen=MyTau->pt();
+	  h1_TauPt_Gen->Fill(TauPt_Gen);
+	  tauGen_p4[nGenTau].SetPxPyPzE(MyTau->px(),MyTau->py(),MyTau->pz(),MyTau->energy());
+	  nGenTau++;
+	}
+      }
+    }
+    //if(   (abs((*pruned)[i].pdgId())==16) && ( ((*pruned)[i].status()==2)) && (sel_tau==true)) {
+    //MyNu= &(*pruned)[i]; //used for calculating the W mass
+    //MyNu->px(); // to get rid of not use warning
+    //}
+  }
+  
+  h1_nGenTau->Fill(nGenTau);
+  if (nGenTau==1) FindTauIDEfficiency(iEvent,tauGen_p4[0]);
+
 
   //-- probValue --//
   //-- https://github.com/cms-sw/cmssw/blob/CMSSW_8_1_X/SimGeneral/MixingModule/python/mix_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU_cfi.py --//
@@ -766,56 +816,6 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     final_weight_PUweight_DOWN=1;
   }
   */
-  ///----///
-  int nGenTau=0;
-  TLorentzVector tauGen_p4[10];
-  const Candidate * MyTau;
-  // const Candidate * MyTauSel=0;
-  double TauPt_Gen=0;
-
-  k_fak_stored=1;
-  if (!RunOnData) {
-    //--GenParticles--//
-    //Handle<edm::View<reco::GenParticle> > pruned;
-    iEvent.getByToken(prunedGenToken_,pruned);
-    Handle<edm::View<pat::PackedGenParticle> > packed;
-    iEvent.getByToken(packedGenToken_,packed);
-
-    ///-- W k-factor --///
-    k_fak_stored=applyWKfactor(1,pruned); 
-    if (k_fak_stored != 100) {
-      k_fak = k_fak_stored;
-      k_fak_up = k_fak_stored + (k_fak_stored*(5.0/100.0));
-      k_fak_down = k_fak_stored - (k_fak_stored*(5.0/100.0));
-      if (k_fak_down<0) k_fak_down=k_fak ;
-      //  std::cout << "k-fact / up / down : " << k_fak_stored << " / " << k_fak_stored_up << " / " << k_fak_stored_down << std::endl;
-    }
- 
-    for(size_t i=0; i<pruned->size();i++){
-      if(   (abs((*pruned)[i].pdgId())==15) && ( ((*pruned)[i].status()==2) )) {
-	MyTau = &(*pruned)[i];
-	if ( (MyTau->pt()>20.0)  &&  (fabs(MyTau->eta())<2.3)  )  {
-	  // MyTauSel=MyTau;
-	  TauPt_Gen=MyTau->pt();
-	  h1_TauPt_Gen->Fill(TauPt_Gen);
-	  tauGen_p4[nGenTau].SetPxPyPzE(MyTau->px(),MyTau->py(),MyTau->pz(),MyTau->energy());
-	  nGenTau++;
-	  //std::cout << " pt " << TauPt_Gen << " nMother=" << MyTau->numberOfMothers() << " mother pdgID = " << MyTau->mother(0)->pdgId() << " mother status = " << MyTau->mother(0)->status()  << std::endl;
-	  //const Candidate * MotherOfMyTau=MyTau->mother(0);
-	}
-      }
-    }
-    
-      //if(   (abs((*pruned)[i].pdgId())==16) && ( ((*pruned)[i].status()==2)) && (sel_tau==true)) {
-          //MyNu= &(*pruned)[i]; //used for calculating the W mass
-          //MyNu->px(); // to get rid of not use warning
-      //}
-
-  }
-
-  h1_nGenTau->Fill(nGenTau);
-  if (nGenTau==1) FindTauIDEfficiency(iEvent,tauGen_p4[0]);
-
 
    //---Trigger---//
    edm::Handle<edm::TriggerResults> triggerBits;
@@ -1133,7 +1133,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    //---------------//
    //---Selection---//
    //---------------//
-
+   std::cout << "Proceed to selection cuts " << std::endl;
    if (passTauTrig && passAllMETFilters ) {
      if ( (nvtx>0) && (nTightMu==0) && (nLooseEle==0) ) {
        //** Stage 2 (Passed trigger, MET filter, vertex-cut, lepton-veto)
@@ -2155,6 +2155,20 @@ int MiniAODAnalyzer::getWdecay(edm::Handle<edm::View<reco::GenParticle>> genPart
     return temp_id;
 }
 
+bool MiniAODAnalyzer::Overlap(edm::Handle<edm::View<reco::GenParticle>> p1) {
+  if ( (sourceFileString.find("WJetsToLNu_HT") != std::string::npos) && (getWmass(p1)>100) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-100_") != std::string::npos) && ( (getWmass(p1)<100) || (getWmass(p1)>200)) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-200_") != std::string::npos) && ( (getWmass(p1)<200) || (getWmass(p1)>500)) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-500_") != std::string::npos) && ( (getWmass(p1)<500) || (getWmass(p1)>1000)) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-1000_") != std::string::npos) && ( (getWmass(p1)<1000) || (getWmass(p1)>2000)) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-2000_") != std::string::npos) && ( (getWmass(p1)<2000) || (getWmass(p1)>3000)) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-3000_") != std::string::npos) && ( (getWmass(p1)<3000) || (getWmass(p1)>4000)) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-4000_") != std::string::npos) && ( (getWmass(p1)<4000) || (getWmass(p1)>5000)) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-5000_") != std::string::npos) && ( (getWmass(p1)<5000) || (getWmass(p1)>6000)) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-6000_") != std::string::npos) && ( (getWmass(p1)<6000)) ) return true;
+
+  return false;
+}
 
 double MiniAODAnalyzer::getWmass(edm::Handle<edm::View<reco::GenParticle>> genPart){
     //std::cout << "wmass_stored is " << wmass_stored << std::endl;

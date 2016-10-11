@@ -10,8 +10,8 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #  that is typically found in the DAS under the Configs for given dataset
 #  (although it can be "overridden" by requirements of a given release)
 
-#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')     # MC
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')  # DATA
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')     # MC
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')  # DATA
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
@@ -35,7 +35,7 @@ my_id_modules = [
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000))
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
@@ -43,6 +43,10 @@ process.source = cms.Source("PoolSource",
 #        '/store/mc/RunIISpring16MiniAODv2/WprimeToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/00000/0A8E0285-A92B-E611-A376-00259081ED0A.root'
 # '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/00000/046410F1-7736-E611-8F28-A0000420FE80.root',
 #        '/store/mc/RunIISpring16MiniAODv2/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/000C4CF4-CC21-E611-9D0A-0025905C54FE.root',
+#        '/store/mc/RunIISpring16MiniAODv2/WToTauNu_M-100_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/70000/309E13C9-B42B-E611-9C97-00259073E51E.root'
+#        '/store/mc/RunIISpring16MiniAODv2/WToTauNu_M-200_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/0A494D33-E62B-E611-B087-848F69FD43A0.root'
+#        '/store/mc/RunIISpring16MiniAODv2/WToTauNu_M-500_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/60000/1E246C8A-A42B-E611-BF7B-C45444922D3C.root'
+        '/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/10000/346E7295-1940-E611-BD20-E41D2D08DD20.root',
 #        '/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/60000/02433DFA-0720-E611-9323-1CB72C1B65D4.root',
 #        '/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/40000/006F5A7A-7D24-E611-97BB-B083FED43141.root',
 #        '/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/06A61384-FA1A-E611-8E7E-B083FED3F2E9.root',
@@ -54,21 +58,21 @@ process.source = cms.Source("PoolSource",
 #      '/store/data/Run2016B/Tau/MINIAOD/PromptReco-v2/000/273/158/00000/D464EE02-D919-E611-8D74-02163E013917.root',
 #      '/store/data/Run2016B/Tau/MINIAOD/PromptReco-v2/000/273/290/00000/4C630F9E-191A-E611-AEB5-02163E013716.root'
 #        '/store/data/Run2016B/Tau/MINIAOD/01Jul2016-v2/20000/02C0A083-734F-E611-A834-549F35AF44AF.root'
-      '/store/data/Run2016E/Tau/MINIAOD/PromptReco-v2/000/276/831/00000/0CFBD536-074D-E611-84B7-02163E011E85.root'
+#      '/store/data/Run2016E/Tau/MINIAOD/PromptReco-v2/000/276/831/00000/0CFBD536-074D-E611-84B7-02163E011E85.root'
     )
 )
 
 process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
 #       outputFile = cms.string('analysis.root'),
-#       RunOnData_ = cms.bool(False),
-       RunOnData_ = cms.bool(True),
+       RunOnData_ = cms.bool(False),
+#       RunOnData_ = cms.bool(True),
 ### generatorName required only for madgraph and powheg. For other cases one can just write "default"
-#       generatorName = cms.string("madgraphMLM"),
-       generatorName = cms.string("default"),
+       generatorName = cms.string("madgraphMLM"),
+#       generatorName = cms.string("default"),
 #       generatorName = cms.string("powheg"),
 ### correct pdfName required only for madgraph, for other cases one can just write "default"
-#       pdfName = cms.string("NNPDF30_lo_as_0130.LHgrid"),   # madgraphMLM
-       pdfName = cms.string("default"),   # powheg and others
+       pdfName = cms.string("NNPDF30_lo_as_0130.LHgrid"),   # madgraphMLM
+#       pdfName = cms.string("default"),   # powheg and others
        debugLevel_ = cms.int32(0),
        vertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
        taus = cms.InputTag("slimmedTaus"),
@@ -76,8 +80,8 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        electrons = cms.InputTag("slimmedElectrons"),
        mets = cms.InputTag("slimmedMETs"),
        bits = cms.InputTag("TriggerResults","","HLT"),
-       bits_MET = cms.InputTag("TriggerResults","","RECO"),  ##for data
-#       bits_MET = cms.InputTag("TriggerResults","","PAT"),  ##for MC
+#       bits_MET = cms.InputTag("TriggerResults","","RECO"),  ##for data
+       bits_MET = cms.InputTag("TriggerResults","","PAT"),  ##for MC
        prescales = cms.InputTag("patTrigger"),
        packed = cms.InputTag("packedGenParticles"),
        pruned = cms.InputTag("prunedGenParticles"),
