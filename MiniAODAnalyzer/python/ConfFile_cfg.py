@@ -1,16 +1,26 @@
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("Demo")
+process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+from Configuration.AlCa.GlobalTag import GlobalTag
+#  as a rule, find the "auto" global tag in $CMSSW_RELEASE_BASE/src/Configuration/AlCa/python/autoCond.py
+#  This auto global tag will look up the "proper" global tag
+#  that is typically found in the DAS under the Configs for given dataset
+#  (although it can be "overridden" by requirements of a given release)
+
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')     # MC
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')  # DATA
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.load("WPrimeToTau.MiniAODAnalyzer.METFilters_cff")
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-#process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",
-#    ignoreTotal = cms.untracked.int32(1),
-#    moduleMemorySummary = cms.untracked.bool(True),                                        
-#)
+process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",
+    ignoreTotal = cms.untracked.int32(1),
+    moduleMemorySummary = cms.untracked.bool(True),                                        
+)
 
 ## MET filter ##
 #process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
@@ -21,6 +31,23 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 #process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
 #process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
 ##
+
+from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+# turn on VID producer, indicate data format  to be
+# DataFormat.AOD or DataFormat.MiniAOD, as appropriate 
+#if useAOD == True :
+#    dataFormat = DataFormat.AOD
+#else 
+dataFormat = DataFormat.MiniAOD
+switchOnVIDElectronIdProducer(process, dataFormat)
+
+# define which IDs we want to produce
+my_id_modules = [
+    'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff'
+    ]
+#add them to the VID producer
+for idmod in my_id_modules:
+    setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
 
@@ -82,6 +109,7 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        useReweighting = cms.bool(True),
        BadChargedCandidateFilter = cms.InputTag("BadChargedCandidateFilter"),
        BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
+       eleIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose"),
        LHEEventTag = cms.InputTag("externalLHEProducer","","LHE"),
 #       LHEEventTag = cms.InputTag("source","","LHEFile")
        tag = cms.untracked.string("initrwgt"),
@@ -100,6 +128,6 @@ process.TFileService = cms.Service("TFileService",
 
 #process.run = cms.Path(process.BadPFMuonFilter *process.BadChargedCandidateFilter)
 
-process.p = cms.Path(process.METFiltersSequence*process.demo)
+process.p = cms.Path(process.METFiltersSequence*process.egmGsfElectronIDSequence*process.demo)
 #process.demo)
 #process.p = cms.Path(process.demo)

@@ -183,7 +183,9 @@ private:
   //QCD stuff
   void QCDAnalyse();
   edm::Handle<pat::MuonCollection> muons;
-  edm::Handle<pat::ElectronCollection> electrons;
+  // pat::Electron objects can be recast as reco::GsfElectron objects //
+  edm::Handle<edm::View<reco::GsfElectron> > electrons; 
+  //edm::Handle<pat::ElectronCollection> electrons;
   edm::Handle<pat::TauCollection> taus;
   edm::Handle<edm::View<reco::GenParticle> > pruned; ///might not work for data
   //reco::GenParticle* GetTruthMatch(std::string name, pat::Tau lepton);
@@ -236,7 +238,8 @@ private:
   edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
   edm::EDGetTokenT<pat::TauCollection> tauToken_;
   edm::EDGetTokenT<pat::MuonCollection> muonToken_;
-  edm::EDGetTokenT<pat::ElectronCollection> electronToken_;
+  edm::EDGetToken  electronToken_; 
+  //edm::EDGetTokenT<pat::ElectronCollection> electronToken_;
   edm::EDGetTokenT<pat::METCollection> metToken_;
   edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
   edm::EDGetTokenT<edm::TriggerResults> triggerBits_MET_;
@@ -249,6 +252,7 @@ private:
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > puCollection_;
   edm::EDGetTokenT<bool> BadChCandFilterToken_;
   edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleIdMapToken_;
   edm::EDGetTokenT<LHEEventProduct> LHEEventToken_;
   edm::EDGetTokenT<LHERunInfoProduct> LHERunInfoToken_;
 
@@ -342,7 +346,10 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
   tauToken_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("taus"))),
   muonToken_(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons"))),
-  electronToken_(consumes<pat::ElectronCollection>(iConfig.getParameter<edm::InputTag>("electrons"))),
+  // electronsMiniAODToken_    = mayConsume<edm::View<reco::GsfElectron> >
+  // (iConfig.getParameter<edm::InputTag>
+  // ("electronsMiniAOD"));
+  electronToken_(mayConsume<edm::View<reco::GsfElectron>>(iConfig.getParameter<edm::InputTag>("electrons"))),
   metToken_(consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("mets"))),
   triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))),
   triggerBits_MET_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits_MET"))),
@@ -355,6 +362,7 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   puCollection_(consumes<std::vector<PileupSummaryInfo> >(iConfig.getParameter<edm::InputTag>("pileupCollection"))),
   BadChCandFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadChargedCandidateFilter"))),
   BadPFMuonFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadPFMuonFilter"))),
+  eleIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleIdMap"))),
   LHEEventToken_( consumes<LHEEventProduct>( iConfig.getParameter<edm::InputTag>( "LHEEventTag" ))),
   //  LHERunInfoToken_( consumes<LHERunInfoProduct,edm::InRun> ( iConfig.getParameter<edm::InputTag>( "LHEEventTag" ))),
   LHERunInfoToken_( consumes<LHERunInfoProduct,edm::InRun> (edm::InputTag("externalLHEProducer"))),
@@ -383,23 +391,27 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_EventCount = histoDir.make<TH1I>("eventCount", "EventCount", 10, 0, 10);
   h1_nGenTau = histoDir.make<TH1I>("nGenTau", "nGenTau", 5, -0.5, 4.5);
   h1_nGoodTau_Reco = histoDir.make<TH1I>("nGoodTauReco", "nGoodTauReco", 5, -0.5, 4.5);
-  h1_TauPt_Gen = histoDir.make<TH1D>("tauPt_Gen", "TauPt_Gen", nbinMT, xlowMT, xupMT);
-  h1_TauPt_reco = histoDir.make<TH1D>("tauPt_reco", "TauPt_reco", nbinMT, xlowMT, xupMT);
-  h1_TauPt_goodreco = histoDir.make<TH1D>("tauPt_goodreco", "TauPt_goodreco", 50, 0, 1000);
+  h1_TauPt_Gen = histoDir.make<TH1D>("tauPt_Gen", "TauPt_Gen", 1000, 0, 4000);
+  h1_TauPt_reco = histoDir.make<TH1D>("tauPt_reco", "TauPt_reco", 1000, 0, 4000);
+  h1_TauPt_goodreco = histoDir.make<TH1D>("tauPt_goodreco", "TauPt_goodreco", 1000, 0, 4000);
   h1_TauEta_reco = histoDir.make<TH1D>("tauEta_reco", "TauEta_reco", 48, -2.4, 2.4);
   h1_TauEta_goodreco = histoDir.make<TH1D>("tauEta_goodreco", "TauEta_goodreco", 48, -2.4, 2.4);
-  h1_TauPt_Stage1 = histoDir.make<TH1D>("tauPt_Stage1", "TauPt_Stage1", nbinMT, xlowMT, xupMT);
-  h1_TauPt_RegA_Stage1 = histoDir.make<TH1D>("tauPt_RegA_Stage1", "TauPt_RegA_Stage1", nbinMT, xlowMT, xupMT);
-  h1_TauPt_RegC_Stage1 = histoDir.make<TH1D>("tauPt_RegC_Stage1", "TauPt_RegC_Stage1", nbinMT, xlowMT, xupMT);
-  h1_TauPt_GenMatchedTau_RegC_Stage1 = histoDir.make<TH1D>("tauPt_GenMatchedTau_RegC_Stage1", "TauPt_GenMatchedTau_RegC_Stage1", nbinMT, xlowMT, xupMT);
+  h1_TauPt_Stage1 = histoDir.make<TH1D>("tauPt_Stage1", "TauPt_Stage1", 1000, 0, 4000);
+  /*
+  h1_TauPt_RegA_Stage1 = histoDir.make<TH1D>("tauPt_RegA_Stage1", "TauPt_RegA_Stage1", 1000, 0, 4000);
+  h1_TauPt_RegC_Stage1 = histoDir.make<TH1D>("tauPt_RegC_Stage1", "TauPt_RegC_Stage1", 1000, 0, 4000);
+  h1_TauPt_GenMatchedTau_RegC_Stage1 = histoDir.make<TH1D>("tauPt_GenMatchedTau_RegC_Stage1", "TauPt_GenMatchedTau_RegC_Stage1", 1000, 0, 1000);
   h1_TauPt_RegD_Stage1 = histoDir.make<TH1D>("tauPt_RegD_Stage1", "TauPt_RegD_Stage1", nbinMT, xlowMT, xupMT);
   h1_TauPt_GenMatchedTau_RegD_Stage1 = histoDir.make<TH1D>("tauPt_GenMatchedTau_RegD_Stage1", "TauPt_GenMatchedTau_RegD_Stage1", nbinMT, xlowMT, xupMT);
+  */
   h1_MT_Stage1 = histoDir.make<TH1D>("mT_Stage1", "MT_Stage1", nbinMT, xlowMT, xupMT);
+  /*
   h1_MT_RegA_Stage1 = histoDir.make<TH1D>("mT_RegA_Stage1", "MT_RegA_Stage1", nbinMT, xlowMT, xupMT);
   h1_MT_RegC_Stage1 = histoDir.make<TH1D>("mT_RegC_Stage1", "MT_RegC_Stage1", nbinMT, xlowMT, xupMT);
   h1_MT_GenMatchedTau_RegC_Stage1 = histoDir.make<TH1D>("mT_GenMatchedTau_RegC_Stage1", "MT_GenMatchedTau_RegC_Stage1", nbinMT, xlowMT, xupMT);
   h1_MT_RegD_Stage1 = histoDir.make<TH1D>("mT_RegD_Stage1", "MT_RegD_Stage1", nbinMT, xlowMT, xupMT);
   h1_MT_GenMatchedTau_RegD_Stage1 = histoDir.make<TH1D>("mT_GenMatchedTau_RegD_Stage1", "MT_GenMatchedTau_RegD_Stage1", nbinMT, xlowMT, xupMT);
+  */
   h1_MT_Stage1_metUncert_JetEnUp = histoDir.make<TH1D>("mT_Stage1_metUncert_JetEnUp", "MT_Stage1_metUncert_JetEnUp", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_metUncert_JetEnDown = histoDir.make<TH1D>("mT_Stage1_metUncert_JetEnDown", "MT_Stage1_metUncert_JetEnDown", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_metUncert_JetResUp = histoDir.make<TH1D>("mT_Stage1_metUncert_JetResUp", "MT_Stage1_metUncert_JetResUp", nbinMT, xlowMT, xupMT);
@@ -420,9 +432,10 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_MT_Stage1_pileupUncertDown =histoDir.make<TH1D>("mT_Stage1_pileupUncertDown", "MT_Stage1_pileupUncertDown", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_kFactorUp =histoDir.make<TH1D>("mT_Stage1_kFactorUp", "MT_Stage1_kFactorUp", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_kFactorDown =histoDir.make<TH1D>("mT_Stage1_kFactorDown", "MT_Stage1_kFactorDown", nbinMT, xlowMT, xupMT);
-  h1_MET_Stage2 = histoDir.make<TH1D>("MET_stage2", "MET_Stage2", nbinMT, xlowMT, xupMT);
-  h1_dphiTauMET_Stage2 = histoDir.make<TH1D>("dphiTauMET_stage2", "dPhiTauMET_Stage2", 500, -1.0, 4.0);
-  h1_pToverEtMiss_Stage2 = histoDir.make<TH1D>("pToverEtMiss_stage2", "pToverEtMiss_Stage2", 12000, 0.0, 12);
+
+  h1_MET_Stage2 = histoDir.make<TH1D>("MET_stage2", "MET_Stage2", 1000, 0, 4000);
+  h1_dphiTauMET_Stage2 = histoDir.make<TH1D>("dphiTauMET_stage2", "dPhiTauMET_Stage2", 100, -1.0, 4.0);
+  h1_pToverEtMiss_Stage2 = histoDir.make<TH1D>("pToverEtMiss_stage2", "pToverEtMiss_Stage2", 1200, 0.0, 12);
 
   if ( doPDFuncertainty ) {
     h1_MT_Stage1_pdfUncertUp = histoDir.make<TH1D>("mT_Stage1_pdfUncertUp", "MT_Stage1_pdfUncertUp", nbinMT, xlowMT, xupMT);
@@ -503,6 +516,7 @@ MiniAODAnalyzer::~MiniAODAnalyzer()
 {
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
+  delete  histname_MT;
   delete  m_kfactorFile_ele;
   delete  m_kfactorFile_tau;
   delete  m_kfactorFile_muo;
@@ -982,34 +996,33 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    }
    //  std::cout << "nTightMu=" << nTightMu << std::endl;
 
-   int nLooseEle=0;
-   //   int nLooseEle_HighPt=0;
-   //edm::Handle<pat::ElectronCollection> electrons;///in header now
-   iEvent.getByToken(electronToken_, electrons);
-   for (const pat::Electron &el : *electrons) {
-     //std::cout <<      el.electronIDs().size() << std::endl;
-     //std::cout <<      el.electronIDs().front().first << std::endl;
-     if (el.pt() < 5) continue;
-     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
-     //std::cout << "ele pt " << el.pt() << " ele eta" << abs(el.eta()) << " ele id " << el.electronID("cutBasedElectronID-Spring15-25ns-V1-standalone-loose") << std::endl;
-     if ( (el.pt()>20) &&  ( abs(el.eta())<2.5 )  && (el.electronID("cutBasedElectronID-Spring15-25ns-V1-standalone-loose")>6) ){
-     // if ( (el.pt()>20) &&  ( abs(el.eta())<2.5 )  && (el.electronID("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose")>6) ){
-         nLooseEle++;
-         EleIDPassed->push_back(1);}
-     else {EleIDPassed->push_back(0);}
-     //printf("elec with pt %4.1f, supercluster eta %+5.3f, sigmaIetaIeta %.3f  ",
-     //      el.pt(), el.superCluster()->eta(), el.sigmaIetaIeta()  );
-   }
-     //std::cout << "nLooseEle=" << nLooseEle << std::endl;
+   edm::Handle<edm::ValueMap<bool> > ele_id_decisions;
+   iEvent.getByToken(eleIdMapToken_ ,ele_id_decisions);
 
+   int nLooseEle=0;
+   iEvent.getByToken(electronToken_, electrons);
+   // for (const pat::Electron &el : *electrons) {
+   for (size_t i = 0; i < electrons->size(); ++i){
+     const auto el = electrons->ptrAt(i);
+     if (el->pt() < 5) continue;
+     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
+     //if ( (el.pt()>20) &&  ( abs(el.eta())<2.5 )  && (el.electronID("cutBasedElectronID-Spring15-25ns-V1-standalone-loose")>6) ){
+     bool isPassEleId  = (*ele_id_decisions)[el];
+     if ( (el->pt()>20) &&  ( abs(el->eta())<2.5 )  && isPassEleId ){
+       //     if ( (el.pt()>20) &&  ( abs(el.eta())<2.5 )  && (el.electronID("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose")>6) ){
+       nLooseEle++;
+       EleIDPassed->push_back(1);}
+     else {EleIDPassed->push_back(0);}
+   }
+   //   std::cout << "nLooseEle=" << nLooseEle << std::endl;
    //edm::Handle<pat::TauCollection> taus;///in header now
    int nGoodTau=0;
    double tau_pt[10]={0};
    double tau_phi[10]={0};
 
-   int nGoodNonIsoTau=0;
-   double tau_pt_nonIso[10]={0};
-   double tau_phi_nonIso[10]={0};
+   // int nGoodNonIsoTau=0;
+   //   double tau_pt_nonIso[10]={0};
+   // double tau_phi_nonIso[10]={0};
 
    int nGoodTau_ScaleUp=0;
    double tau_pt_ScaleUp[10]={0};
@@ -1023,22 +1036,25 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    TLorentzVector tau_NoShift(0,0,0,0);
    TLorentzVector tau_ScaleUp(0,0,0,0);
    TLorentzVector tau_ScaleDown(0,0,0,0);
-   TLorentzVector tau_nonIso(0,0,0,0);
+   // TLorentzVector tau_nonIso(0,0,0,0);
 
    iEvent.getByToken(tauToken_, taus);
 
+  
    for (const pat::Tau &tau : *taus) {
+
+     /*
      if (PassTauID_NonIsolated(tau)==true) {
        tau_nonIso.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
        if (PassTauAcceptance(tau_nonIso)==true) {
-             tau_pt_nonIso[nGoodNonIsoTau]=tau_nonIso.Pt();
-             tau_phi_nonIso[nGoodNonIsoTau]=tau_nonIso.Phi();
-             nGoodNonIsoTau++;
+	 tau_pt_nonIso[nGoodNonIsoTau]=tau_nonIso.Pt();
+	 tau_phi_nonIso[nGoodNonIsoTau]=tau_nonIso.Phi();
+	 nGoodNonIsoTau++;
        }
      }
+     */
 
      if ( (PassTauID(tau)==true) ) {
-
        tau_NoShift.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
        tau_ScaleUp.SetPxPyPzE((1+tauScaleShift)*(tau.px()),(1+tauScaleShift)*(tau.py()),(1+tauScaleShift)*(tau.pz()),(1+tauScaleShift)*(tau.energy()));
        tau_ScaleDown.SetPxPyPzE((1-tauScaleShift)*(tau.px()),(1-tauScaleShift)*(tau.py()),(1-tauScaleShift)*(tau.pz()),(1-tauScaleShift)*(tau.energy()));
@@ -1246,12 +1262,13 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      }
    }
 
+   /*
    //--------------//
    //-- Region A --// Only one non-isolated tau //
    //--------------//
    if (passTauTrig && passAllMETFilters ) {
      if ( (nvtx>0) && (nTightMu==0) && (nLooseEle==0) ) {
-       //** Stage1 = final stage (all cuts applied) **//
+       // Stage1 = final stage (all cuts applied) //
        if ( (PassFinalCuts(nGoodNonIsoTau,met_val,met_phi,tau_pt_nonIso[0],tau_phi_nonIso[0]) == true) ) {
          h1_TauPt_RegA_Stage1->Fill(tau_pt_nonIso[0],final_weight);
          //std::cout << "*Standard* dphi_tau_met=" << dphi_tau_met << std::endl;
@@ -1262,6 +1279,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      }
    }
 
+*/
+
+   /*
    //--------------//
    //-- Region C --// One non-isolated tau + one isolated e/mu
    //--------------//
@@ -1289,7 +1309,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        }
      }
    }
-   
+   */
+
+   /*
    //--------------//
    //-- Region D --// One isolated tau + one isolated e/mu
    //--------------//
@@ -1315,7 +1337,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        }
      }
    }
-   
+   */
+
    //QCDAnalyse();
    //if (not RunOnData)
    QCDAnalyseTau(met,final_weight,pruned);
@@ -2360,7 +2383,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
             }
             i++;
         }
-        if (eleBool) std::cout << "electron passed " << std::endl;
+	//        if (eleBool) std::cout << "electron passed " << std::endl;
         i=0;
         bool muonBool=false;
         //for( auto part: MuonList) {

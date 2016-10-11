@@ -9,5 +9,8 @@
 <use name="DataFormats/VertexReco"/>
 <use name="PhysicsTools/Utilities"/>
 <use name="SimDataFormats/PileupSummaryInfo"/>
+<use name="CommonTools/UtilAlgos"/>
+<use name="RecoEgamma/EgammaTools" />
+<use name="RecoEgamma/ElectronIdentification" />
 <use name="HLTrigger/HLTcore"/>
 <flags EDM_PLUGIN="1"/>

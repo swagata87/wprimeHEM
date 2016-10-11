@@ -20,6 +20,7 @@
 <use name="JetMETCorrections/Objects"/>
 <use name="CondFormats/JetMETObjects"/>
 <use name="RecoEgamma/EgammaTools"/>
+<use name="RecoEgamma/ElectronIdentification" />
 <export>
   <use name="root"/>
   <lib   name="1"/>
