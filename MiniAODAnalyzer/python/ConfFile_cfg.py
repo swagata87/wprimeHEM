@@ -4,6 +4,7 @@ process = cms.Process("Demo")
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
+
 #  as a rule, find the "auto" global tag in $CMSSW_RELEASE_BASE/src/Configuration/AlCa/python/autoCond.py
 #  This auto global tag will look up the "proper" global tag
 #  that is typically found in the DAS under the Configs for given dataset
@@ -22,22 +23,7 @@ process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",
     moduleMemorySummary = cms.untracked.bool(True),                                        
 )
 
-## MET filter ##
-#process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
-#process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
-#process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
-##
-#process.load('RecoMET.METFilters.BadChargedCandidateFilter_cfi')
-#process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
-#process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
-##
-
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-# turn on VID producer, indicate data format  to be
-# DataFormat.AOD or DataFormat.MiniAOD, as appropriate 
-#if useAOD == True :
-#    dataFormat = DataFormat.AOD
-#else 
 dataFormat = DataFormat.MiniAOD
 switchOnVIDElectronIdProducer(process, dataFormat)
 
@@ -116,10 +102,6 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        doPDFuncertainty_ = cms.bool(True),
 
 )
-
-#process.out = cms.OutputModule("PoolOutputModule",
-#        fileName = cms.untracked.string('analysis.root')
-#)
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string('hist_analysis.root'),
