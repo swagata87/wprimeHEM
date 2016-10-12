@@ -19,7 +19,7 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",
     ignoreTotal = cms.untracked.int32(1),
-    moduleMemorySummary = cms.untracked.bool(True),                                        
+    moduleMemorySummary = cms.untracked.bool(True),
 )
 
 ## MET filter ##
@@ -34,10 +34,10 @@ process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",
 
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 # turn on VID producer, indicate data format  to be
-# DataFormat.AOD or DataFormat.MiniAOD, as appropriate 
+# DataFormat.AOD or DataFormat.MiniAOD, as appropriate
 #if useAOD == True :
 #    dataFormat = DataFormat.AOD
-#else 
+#else
 dataFormat = DataFormat.MiniAOD
 switchOnVIDElectronIdProducer(process, dataFormat)
 
@@ -88,6 +88,7 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        taus = cms.InputTag("slimmedTaus"),
        muons = cms.InputTag("slimmedMuons"),
        electrons = cms.InputTag("slimmedElectrons"),
+       jets = cms.InputTag("slimmedJets"),
        mets = cms.InputTag("slimmedMETs"),
        bits = cms.InputTag("TriggerResults","","HLT"),
        bits_MET = cms.InputTag("TriggerResults","","RECO"),  ##for data
