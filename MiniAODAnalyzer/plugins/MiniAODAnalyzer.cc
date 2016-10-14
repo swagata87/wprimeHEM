@@ -39,6 +39,7 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/PatCandidates/interface/Tau.h"
+#include "DataFormats/PatCandidates/interface/Particle.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -111,6 +112,7 @@ private:
   virtual void beginRun( edm::Run const &iRun, edm::EventSetup const &iSetup ) override;
   bool PassTauID(const pat::Tau &tau);
   bool PassTauID_NonIsolated(const pat::Tau &tau);
+  bool PassTauID_NonIsolated(const pat::Tau &tau, std::string idcheck);
   bool PassTauAcceptance(TLorentzVector tau);
   bool FindTauIDEfficiency(const edm::Event&,TLorentzVector gen_p4);
   bool PassFinalCuts(int nGoodTau_, double met_val_, double met_phi_, double tau_pt_, double tau_phi_);
@@ -125,7 +127,7 @@ private:
   virtual void Create_Trees();
   virtual void Fill_Tree(TLorentzVector sel_lepton, const pat::MET sel_met,double weight, std::string systematic);
   //virtual void Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, const pat::MET sel_met, double weight);
-  virtual void Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lepton_n, edm::Handle<std::vector<pat::Jet>> JetList,const pat::MET sel_met, double weight);
+  virtual void Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lepton_n, edm::Handle<std::vector<pat::Jet>> JetList,const pat::MET sel_met, double weight,int ifake);
 
   std::unordered_map< std::string,float > mLeptonTree;
   //  std::unordered_map< std::string,float > *mLeptonTree = new std::unordered_map< std::string,float >;
@@ -171,6 +173,8 @@ private:
   TH1D* m_kfactorHist_ele[3];
   TH1D* m_kfactorHist_muo[3];
   TH1D* m_kfactorHist_tau[3];
+
+
   std::string sourceFileString;
   double WtoInt;
   double WJetsInt;
@@ -181,10 +185,15 @@ private:
 
   //discriminators
   std::vector<std::string> *d_mydisc = new std::vector<std::string> ;
+  std::vector<std::string> *d_mydisc_emu = new std::vector<std::string> ;
+  std::vector<std::string> *d_mydisc_mu = new std::vector<std::string> ;
+  void SetUpDisc();
 
   //QCD stuff
   double minDphiMET(std::vector<pat::Jet> JetList, const pat::MET sel_met);
-  void QCDAnalyse();
+  void QCDAnalyse(const pat::MET sel_met);
+  bool check_single_tau_kinematics(pat::Tau lepton, const pat::MET sel_met);
+
   edm::Handle<pat::MuonCollection> muons;
   // pat::Electron objects can be recast as reco::GsfElectron objects //
   edm::Handle<edm::View<reco::GsfElectron> > electrons;
@@ -203,6 +212,24 @@ private:
   int vetoNumberEle(double ptTreshold,double vetoConeSize);
   int vetoNumberMuon(double ptTreshold,double vetoConeSize);
   int vetoNumberTau(double ptTreshold);
+  bool m_do_complicated_tau_stuff;
+  //std::map<int,std::vector<pat::Particle>>qcd_leptons;
+  std::vector<pat::Tau> *qcd_lepton_tau = new std::vector<pat::Tau>;
+  std::vector<double> *qcd_weight_tau = new std::vector<double>;
+  std::vector<pat::Electron> *qcd_lepton_ele = new std::vector<pat::Electron>;
+  std::vector<double> *qcd_weight_ele = new std::vector<double>;
+  std::vector<pat::Muon> *qcd_lepton_mu = new std::vector<pat::Muon>;
+  std::vector<double> *qcd_weight_mu = new std::vector<double>;
+
+  //std::string QCDWeightE_;
+  //std::string QCDWeightMu_;
+  std::string QCDWeightTau_;
+  //TFile* m_qcdweightFile_ele;
+  //TFile* m_qcdweightFile_muo;
+  TFile* m_qcdweightFile_tau;
+  //TH1D* hist_qcd_weight_ele;
+  //TH1D* hist_qcd_weight_muo;
+  TH2D* hist_qcd_weight_tau;
 
   std::vector<int> *EleIDPassed = new std::vector<int> ;
   std::vector<int> *MuonIDPassed = new std::vector<int>;
@@ -390,6 +417,10 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   KFactorMu_ = iConfig.getParameter<std::string>("KFactorMu") ;
   KFactorTau_ = iConfig.getParameter<std::string>("KFactorTau") ;
   sourceFileString=iConfig.getParameter<std::string>("sourceFileString");
+  //QCDWeightE_ = iConfig.getParameter<std::string>("QCDWeightE") ;
+  //QCDWeightMu_ = iConfig.getParameter<std::string>("QCDWeightMu") ;
+  QCDWeightTau_ = iConfig.getParameter<std::string>("QCDWeightTau") ;
+  sourceFileString=iConfig.getParameter<std::string>("sourceFileString");
   useReweighting=iConfig.getParameter<bool>("useReweighting");
   TFileDirectory histoDir = fs->mkdir("histoDir");
   /////  if (isPowheg) lheString = "source" ;
@@ -476,6 +507,18 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
           helper->CreateHisto(nstages,Form("Tau_nofake_pt_%s",gen.c_str()),  8000, 0, 8000, "p_{T} [GeV]");
       }
   }
+  m_do_complicated_tau_stuff=false;
+
+
+  //m_qcdweightFile_ele = new TFile( ,"READ");
+  //qcd_weight_ele=(TH1D*) qcd_weight_ele.Get("qcdFake_pt");
+  //qcd_weight_ele->SetName("eleFake");
+  //m_qcdweightFile_muo = new TFile( ,"READ");
+  //qcd_weight_muo=(TH1D*) qcd_weight_muo.Get("qcdFake_pt");
+  //qcd_weight_muo->SetName("muoFake");
+  m_qcdweightFile_tau = new TFile(QCDWeightTau_.c_str(),"READ");
+  hist_qcd_weight_tau=(TH2D*) m_qcdweightFile_tau->Get("qcdFake_pt");
+  hist_qcd_weight_tau->SetName("tauFake");
 
   ///k-factor
   m_kfactorFile_ele= new TFile(KFactorE_.c_str(),"READ");
@@ -495,10 +538,7 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
 
   // discriminators
   d_mydisc->clear();
-  d_mydisc->push_back("byLooseCombinedIsolationDeltaBetaCorr3Hits");
-  d_mydisc->push_back("byMediumCombinedIsolationDeltaBetaCorr3Hits");
-  d_mydisc->push_back("byPhotonPtSumOutsideSignalCone");
-  d_mydisc->push_back("byTightCombinedIsolationDeltaBetaCorr3Hits");
+  SetUpDisc();
 
   h1_recoVtx_NoPUWt = histoDir.make<TH1D>("recoVtx_NoPUWt", "RecoVtx_NoPUWt", 100, 0, 100);
   h1_recoVtx_WithPUWt = histoDir.make<TH1D>("recoVtx_WithPUWt", "RecoVtx_WithPUWt", 100, 0, 100);
@@ -526,9 +566,18 @@ MiniAODAnalyzer::~MiniAODAnalyzer()
   delete  m_kfactorFile_ele;
   delete  m_kfactorFile_tau;
   delete  m_kfactorFile_muo;
+  delete  m_qcdweightFile_tau;
   delete  pdf_indices;
   delete  inpdfweights;
   delete  d_mydisc;
+  delete  d_mydisc_emu;
+  delete  d_mydisc_mu;
+  delete  qcd_lepton_ele;
+  delete  qcd_weight_ele;
+  delete  qcd_lepton_mu;
+  delete  qcd_lepton_mu;
+  delete  qcd_lepton_tau;
+  delete  qcd_weight_tau;
   delete  EleIDPassed;
   delete  MuonIDPassed;
   delete  FakeCandPt;
@@ -1344,15 +1393,27 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      }
    }
    */
-
-   //QCDAnalyse();
+   bool doQCDAna=true;
+   qcd_lepton_ele->clear();
+   qcd_weight_ele->clear();
+   qcd_lepton_mu->clear();
+   qcd_weight_mu->clear();
+   qcd_lepton_tau->clear();
+   qcd_weight_tau->clear();
+   if (doQCDAna) QCDAnalyse(met);
    //if (not RunOnData)
    QCDAnalyseTau(met,final_weight,pruned);
    //if(tau_NoShift.Pt()>80 && calcMT(tau_NoShift,met)>50){
    iEvent.getByToken(jetToken_, jets);
 
    //Fill_QCD_Tree(true,tau_NoShift,met,final_weight);
-   Fill_QCD_Tree(true,tau_NoShift,15,jets,met,final_weight);
+   Fill_QCD_Tree(true,tau_NoShift,15,jets,met,final_weight,0);
+   for(unsigned int ifake=0; ifake<qcd_lepton_tau->size(); ifake++){
+       pat::Tau qcd_lepton=(*qcd_lepton_tau)[ifake];
+       if(qcd_lepton.pt()>50 && calcMT(qcd_lepton,met)>50){
+           Fill_QCD_Tree(false,tau_NoShift,15,jets,met,final_weight,ifake);
+       }
+   }
    Fill_Tree(tau_NoShift,met,final_weight,"");
    helper->Tree_Filler("reweighttree");
    //}
@@ -1451,7 +1512,27 @@ bool MiniAODAnalyzer::PassTauID_NonIsolated(const pat::Tau &tau)
 
    return passTauID_NonIso_;
 }
+bool MiniAODAnalyzer::PassTauID_NonIsolated(const pat::Tau &tau, std::string idcheck){
+    ///needs to be implemented
 
+    //if(m_tauIso[idcheck]){
+        //return tau->getUserRecord(Form("IsoFailedFull_%s",idcheck.c_str()));
+    //}
+    //if(tau->hasUserRecord(Form("FullIDpassed_%s",idcheck.c_str()))){
+        //if(tau->getUserRecord(Form("FullIDpassed_%s",idcheck.c_str())).toBool()){
+            //return false;
+        //}
+    //}
+    bool passTauID_NonIso_=true;
+
+    //----Tau ID----//
+    if ( tau.tauID("decayModeFindingNewDMs") < 0.5 ) passTauID_NonIso_=false;
+    if ( tau.tauID(idcheck) > 0.5 ) passTauID_NonIso_=false;
+    if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_NonIso_=false;
+    if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_NonIso_=false;
+
+    return passTauID_NonIso_;
+}
 bool MiniAODAnalyzer::PassTauAcceptance(TLorentzVector tau)
 {
   bool passTauAcc_=true;
@@ -1681,6 +1762,18 @@ void MiniAODAnalyzer::Create_Trees(){
   mQCDTree["decay_mode"]=0;
   mQCDTree["metTriggerd"]=0;
 
+  for(unsigned int ilep=1;ilep<3; ilep++){
+    mQCDTree[ Form("mt_%d", ilep)   ]=0;
+    mQCDTree[ Form("pt_%d", ilep)]=0;
+    mQCDTree[ Form("eta_%d", ilep)]=0;
+    mQCDTree[ Form("delta_phi_%d", ilep)]=0;
+    mQCDTree[ Form("decay_mode_%d", ilep)]=0;
+    //if(m_do_complicated_tau_stuff){
+    //for(auto idisc : d_mydisc){
+    //mQCDTree[Form("%s_%d", idisc.c_str() ,ilep ) ]=0;
+    //}
+    //}
+  }
 /*        if(m_do_complicated_tau_stuff){
             for(auto idisc : d_mydisc){
                 mQCDTree[idisc]=0;
@@ -1857,7 +1950,7 @@ void MiniAODAnalyzer::Fill_Tree(TLorentzVector sel_lepton, const pat::MET sel_me
 }
 
 //void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, const pat::MET sel_met, double weight){
-void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lepton_n, edm::Handle<std::vector<pat::Jet>> JetList, const pat::MET sel_met, double weight){
+void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lepton_n, edm::Handle<std::vector<pat::Jet>> JetList, const pat::MET sel_met, double weight,int ifake){
 
     if(iso){
         mQCDTree["lepton_n"]=lepton_n;
@@ -1910,13 +2003,13 @@ void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lept
         mQCDTree["ThisWeight"]=weight;
         mQCDTree["met"]=sel_met.pt();
         mQCDTree["minDphi"]=minDphiMET(*JetList,sel_met);
-        //qcd_lepton=qcd_leptons[lepton_n][0];
+        pat::Tau qcd_lepton=(*qcd_lepton_tau)[0];
 
-        //mQCDTree["QCDWeight"]=qcd_weight[qcd_lepton->getPdgNumber()][ifake];
-        //mQCDTree["mt"]=calcMT(qcd_lepton,sel_met);
-        //mQCDTree["pt"]=qcd_lepton.Pt();
-        //mQCDTree["eta"]=qcd_lepton.Eta();
-        //mQCDTree["delta_phi"]=DeltaPhi(qcd_lepton,sel_met);
+        mQCDTree["QCDWeight"]=(*qcd_weight_tau)[ifake];
+        mQCDTree["mt"]=calcMT(qcd_lepton,sel_met);
+        mQCDTree["pt"]=qcd_lepton.pt();
+        mQCDTree["eta"]=qcd_lepton.eta();
+        mQCDTree["delta_phi"]=deltaPhi(qcd_lepton.phi(),sel_met.phi());
         //mQCDTree["lepton_type"]=qcd_lepton->getPdgNumber();
         mQCDTree["lepton_type"]=lepton_n;
         mQCDTree["metTriggerd"]=0;
@@ -1928,7 +2021,7 @@ void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lept
                 //mQCDTree["metTriggerd"]=1.;
             //}
         //}
-        //mQCDTree["decay_mode"]=qcd_lepton.decayMode();
+        mQCDTree["decay_mode"]=qcd_lepton.decayMode();
         //if(abs(qcd_lepton->getPdgNumber())==15 && m_do_complicated_tau_stuff){
             //for(auto idisc : d_mydisc){
                 //mQCDTree[idisc]=qcd_lepton->getUserRecord(idisc).toDouble();
@@ -1946,26 +2039,27 @@ void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lept
                 //}
             //}
         }
-        //int i_qcd=1;
-        //for(auto i_qcd_lepton: qcd_leptons[lepton_n]){
+        int i_qcd=1;
+        for(auto i_qcd_lepton: *qcd_lepton_tau){
             //if(i_qcd_lepton== qcd_lepton){
                 //continue;
             //}
-            //if(i_qcd> 2){
-                //break;
-            //}
-            //mQCDTree[ Form("mt_%d", i_qcd)   ]=calcMT(i_qcd_lepton,sel_met);
-            //mQCDTree[ Form("pt_%d", i_qcd)]=i_qcd_lepton-Pt();
-            //mQCDTree[ Form("eta_%d", i_qcd)]=i_qcd_lepton.Eta();
-            //mQCDTree[ Form("delta_phi_%d", i_qcd)]=deltaPhi(i_qcd_lepton.Phi(),sel_met.phi());
-            //mQCDTree[Form("decay_mode_%d", i_qcd)]=i_qcd_lepton.decayMode();
+            if(i_qcd> 2){
+                break;
+            }
+            mQCDTree[ Form("mt_%d", i_qcd)   ]=calcMT(i_qcd_lepton,sel_met);
+            mQCDTree[ Form("pt_%d", i_qcd)]=i_qcd_lepton.pt();
+            mQCDTree[ Form("eta_%d", i_qcd)]=i_qcd_lepton.eta();
+            mQCDTree[ Form("delta_phi_%d", i_qcd)]=deltaPhi(i_qcd_lepton.phi(),sel_met.phi());
+            mQCDTree[Form("decay_mode_%d", i_qcd)]=i_qcd_lepton.decayMode();
             //~if(abs(i_qcd_lepton->getPdgNumber())==15 && m_do_complicated_tau_stuff){
                 //~for(auto idisc : d_mydisc){
                     //~mQCDTree[Form("%s_%d", idisc.c_str(), i_qcd) ]=i_qcd_lepton->getUserRecord(idisc).toDouble();
                 //~}
             //~}
-            //~i_qcd++;
-        //}
+            i_qcd++;
+            //std::cout << "in" << std::endl;
+        }
         helper->Tree_Filler("qcdtree");
     }
 }
@@ -2162,171 +2256,158 @@ double MiniAODAnalyzer::getWmass(edm::Handle<edm::View<reco::GenParticle>> genPa
     return wmass_stored;
 }
 
-/*
-void MiniAODAnalyzer::QCDAnalyse() {
+void MiniAODAnalyzer::SetUpDisc(){
+    ///tau discriminators
+    d_mydisc->push_back("byLooseCombinedIsolationDeltaBetaCorr3Hits");
+    d_mydisc->push_back("byLooseCombinedIsolationDeltaBetaCorr3HitsdR03");
+    d_mydisc->push_back("byLooseIsolationMVA3newDMwLT");
+    d_mydisc->push_back("byLooseIsolationMVArun2v1DBnewDMwLT");
+    d_mydisc->push_back("byLooseIsolationMVArun2v1PWnewDMwLT");
+    d_mydisc->push_back("byLoosePileupWeightedIsolation3Hits");
+    d_mydisc->push_back("byMediumCombinedIsolationDeltaBetaCorr3Hits");
+    d_mydisc->push_back("byMediumCombinedIsolationDeltaBetaCorr3HitsdR03");
+    d_mydisc->push_back("byMediumIsolationMVA3newDMwLT");
+    d_mydisc->push_back("byMediumIsolationMVArun2v1DBnewDMwLT");
+    d_mydisc->push_back("byMediumIsolationMVArun2v1PWnewDMwLT");
+    d_mydisc->push_back("byMediumPileupWeightedIsolation3Hits");
+    d_mydisc->push_back("byTightCombinedIsolationDeltaBetaCorr3Hits");
+    d_mydisc->push_back("byTightCombinedIsolationDeltaBetaCorr3HitsdR03");
+    d_mydisc->push_back("byTightIsolationMVA3newDMwLT");
+    d_mydisc->push_back("byTightIsolationMVArun2v1DBnewDMwLT");
+    d_mydisc->push_back("byTightIsolationMVArun2v1PWnewDMwLT");
+    d_mydisc->push_back("byTightPileupWeightedIsolation3Hits");
+    d_mydisc->push_back("byVLooseIsolationMVA3newDMwLT");
+    d_mydisc->push_back("byVLooseIsolationMVArun2v1DBnewDMwLT");
+    d_mydisc->push_back("byVLooseIsolationMVArun2v1PWnewDMwLT");
+    d_mydisc->push_back("byVTightIsolationMVA3newDMwLT");
+    d_mydisc->push_back("byVTightIsolationMVArun2v1DBnewDMwLT");
+    d_mydisc->push_back("byVTightIsolationMVArun2v1PWnewDMwLT");
+    d_mydisc->push_back("byVVTightIsolationMVA3newDMwLT");
+    d_mydisc->push_back("byVVTightIsolationMVArun2v1DBnewDMwLT");
+    d_mydisc->push_back("byVVTightIsolationMVArun2v1PWnewDMwLT");
+
+    ///electron and muon discriminators
+    d_mydisc_emu->push_back("againstElectronLooseMVA5");
+    d_mydisc_emu->push_back("againstElectronLooseMVA6");
+    d_mydisc_emu->push_back("againstElectronMediumMVA5");
+    d_mydisc_emu->push_back("againstElectronMediumMVA6");
+    d_mydisc_emu->push_back("againstElectronTightMVA5");
+    d_mydisc_emu->push_back("againstElectronTightMVA6");
+    d_mydisc_emu->push_back("againstElectronVLooseMVA5");
+    d_mydisc_emu->push_back("againstElectronVLooseMVA6");
+    d_mydisc_emu->push_back("againstElectronVTightMVA5");
+    d_mydisc_emu->push_back("againstElectronVTightMVA6");
+    d_mydisc_emu->push_back("againstMuonLoose3");
+    d_mydisc_emu->push_back("againstMuonTight3");
+
+    ///muon discriminators
+    d_mydisc_mu->push_back("isPFMuon");
+    d_mydisc_mu->push_back("isGlobalMuon");
+    d_mydisc_mu->push_back("isTrackerMuon");
+    d_mydisc_mu->push_back("isStandAloneMuon");
+    d_mydisc_mu->push_back("isTightMuon");
+    d_mydisc_mu->push_back("isHighPtMuon");
+}
+
+void MiniAODAnalyzer::QCDAnalyse(const pat::MET sel_met) {
     //inverted isolation
-    if(sel_lepton!=0 or m_do_complicated_tau_stuff){
-        return;
+        //inverted isolation
+
+    double m_leptonVetoPt=20;
+    double vetoConeSize=0.3;
+    int numVetoEle=vetoNumberEle(m_leptonVetoPt, vetoConeSize);
+    int numVetoMuo=vetoNumberMuon(m_leptonVetoPt, vetoConeSize);
+    //int numVetoTau=vetoNumberTau(m_leptonVetoPt);
+
+
+    if( numVetoEle==0 && taus->size()>=1 && numVetoMuo==0 ){
+        int passedID=0;
+        std::map<std::string,int> passedID_disc;
+        for(std::vector<std::string>::iterator disc_it = d_mydisc->begin(); disc_it != d_mydisc->end(); disc_it++){
+            passedID_disc[(*disc_it)]=0;
+        }
+        for( pat::Tau it: *taus ) {
+
+            if(m_do_complicated_tau_stuff){
+                for(std::vector<std::string>::iterator disc_it = d_mydisc->begin(); disc_it != d_mydisc->end(); disc_it++){
+                    if(PassTauID_NonIsolated(it,*disc_it)){
+                        passedID_disc[(*disc_it)]++;
+                        //(*it)->setPdgNumber(15);
+                        qcd_lepton_tau->push_back(it);
+                    }
+                }
+            }else{
+                if( PassTauID_NonIsolated(it) ){
+                    passedID++;
+                    //(*it)->setPdgNumber(15);
+                    qcd_lepton_tau->push_back(it);
+                }
+            }
+        }
+        //std::cout << passedID << "tau" << std::endl;
     }
-    int qcd_id=0;
+
+    if(qcd_lepton_tau->size()>0){
+        unsigned int counter = 0;
+        for(pat::Tau i_qcd_lepton: *qcd_lepton_tau){
+            //check_single_tau_kinematics(i_qcd_lepton,sel_met);
+            //if(!i_qcd_lepton->getUserRecord("passedBasicKin").toBool()){
+            if (i_qcd_lepton.pt()<50){
+                qcd_weight_tau->push_back(0.);
+            }else{
+                //double content= hist_qcd_weight_tau->GetBinContent(hist_qcd_weight_tau->FindBin(i_qcd_lepton.pt(),i_qcd_lepton.eta()));
+                //qcd_weight_tau->push_back(max(0., content ));
+                qcd_weight_tau->push_back(std::max(0., hist_qcd_weight_tau->GetBinContent(hist_qcd_weight_tau->FindBin(i_qcd_lepton.pt(),i_qcd_lepton.eta()))));
+                //~qcd_weight[qcd_id].push_back(max(0.,qcd_weight_tau_pt->GetBinContent(qcd_weight_tau_pt->FindBin(i_qcd_lepton->getPt()  ))));
+            }
+            //double hist_content;
+            for(unsigned int i=0;  i<qcd_lepton_tau->size();i++){
+                //if (qcd_lepton_tau[i]==i_qcd_lepton){
+                if (i==counter){
+                    continue;
+                }
+                //~qcd_weight[qcd_id].back()*=(1-max(0.,qcd_weight_tau_pt->GetBinContent(qcd_weight_tau_pt->FindBin(qcd_leptons[qcd_id][i]->getPt(),i_qcd_lepton->getUserRecord("decayMode")))));
+                //hist_content=hist_qcd_weight_tau->GetBinContent(hist_qcd_weight_tau->FindBin(i_qcd_lepton.pt(),i_qcd_lepton.eta()  ));
+                //qcd_weight_tau->push_back()*=(1-max(0.,hist_content ));
+                qcd_weight_tau->back()*=(1-std::max(0.,hist_qcd_weight_tau->GetBinContent(hist_qcd_weight_tau->FindBin(i_qcd_lepton.pt(),i_qcd_lepton.eta()  ))));
+            }
+            counter++;
+            //cout<<qcd_weight[qcd_id].back()<<endl;
+        }
+
+    }
+
+}
+
+
+
+bool MiniAODAnalyzer::check_single_tau_kinematics(pat::Tau lepton, const pat::MET sel_met){
+    ///turns out not to be needed atm
     bool passed=false;
     bool passedPtMet=false;
     bool passedDeltaPhi=false;
 
-    double m_leptonVetoPt=20;
-    int numVetoMuo=vetoNumber(MuonList,m_leptonVetoPt);
-    int numVetoTau=vetoNumberTau(TauList,m_leptonVetoPt);
-    int numVetoEle=vetoNumber(EleList,m_leptonVetoPt);
+    double m_met_cut=120;
+    double m_delta_phi_cut=2.4;
+    double m_pt_met_min_cut=0.7;
+    double m_pt_met_max_cut=1.3;
+    //if(sel_met && lepton && lepton.pt()>m_pt_min_cut){
+    //if(sel_met && lepton && sel_met.pt()>m_met_cut){
+    if(sel_met.pt()>m_met_cut){
 
-
-    if( numVetoEle==0 && TauList->size()>=1 && numVetoMuo==0 ){
-        int passedID=0;
-        map<string,int> passedID_disc;
-        for(std::vector<std::string>::iterator disc_it = d_mydisc.begin(); disc_it != d_mydisc.end(); disc_it++){
-            passedID_disc[(*disc_it)]=0;
-        }
-        for( std::vector< pxl::Particle* >::iterator it = TauList->begin(); it != TauList->end(); ++it ) {
-
-            if(m_do_complicated_tau_stuff){
-                for(std::vector<std::string>::iterator disc_it = d_mydisc.begin(); disc_it != d_mydisc.end(); disc_it++){
-                    if(not ((*it)->getUserRecord( (*disc_it) ).toDouble()>0.5)){
-                        passedID_disc[(*disc_it)]++;
-                        (*it)->setPdgNumber(15);
-                        QCDLeptonList.push_back(*it);
-                    }
-                }
-            }else{
-                //if( Check_Tau_ID_no_iso(*it) ){
-                    //passedID++;
-                    //(*it)->setPdgNumber(15);
-                    //QCDLeptonList.push_back(*it);
-                //}
-            }
-        }
-        if(passedID>=1){
-            qcd_lepton=QCDLeptonList.at(0);
-            m_pt_min_cut=m_pt_min_cut_tau;
-            m_delta_phi_cut=m_delta_phi_cut_tau;
-            m_pt_met_min_cut=m_pt_met_min_cut_tau;
-            m_pt_met_max_cut=m_pt_met_max_cut_tau;
-
-            m_pt_met_min_cut_funk_root=m_pt_met_min_cut_funk_root_tau;
-            m_pt_met_max_cut_funk_root=m_pt_met_max_cut_funk_root_tau;
-            m_delta_phi_cut_funk_root=m_delta_phi_cut_funk_root_tau;
-            qcd_id=15;
-        }
-    }
-
-    if( EleList->size()>=1 && numVetoTau==0 && numVetoMuo==0 ){
-        int passedID=0;
-        for( std::vector< pxl::Particle* >::iterator it = EleList->begin(); it != EleList->end(); ++it ) {
-
-            if( (*it)->hasUserRecord("loosIDnoISO")){
-                if ( (*it)->getUserRecord("loosIDnoISO").toBool() or (*it)->getUserRecord("loosIDandISO").toBool() ){
-                    passedID++;
-                    (*it)->setPdgNumber(11);
-                    QCDLeptonList.push_back(*it);
-                }
-            }
-            //we can not do the fr if we tag the electrons!!
-            //else if (EleList->size()==1){
-                //passedID++;
-                //tmpEle=( pxl::Particle* ) EleList->at(0);
-                //break;
-            //}
-        }
-        //cout<<passedID<<endl;
-        if(passedID>=1){
-            qcd_lepton=QCDLeptonList.at(0);
-            m_pt_min_cut=m_pt_min_cut_ele;
-            m_delta_phi_cut=m_delta_phi_cut_ele;
-            m_pt_met_min_cut=m_pt_met_min_cut_ele;
-            m_pt_met_max_cut=m_pt_met_max_cut_ele;
-
-            m_pt_met_min_cut_funk_root=m_pt_met_min_cut_funk_root_ele;
-            m_pt_met_max_cut_funk_root=m_pt_met_max_cut_funk_root_ele;
-            m_delta_phi_cut_funk_root=m_delta_phi_cut_funk_root_ele;
-            qcd_id=11;
-        }
-    }
-    if( numVetoEle==0 && numVetoTau==0 && MuonList->size()>=1 ){
-        int passedID=0;
-        for( std::vector< pxl::Particle* >::iterator it = MuonList->begin(); it != MuonList->end(); ++it ) {
-            if( (*it)->hasUserRecord("ISOfailed")){
-                if (  (*it)->getUserRecord("ISOfailed").toBool() ){
-                    passedID++;
-                    (*it)->setPdgNumber(13);
-                    QCDLeptonList.push_back(*it);
-                }
-            }
-            //we can not do the fr if we tag the muons!!
-            //else if (MuonList->size()==1){
-                //passedID++;
-                //tmpMuo=( pxl::Particle* ) MuonList->at(0);
-                //break;
-            //}
-        }
-        if(passedID>=1){
-            qcd_lepton=QCDLeptonList.at(0);
-            m_pt_min_cut=m_pt_min_cut_muo;
-            m_delta_phi_cut=m_delta_phi_cut_muo;
-            m_pt_met_min_cut=m_pt_met_min_cut_muo;
-            m_pt_met_max_cut=m_pt_met_max_cut_muo;
-
-            m_pt_met_min_cut_funk_root=m_pt_met_min_cut_funk_root_muo;
-            m_pt_met_max_cut_funk_root=m_pt_met_max_cut_funk_root_muo;
-            m_delta_phi_cut_funk_root=m_delta_phi_cut_funk_root_muo;
-            qcd_id=13;
-        }
-    }
-
-    if(sel_met && qcd_lepton && qcd_lepton->getPt()>m_pt_min_cut){
-        if(qcd_id==11){
-            qcd_weight = max(0.,qcd_weight_ele_pt->GetBinContent(qcd_weight_ele_pt->FindBin(qcd_lepton->getPt())));
-            for(unsigned int i=1;  i<QCDLeptonList.size();i++){
-                qcd_weight*=(1-max(0.,qcd_weight_ele_pt->GetBinContent(qcd_weight_ele_pt->FindBin(QCDLeptonList[i]->getPt()))));
-            }
-            //for(unsigned int j=0;  j<QCDLeptonList.size();j++){
-                //qcd_weight = max(0.,qcd_weight_ele_pt->GetBinContent(qcd_weight_ele_pt->FindBin(QCDLeptonList[j]->getPt())));
-                //for(unsigned int i=0;  i<QCDLeptonList.size();i++){
-                    //if(i==j){
-                        //continue;
-                    //}
-                    //qcd_weight*=(1-max(0.,qcd_weight_ele_pt->GetBinContent(qcd_weight_ele_pt->FindBin(QCDLeptonList[i]->getPt()))));
-                //}
-            //}
-        }
-
-        if(qcd_id==13){
-            qcd_weight = max(0.,qcd_weight_muo_pt->GetBinContent(qcd_weight_muo_pt->FindBin(qcd_lepton->getPt())));
-        }
-        if(qcd_id==15){
-            qcd_weight = max(0.,qcd_weight_tau_pt->GetBinContent(qcd_weight_tau_pt->FindBin(qcd_lepton->getUserRecord("decayMode"))));
-        }
-        double mt=MT(qcd_lepton,sel_met);
-        m_pt_met_min_cut=   m_pt_met_min_cut_funk_root.Eval(mt);
-        m_pt_met_max_cut=   m_pt_met_max_cut_funk_root.Eval(mt);
-        m_delta_phi_cut=    m_delta_phi_cut_funk_root.Eval(mt);
-
-        if(qcd_lepton->getPt()/sel_met->getPt()>m_pt_met_min_cut && qcd_lepton->getPt()/sel_met->getPt()<m_pt_met_max_cut){
+        if(lepton.pt()/sel_met.pt()>m_pt_met_min_cut && lepton.pt()/sel_met.pt()<m_pt_met_max_cut){
             passedPtMet=true;
         }
-        if(DeltaPhi(qcd_lepton->getPhi(),sel_met->getPhi())>m_delta_phi_cut){
+        if(deltaPhi(lepton.phi(),sel_met.phi())>m_delta_phi_cut){
             passedDeltaPhi=true;
         }
         if (passedDeltaPhi && passedPtMet){
             passed=true;
         }
     }
-    if(qcd_lepton){
-        qcd_lepton->setUserRecord("passedPtMet",passedPtMet);
-        qcd_lepton->setUserRecord("passedDeltaPhi",passedDeltaPhi);
-        qcd_lepton->setUserRecord("passed",passed);
-        qcd_lepton->setPdgNumber(qcd_id);
-    }
-
+    return passed;
 }
-*/
+
 int MiniAODAnalyzer::vetoNumberEle(double ptTreshold,double vetoConeSize){
     //make veto numbers
     //we don't need std::vectors, do we?
@@ -2337,7 +2418,7 @@ int MiniAODAnalyzer::vetoNumberEle(double ptTreshold,double vetoConeSize){
             bool veto_tau=false; //if particle is used as tau
             int i=0;
             for( auto tau : *taus ){
-                if( PassTauID(tau) && DeltaR(part,tau)<vetoConeSize){
+                if( PassTauID(tau) && DeltaR(part,tau)>vetoConeSize){
                     veto_tau=true;
                 }
                 i++;
@@ -2363,7 +2444,7 @@ int MiniAODAnalyzer::vetoNumberMuon(double ptTreshold,double vetoConeSize){
             bool veto_tau=false; //if particle is used as tau
             int i=0;
             for( auto tau : *taus ){
-                if( PassTauID(tau) && DeltaR(part,tau)<vetoConeSize){
+                if( PassTauID(tau) && DeltaR(part,tau)>vetoConeSize){
                     veto_tau=true;
                 }
                 i++;
@@ -2400,6 +2481,173 @@ int MiniAODAnalyzer::vetoNumberTau(double ptTreshold){
     return numVeto;
 }
 
+/*
+backup
+void MiniAODAnalyzer::QCDAnalyse() {
+    //inverted isolation
+        //inverted isolation
+
+    int qcd_id=0;
+
+
+    double m_leptonVetoPt=20;
+    double vetoConeSize=0.3;
+    int numVetoEle=vetoNumberEle(m_leptonVetoPt, vetoConeSize);
+    int numVetoMuo=vetoNumberMuon(m_leptonVetoPt, vetoConeSize);
+    int numVetoTau=vetoNumberTau(m_leptonVetoPt);
+
+
+    if( numVetoEle==0 && taus->size()>=1 && numVetoMuo==0 ){
+        int passedID=0;
+        std::map<std::string,int> passedID_disc;
+        for(std::vector<std::string>::iterator disc_it = d_mydisc->begin(); disc_it != d_mydisc->end(); disc_it++){
+            passedID_disc[(*disc_it)]=0;
+        }
+        for( pat::Tau it: *taus ) {
+
+            if(m_do_complicated_tau_stuff){
+                for(std::vector<std::string>::iterator disc_it = d_mydisc->begin(); disc_it != d_mydisc->end(); disc_it++){
+                    if(PassTauID_NonIsolated(it,*disc_it)){
+                        passedID_disc[(*disc_it)]++;
+                        //(*it)->setPdgNumber(15);
+                        qcd_lepton_tau->push_back(it);
+                    }
+                }
+            }else{
+                if( PassTauID_NonIsolated(it) ){
+                    passedID++;
+                    //(*it)->setPdgNumber(15);
+                    qcd_lepton_tau->push_back(it);
+                }
+            }
+        }
+        std::cout << passedID << "tau" << std::endl;
+    }
+
+    ///may be needed for electron channel
+    if( electrons->size()>=1 && numVetoTau==0 && numVetoMuo==0  ){
+        int passedID=0;
+        for( pat::Electron it: *electrons ) {
+
+            //if( (it).electronID("loosIDnoISO")){
+            std::cout << (it).electronID("loosIDnoISO") << std::endl;
+                if ( ((it).electronID("loosIDnoISO") or (it).electronID("loosIDandISO") )){
+                    passedID++;
+                    //(*it)->setPdgNumber(11);
+                    qcd_lepton_ele->push_back(it);
+                }
+            //}
+        }
+        std::cout<<passedID<<"ele" << std::endl;
+
+    }
+
+    ///not needed for now ///
+    if( numVetoEle==0 && numVetoTau==0 && muons->size()>=1 && m_doMuo){
+        int passedID=0;
+        for( std::vector< pxl::Particle* >::iterator it = MuonList->begin(); it != MuonList->end(); ++it ) {
+            if( (*it)->hasUserRecord("ISOfailed")){
+                if (  (*it)->getUserRecord("ISOfailed").toBool() ){
+                    passedID++;
+                    //(*it)->setPdgNumber(13);
+                    qcd_leptons[13].push_back(*it);
+                }
+            }
+            //we can not do the fr if we tag the muons!!
+            //else if (MuonList->size()==1){
+                //passedID++;
+                //tmpMuo=( pxl::Particle* ) MuonList->at(0);
+                //break;
+            //}
+        }
+    }
+
+
+    if(qcd_lepton_tau->size()>0){
+        //m_pt_min_cut=m_pt_min_cut_tau;
+        //m_delta_phi_cut=m_delta_phi_cut_tau;
+        //m_pt_met_min_cut=m_pt_met_min_cut_tau;
+        //m_pt_met_max_cut=m_pt_met_max_cut_tau;
+
+
+        ///met cut?
+        //m_pt_min_cut=m_pt_min_cut_tau;
+        m_delta_phi_cut=2.4;
+        m_pt_met_min_cut=0.7;
+        m_pt_met_max_cut=1.3;
+
+        m_pt_met_min_cut_funk_root=m_pt_met_min_cut_funk_root_tau;
+        m_pt_met_max_cut_funk_root=m_pt_met_max_cut_funk_root_tau;
+        m_delta_phi_cut_funk_root=m_delta_phi_cut_funk_root_tau;
+        qcd_id=15;
+        for(pat::Tau i_qcd_lepton: qcd_lepton_tau){
+            check_single_lepton_kinematics(i_qcd_lepton,qcd_id);
+            if(!i_qcd_lepton->getUserRecord("passedBasicKin").toBool()){
+                qcd_weight[qcd_id].push_back(0.);
+            }else{
+                qcd_weight[qcd_id].push_back(max(0.,qcd_weight_tau_pt->GetBinContent(qcd_weight_tau_pt->FindBin(i_qcd_lepton->getPt(),i_qcd_lepton->getEta()  ))));
+                //qcd_weight[qcd_id].push_back(max(0.,qcd_weight_tau_pt->GetBinContent(qcd_weight_tau_pt->FindBin(i_qcd_lepton->getPt()  ))));
+            }
+            for(unsigned int i=0;  i<qcd_leptons[15].size();i++){
+                if (qcd_leptons[qcd_id][i]==i_qcd_lepton){
+                    continue;
+                }
+                //qcd_weight[qcd_id].back()*=(1-max(0.,qcd_weight_tau_pt->GetBinContent(qcd_weight_tau_pt->FindBin(qcd_leptons[qcd_id][i]->getPt(),i_qcd_lepton->getUserRecord("decayMode")))));
+                qcd_weight[qcd_id].back()*=(1-max(0.,qcd_weight_tau_pt->GetBinContent(qcd_weight_tau_pt->FindBin(i_qcd_lepton->getPt(),i_qcd_lepton->getEta()  ))));
+            }
+            //cout<<qcd_weight[qcd_id].back()<<endl;
+        }
+
+    }
+
+    if(qcd_leptons[11].size()>0){
+        m_pt_min_cut=m_pt_min_cut_ele;
+        m_delta_phi_cut=m_delta_phi_cut_ele;
+        m_pt_met_min_cut=m_pt_met_min_cut_ele;
+        m_pt_met_max_cut=m_pt_met_max_cut_ele;
+
+        m_pt_met_min_cut_funk_root=m_pt_met_min_cut_funk_root_ele;
+        m_pt_met_max_cut_funk_root=m_pt_met_max_cut_funk_root_ele;
+        m_delta_phi_cut_funk_root=m_delta_phi_cut_funk_root_ele;
+        qcd_id=11;
+        for(pxl::Particle* i_qcd_lepton: qcd_leptons[qcd_id]){
+            check_single_lepton_kinematics(i_qcd_lepton,qcd_id);
+            qcd_weight[qcd_id].push_back(max(0.,qcd_weight_ele_pt->GetBinContent(qcd_weight_ele_pt->FindBin(i_qcd_lepton->getPt()))));
+            for(unsigned int i=0;  i<qcd_leptons[qcd_id].size();i++){
+                if (qcd_leptons[qcd_id][i]==i_qcd_lepton){
+                    continue;
+                }
+                qcd_weight[qcd_id].back()*=(1-max(0.,qcd_weight_ele_pt->GetBinContent(qcd_weight_ele_pt->FindBin(qcd_leptons[qcd_id][i]->getPt()))));
+            }
+        }
+    }
+
+    if(qcd_leptons[13].size()>0){
+        m_pt_min_cut=m_pt_min_cut_muo;
+        m_delta_phi_cut=m_delta_phi_cut_muo;
+        m_pt_met_min_cut=m_pt_met_min_cut_muo;
+        m_pt_met_max_cut=m_pt_met_max_cut_muo;
+
+        m_pt_met_min_cut_funk_root=m_pt_met_min_cut_funk_root_muo;
+        m_pt_met_max_cut_funk_root=m_pt_met_max_cut_funk_root_muo;
+        m_delta_phi_cut_funk_root=m_delta_phi_cut_funk_root_muo;
+        qcd_id=13;
+        for(pxl::Particle* i_qcd_lepton: qcd_leptons[qcd_id]){
+            check_single_lepton_kinematics(i_qcd_lepton,qcd_id);
+            qcd_weight[qcd_id].push_back(max(0.,qcd_weight_muo_pt->GetBinContent(qcd_weight_muo_pt->FindBin(i_qcd_lepton->getPt()))));
+            for(unsigned int i=0;  i<qcd_leptons[qcd_id].size();i++){
+                if (qcd_leptons[qcd_id][i]==i_qcd_lepton){
+                    continue;
+                }
+                qcd_weight[qcd_id].back()*=(1-max(0.,qcd_weight_muo_pt->GetBinContent(qcd_weight_muo_pt->FindBin(qcd_leptons[qcd_id][i]->getPt()))));
+            }
+        }
+    }
+
+
+
+}
+*/
 void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::Handle<edm::View<reco::GenParticle>> genPart) {
 //void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met) {
 
@@ -2470,7 +2718,6 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
             if( not PassTauID_NonIsolated(tau)  and not PassTauID(tau)){
                 continue;
             }
-            bool m_do_complicated_tau_stuff=false;
             if(!m_do_complicated_tau_stuff){
                 //cout<<"ele   "<<eleTrig<<"   "<<eleCandi<<endl;
                 //cout<<"muon   "<<muoTrig<<"   "<<muoCandi<<endl;
