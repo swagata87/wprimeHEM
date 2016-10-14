@@ -20,7 +20,7 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",
     ignoreTotal = cms.untracked.int32(1),
-    moduleMemorySummary = cms.untracked.bool(True),                                        
+    moduleMemorySummary = cms.untracked.bool(True),
 )
 
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
@@ -78,6 +78,7 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        taus = cms.InputTag("slimmedTaus"),
        muons = cms.InputTag("slimmedMuons"),
        electrons = cms.InputTag("slimmedElectrons"),
+       jets = cms.InputTag("slimmedJets"),
        mets = cms.InputTag("slimmedMETs"),
        bits = cms.InputTag("TriggerResults","","HLT"),
 #       bits_MET = cms.InputTag("TriggerResults","","RECO"),  ##for data
@@ -95,6 +96,7 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        KFactorE = cms.string("k_faktors_ele.root"),
        KFactorMu = cms.string("k_faktors_mu.root"),
        KFactorTau = cms.string("k_faktors_tau.root"),
+       QCDWeightTau = cms.string("qcdFakeOutput15pt_eta.root"),
        sourceFileString = cms.string(process.source_().dumpConfig().split('\n')[2].split("/")[4]),
        useReweighting = cms.bool(True),
        BadChargedCandidateFilter = cms.InputTag("BadChargedCandidateFilter"),
