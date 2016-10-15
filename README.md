@@ -16,6 +16,9 @@ git cms-init
 
 git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate
 
+To use the electron ID egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose, one needs to merge a code from a private CMSSW branch :
+git cms-merge-topic ikrav:egm_id_80X_v1
+
 
 
 Go to CMSSW_8_X_Y/src/ and do 'cmsenv' and then get the analysis package from github.
