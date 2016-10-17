@@ -120,7 +120,7 @@ private:
   bool PassFinalCuts(TLorentzVector part1, const pat::MET part2);
   bool PassFinalCuts(int nGoodTau_,TLorentzVector part1, const pat::MET part2);
   double GetTauIDScaleFactor(double tau_pt, std::string mode);
-  bool Overlap(edm::Handle<edm::View<reco::GenParticle>>);
+  bool Overlap(edm::Handle<edm::View<reco::GenParticle>>, double);
 
   std::vector<int> *pdf_indices = new std::vector<int>;
   std::vector<double> *inpdfweights = new std::vector<double>;
@@ -188,7 +188,7 @@ private:
   double tauID_SF =1.0;
   double tauID_SF_syst_up =1.0 ;
   double tauID_SF_syst_down =1.0;
-
+  double genHT = 0.0;
   //discriminators
   std::vector<std::string> *d_mydisc = new std::vector<std::string> ;
   std::vector<std::string> *d_mydisc_emu = new std::vector<std::string> ;
@@ -737,7 +737,34 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  std::cout << "\n --EVENT-- " << Event << std::endl;
+  // std::cout << "\n\n --EVENT-- " << Event << std::endl;
+
+  edm::Handle<LHEEventProduct> EvtHandle ;
+  if  ( !(RunOnData) ) {
+    iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
+    //Gen-HT//
+    if (EvtHandle.isValid() ) {
+      if (  (sourceFileString.find("WJetsToLNu") != std::string::npos) ) {
+	lhef::HEPEUP lheParticleInfo = EvtHandle->hepeup();
+        // get the five vector
+        // (Px, Py, Pz, E and M in GeV)
+	std::vector<lhef::HEPEUP::FiveVector> allParticles = lheParticleInfo.PUP;
+	std::vector<int> statusCodes = lheParticleInfo.ISTUP;
+
+        double ht = 0;
+        for (unsigned int i = 0; i < statusCodes.size(); i++) {
+	  if (statusCodes[i] == 1) {
+	    if (abs(lheParticleInfo.IDUP[i]) < 11 || abs(lheParticleInfo.IDUP[i]) > 16 || abs(lheParticleInfo.IDUP[i]) > 22) {
+	      //std::cout << "Add particle with ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
+	      ht += sqrt(pow(allParticles[i][0], 2) + pow(allParticles[i][1], 2));
+	    }
+	  }
+        }
+	genHT=ht;
+	//std::cout << "genHT=" << genHT << std::endl;
+      }
+    }
+  }
 
   //-- kfactor --//
   wmass_stored=0;
@@ -755,8 +782,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     iEvent.getByToken(prunedGenToken_,pruned);
     //    Handle<edm::View<pat::PackedGenParticle> > packed;
     //    iEvent.getByToken(packedGenToken_,packed);
-    if ( Overlap(pruned) ) {
-      std::cout << "Reject! Wmass = " << getWmass(pruned) << " sample = " << sourceFileString  << std::endl ;
+    if ( Overlap(pruned, genHT) ) {
+      // std::cout << "Reject! Wmass = " << getWmass(pruned) << " sample = " << sourceFileString  << " HT=" << genHT << std::endl ;
       return;
     }
     ///-- W k-factor --///
@@ -789,6 +816,32 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   h1_nGenTau->Fill(nGenTau);
   if (nGenTau==1) FindTauIDEfficiency(iEvent,tauGen_p4[0]);
+
+
+  ///--PDF weight--///
+  //  edm::Handle<LHEEventProduct> EvtHandle ;
+  if  ( !(RunOnData) ) {
+    // iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
+    if  ( (EvtHandle.isValid()) ) {
+      if ( doPDFuncertainty) {
+	inpdfweights->clear();
+	for (unsigned int i=0; i<EvtHandle->weights().size(); i++) {
+	  int id_i = stoi( EvtHandle->weights()[i].id );
+	  for( unsigned int j = 0; j<pdf_indices->size(); j++ ) {
+	    int id_j = pdf_indices->at(j);
+	    if( id_i == id_j ){
+	      float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
+	      //   std::cout << "pdf_weight=" << pdf_weight  << std::endl;
+	      inpdfweights->push_back( pdf_weight );
+	    }
+	  }
+	}
+      }
+      else {
+	if (debugLevel) std::cout << "PDF weights not saved in CMSSW. Do post-facto reweighting" << std::endl;
+      }
+    }
+  }
 
 
   //-- probValue --//
@@ -832,43 +885,6 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   }
   //  std::cout << "RunOnData=" << RunOnData << " mc_event_weight=" << mc_event_weight << std::endl;
 
-  if ( doPDFuncertainty) {
-    ///--PDF weight--///
-    edm::Handle<LHEEventProduct> EvtHandle ;
-    if  ( !(RunOnData) ) {
-      iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
-      if  ( (EvtHandle.isValid()) ) {
-    inpdfweights->clear();
-    for (unsigned int i=0; i<EvtHandle->weights().size(); i++) {
-      int id_i = stoi( EvtHandle->weights()[i].id );
-      for( unsigned int j = 0; j<pdf_indices->size(); j++ ) {
-        int id_j = pdf_indices->at(j);
-        if( id_i == id_j ){
-          float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
-          //   std::cout << "pdf_weight=" << pdf_weight  << std::endl;
-          inpdfweights->push_back( pdf_weight );
-        }
-      }
-    }
-      }
-      else {
-    if (debugLevel) std::cout << "PDF weights not saved in CMSSW. Do post-facto reweighting" << std::endl;
-      }
-    }
-  }
-  /*
-  if (!RunOnData) {
-    final_weight               =Lumi_Wt*mc_event_weight;
-    final_weight_PUweight_UP   =Lumi_Wt_UP*mc_event_weight;
-    final_weight_PUweight_DOWN =Lumi_Wt_DOWN*mc_event_weight;
-
-  }
-  else {
-    final_weight=1;
-    final_weight_PUweight_UP=1;
-    final_weight_PUweight_DOWN=1;
-  }
-  */
 
    //---Trigger---//
    edm::Handle<edm::TriggerResults> triggerBits;
@@ -1186,7 +1202,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    //---------------//
    //---Selection---//
    //---------------//
-   std::cout << "Proceed to selection cuts " << std::endl;
+   //   std::cout << "Proceed to selection cuts " << std::endl;
    if (passTauTrig && passAllMETFilters ) {
      if ( (nvtx>0) && (nTightMu==0) && (nLooseEle==0) ) {
        //** Stage 2 (Passed trigger, MET filter, vertex-cut, lepton-veto)
@@ -1206,6 +1222,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      h1_TauPt_Stage1->Fill(tau_pt[0],final_weight);
      //std::cout << "*Standard* dphi_tau_met=" << dphi_tau_met << std::endl;
      double MT=  sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_tau_met)));
+     std::cout << "MT = " << MT << std::endl;
      h1_MT_Stage1->Fill(MT,final_weight);
 
      //--PU Systematics--//
@@ -2289,8 +2306,9 @@ int MiniAODAnalyzer::getWdecay(edm::Handle<edm::View<reco::GenParticle>> genPart
     return temp_id;
 }
 
-bool MiniAODAnalyzer::Overlap(edm::Handle<edm::View<reco::GenParticle>> p1) {
-  if ( (sourceFileString.find("WJetsToLNu_HT") != std::string::npos) && (getWmass(p1)>100) ) return true;
+bool MiniAODAnalyzer::Overlap(edm::Handle<edm::View<reco::GenParticle>> p1, double HT) {
+  if ( (sourceFileString.find("WJetsToLNu_Tune") != std::string::npos) && ( (getWmass(p1)>100) || (HT>100.0) ) ) return true;
+  if ( (sourceFileString.find("WJetsToLNu_HT") != std::string::npos) && (getWmass(p1)>100) && (HT<100.0)  ) return true;
   if ( (sourceFileString.find("WToTauNu_M-100_") != std::string::npos) && ( (getWmass(p1)<100) || (getWmass(p1)>200)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-200_") != std::string::npos) && ( (getWmass(p1)<200) || (getWmass(p1)>500)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-500_") != std::string::npos) && ( (getWmass(p1)<500) || (getWmass(p1)>1000)) ) return true;
