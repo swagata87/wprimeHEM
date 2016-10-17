@@ -8,12 +8,12 @@ config.General.transferLogs = True
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'ConfFile_cfg.py'
 config.JobType.outputFiles = ['hist_analysis.root']
-config.JobType.inputFiles = ['MC_pileup.root','Data_pileup_normalized.root','Data_pileup_normalized_UP.root','Data_pileup_normalized_DOWN.root', 'k_faktors_ele.root', 'k_faktors_mu.root', 'k_faktors_tau.root','METFilters_cff.py']
+config.JobType.inputFiles = ['MC_pileup.root','Data_pileup_normalized.root','Data_pileup_normalized_UP.root','Data_pileup_normalized_DOWN.root', 'k_faktors_ele.root', 'k_faktors_mu.root', 'k_faktors_tau.root','METFilters_cff.py', 'qcdFakeOutput15pt_eta.root']
 
 config.Data.inputDataset = ''
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'LumiBased'
-config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Cert_271036-277933_13TeV_PromptReco_Collisions16_JSON.txt'
+config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Cert_271036-282037_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt'
 #config.Data.unitsPerJob = 4
 config.Data.outLFNDirBase = '/store/user/%s/crab_Wprime_Oct2/' % (getUsernameFromSiteDB())
 config.Data.publication = False
@@ -43,8 +43,8 @@ if __name__ == '__main__':
     #############################################################################################
 
 ## Data ##
-    config.General.requestName = 'Tau_Run2016B_01Jul2016_v2'
-    config.Data.inputDataset = '/Tau/Run2016B-01Jul2016-v2/MINIAOD'
+    config.General.requestName = 'Tau_Run2016B_PromptReco_v2'
+    config.Data.inputDataset = '/Tau/Run2016B-PromptReco-v2/MINIAOD'
     config.Data.unitsPerJob = 15
     #config.Data.totalUnits = 4
     submit(config)
@@ -73,11 +73,11 @@ if __name__ == '__main__':
     #config.Data.totalUnits = 4
     submit(config)
 
-    config.General.requestName = 'Tau_Run2016G_PromptReco_v1'
-    config.Data.inputDataset = '/Tau/Run2016G-PromptReco-v1/MINIAOD'
-    config.Data.unitsPerJob = 15
+#    config.General.requestName = 'Tau_Run2016G_PromptReco_v1'
+#    config.Data.inputDataset = '/Tau/Run2016G-PromptReco-v1/MINIAOD'
+#    config.Data.unitsPerJob = 15
     #config.Data.totalUnits = 4
-    submit(config)
+#    submit(config)
 
 
 
