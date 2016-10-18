@@ -7,6 +7,7 @@ In order to achieve compatability with the WPrimeToTau analyser, one has to chan
 Once the plotlib is compatible, one should rename the merged hist.root files and move them all in one folder. This can be done with python makeOutput.py
 One has to remember to change the directory according to the analyzed data used.
 
+To be able to execute the plotting script one has to source TAPAS and CMSSW. TAPAS can be sourced via source Path/To/TAPAS/setenv_tapas.sh
 Now one can execute the plotting script with:
 python plotrun_all_25nsWprime.py
 
