@@ -18,6 +18,7 @@ class plotConfiguration:
     def __init__(self, useRoot=False ,basedir=None ,do_ddQCD=True):
         if basedir is None:
             self.basedir="/net/scratch_cms/institut_3a/materok/wprime/okt14/crab_projects/merged"
+            #self.basedir="/net/scratch_cms/institut_3a/materok/wprime/run1/crab_projects/merged"
         else:
             self.basedir=basedir
         self.useRoot=useRoot
@@ -29,8 +30,8 @@ class plotConfiguration:
         self.lumi+= 5882 #RunB
         self.lumi+= 2646 #RunC
         self.lumi+= 4353 #RunD
-        #self.lumi+= 4049 #RunE
-        #self.lumi+= 3160 #RunF
+        self.lumi+= 4049 #RunE
+        self.lumi+= 3160 #RunF
         #self.lumi= 11048 #RunC + RunD + RunE
         #self.lumi= 12881 #RunB + RunC + RunF
 
@@ -129,7 +130,7 @@ class plotConfiguration:
         "WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
         "WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"
         ]
-"""
+        """
         self.bglist[r'$\mathsf{W\rightarrow \tau \nu}$']=[
 
         "WToTauNu_M-100_TuneCUETP8M1_13TeV-pythia8-tauola",
@@ -143,7 +144,7 @@ class plotConfiguration:
         "WToTauNu_M-6000_TuneCUETP8M1_13TeV-pythia8-tauola"
         ]
 
-"""
+        """
 
 
         self.bghists.additionalWeight["dataDrivenQCD"]=0.938091502614
@@ -215,7 +216,10 @@ class plotConfiguration:
         #self.DataFiles=["TauRunC"]
         #self.DataFiles=["TauRunD"]
         #self.DataFiles=["TauRunE"]
-        self.DataFiles=["Tau_Run2016B_PromptReco_v2","Tau_Run2016C_PromptReco_v2","Tau_Run2016D_PromptReco_v2"]
+        #self.DataFiles=["Tau_Run2016E_PromptReco_v2","Tau_Run2016C_PromptReco_v2","Tau_Run2016D_PromptReco_v2"]
+        self.DataFiles=["Tau_Run2016B_PromptReco_v2","Tau_Run2016C_PromptReco_v2",
+        "Tau_Run2016D_PromptReco_v2","Tau_Run2016E_PromptReco_v2","Tau_Run2016F_PromptReco_v1"]
+        #self.DataFiles=["Tau_Run2016C_PromptReco_v2","Tau_Run2016D_PromptReco_v2"]
         #self.DataFiles=["TauRunC","TauRunD","TauRunE"]
 
 
