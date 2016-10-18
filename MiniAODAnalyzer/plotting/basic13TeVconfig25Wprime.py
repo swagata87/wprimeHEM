@@ -53,6 +53,7 @@ class plotConfiguration:
 
         #do_ddQCD=False
         self.bglist=OrderedDict()
+
         self.bglist["Diboson"]=[
         "WW_TuneCUETP8M1_13TeV-pythia8",
         "WZ_TuneCUETP8M1_13TeV-pythia8",
@@ -128,7 +129,7 @@ class plotConfiguration:
         "WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
         "WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"
         ]
-        """
+"""
         self.bglist[r'$\mathsf{W\rightarrow \tau \nu}$']=[
 
         "WToTauNu_M-100_TuneCUETP8M1_13TeV-pythia8-tauola",
@@ -141,8 +142,8 @@ class plotConfiguration:
         "WToTauNu_M-5000_TuneCUETP8M1_13TeV-pythia8-tauola",
         "WToTauNu_M-6000_TuneCUETP8M1_13TeV-pythia8-tauola"
         ]
-        """
 
+"""
 
 
         self.bghists.additionalWeight["dataDrivenQCD"]=0.938091502614
@@ -176,6 +177,7 @@ class plotConfiguration:
 
         self.bgcolorList={}
         self.bgcolorList[r'$\mathsf{W\rightarrow l \nu}$']=getRGBTColor(861)
+        self.bgcolorList[r'$\mathsf{W\rightarrow \tau \nu}$']=getRGBTColor(861)
         self.bgcolorList["WJets"]="lightblue"
         self.bgcolorList["W"]=getRGBTColor(861)
         self.bgcolorList["W on shell"]="lightblue"
