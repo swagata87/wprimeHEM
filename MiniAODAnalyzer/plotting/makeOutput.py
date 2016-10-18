@@ -16,13 +16,18 @@ if not os.path.exists(directory+"/merged"):
 for name in os.listdir(directory):
     path=directory+"/"+name+filepath
     print "working on: ", name.replace("crab_","")
+
     if name=="merged" or name=="MClist.txt" or name=="crab.log":
         counter+=1
         print "done with ",counter, " out of ", number, " directories"
         continue
     if os.path.isfile(path):
         #print directory+name.replace("crab_","/merged/")+".root"
-        shutil.copy2(path,directory+name.replace("crab_","/merged/")+".root")
+        if not os.path.isfile(directory+name.replace("crab_","/merged/")+".root"):
+            print "doesnt exist in merged yet, will copy"
+            shutil.copy2(path,directory+name.replace("crab_","/merged/")+".root")
+        else:
+            print "exists and is skipped"
         MCfile.write(name.replace("crab_",""))
         MCfile.write("\n")
     counter+=1
