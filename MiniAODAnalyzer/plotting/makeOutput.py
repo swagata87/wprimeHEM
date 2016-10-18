@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 
 directory="/net/scratch_cms/institut_3a/materok/wprime/okt14/crab_projects"
 filepath="/results/hist.root"
@@ -33,4 +34,5 @@ for name in os.listdir(directory):
     counter+=1
     print "done with ",counter, " out of ", number, " directories"
 MCfile.close()
+subprocess.call(["sort", directory+"/MClist.txt", "-o", directory+"/MClist.txt"])
 print "done"
