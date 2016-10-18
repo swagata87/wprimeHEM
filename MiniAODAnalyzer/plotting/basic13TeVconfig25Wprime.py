@@ -17,7 +17,7 @@ def splitbg(whichbg,bglist,colorlist):
 class plotConfiguration:
     def __init__(self, useRoot=False ,basedir=None ,do_ddQCD=True):
         if basedir is None:
-            self.basedir="/net/scratch_cms/institut_3a/materok/wprime/run1/crab_projects/merged"
+            self.basedir="/net/scratch_cms/institut_3a/materok/wprime/okt14/crab_projects/merged"
         else:
             self.basedir=basedir
         self.useRoot=useRoot
@@ -25,10 +25,14 @@ class plotConfiguration:
 
         self.xs= ConfigObj("xsFile13TeV_25ns_wprime.cfg")
 
-        #self.lumi= 2646 #RunC
-        #self.lumi= 4353 #RunD
-        #self.lumi= 4049 #RunE
-        self.lumi= 11048 #RunC + RunD + RunE
+        self.lumi=0
+        self.lumi+= 5882 #RunB
+        self.lumi+= 2646 #RunC
+        self.lumi+= 4353 #RunD
+        #self.lumi+= 4049 #RunE
+        #self.lumi+= 3160 #RunF
+        #self.lumi= 11048 #RunC + RunD + RunE
+        #self.lumi= 12881 #RunB + RunC + RunF
 
         self.bghists=HistStorage(self.xs,self.lumi,path=self.basedir,useRoot=self.useRoot)
         self.bghists.setDataDriven("dataDrivenQCD")
@@ -115,7 +119,7 @@ class plotConfiguration:
         ##"WJetsToLNu_13TeVMLM_MG",
         #]
 
-        self.bglist[r'$\mathsf{W\rightarrow l \nu}$']=[
+        self.bglist["WJets"]=[
         "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
         "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
         "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
@@ -124,7 +128,20 @@ class plotConfiguration:
         "WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
         "WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"
         ]
+        """
+        self.bglist[r'$\mathsf{W\rightarrow \tau \nu}$']=[
 
+        "WToTauNu_M-100_TuneCUETP8M1_13TeV-pythia8-tauola",
+        "WToTauNu_M-200_TuneCUETP8M1_13TeV-pythia8-tauola",
+        "WToTauNu_M-500_TuneCUETP8M1_13TeV-pythia8-tauola",
+        "WToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola",
+        "WToTauNu_M-2000_TuneCUETP8M1_13TeV-pythia8-tauola",
+        "WToTauNu_M-3000_TuneCUETP8M1_13TeV-pythia8-tauola",
+        "WToTauNu_M-4000_TuneCUETP8M1_13TeV-pythia8-tauola",
+        "WToTauNu_M-5000_TuneCUETP8M1_13TeV-pythia8-tauola",
+        "WToTauNu_M-6000_TuneCUETP8M1_13TeV-pythia8-tauola"
+        ]
+        """
 
 
 
@@ -159,6 +176,7 @@ class plotConfiguration:
 
         self.bgcolorList={}
         self.bgcolorList[r'$\mathsf{W\rightarrow l \nu}$']=getRGBTColor(861)
+        self.bgcolorList["WJets"]="lightblue"
         self.bgcolorList["W"]=getRGBTColor(861)
         self.bgcolorList["W on shell"]="lightblue"
         self.bgcolorList[r'$\mathsf{W\rightarrow l \nu}$ MCatNLO']="brown"
@@ -195,7 +213,8 @@ class plotConfiguration:
         #self.DataFiles=["TauRunC"]
         #self.DataFiles=["TauRunD"]
         #self.DataFiles=["TauRunE"]
-        self.DataFiles=["TauRunC","TauRunD","TauRunE"]
+        self.DataFiles=["Tau_Run2016B_PromptReco_v2","Tau_Run2016C_PromptReco_v2","Tau_Run2016D_PromptReco_v2"]
+        #self.DataFiles=["TauRunC","TauRunD","TauRunE"]
 
 
     def compile_obj(self):
