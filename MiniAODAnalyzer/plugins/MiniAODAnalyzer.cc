@@ -745,23 +745,23 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     //Gen-HT//
     if (EvtHandle.isValid() ) {
       if (  (sourceFileString.find("WJetsToLNu") != std::string::npos) ) {
-	lhef::HEPEUP lheParticleInfo = EvtHandle->hepeup();
+    lhef::HEPEUP lheParticleInfo = EvtHandle->hepeup();
         // get the five vector
         // (Px, Py, Pz, E and M in GeV)
-	std::vector<lhef::HEPEUP::FiveVector> allParticles = lheParticleInfo.PUP;
-	std::vector<int> statusCodes = lheParticleInfo.ISTUP;
+    std::vector<lhef::HEPEUP::FiveVector> allParticles = lheParticleInfo.PUP;
+    std::vector<int> statusCodes = lheParticleInfo.ISTUP;
 
         double ht = 0;
         for (unsigned int i = 0; i < statusCodes.size(); i++) {
-	  if (statusCodes[i] == 1) {
-	    if (abs(lheParticleInfo.IDUP[i]) < 11 || abs(lheParticleInfo.IDUP[i]) > 16 || abs(lheParticleInfo.IDUP[i]) > 22) {
-	      //std::cout << "Add particle with ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
-	      ht += sqrt(pow(allParticles[i][0], 2) + pow(allParticles[i][1], 2));
-	    }
-	  }
+      if (statusCodes[i] == 1) {
+        if (abs(lheParticleInfo.IDUP[i]) < 11 || abs(lheParticleInfo.IDUP[i]) > 16 || abs(lheParticleInfo.IDUP[i]) > 22) {
+          //std::cout << "Add particle with ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
+          ht += sqrt(pow(allParticles[i][0], 2) + pow(allParticles[i][1], 2));
         }
-	genHT=ht;
-	//std::cout << "genHT=" << genHT << std::endl;
+      }
+        }
+    genHT=ht;
+    //std::cout << "genHT=" << genHT << std::endl;
       }
     }
   }
@@ -824,21 +824,21 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     // iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
     if  ( (EvtHandle.isValid()) ) {
       if ( doPDFuncertainty) {
-	inpdfweights->clear();
-	for (unsigned int i=0; i<EvtHandle->weights().size(); i++) {
-	  int id_i = stoi( EvtHandle->weights()[i].id );
-	  for( unsigned int j = 0; j<pdf_indices->size(); j++ ) {
-	    int id_j = pdf_indices->at(j);
-	    if( id_i == id_j ){
-	      float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
-	      //   std::cout << "pdf_weight=" << pdf_weight  << std::endl;
-	      inpdfweights->push_back( pdf_weight );
-	    }
-	  }
-	}
+    inpdfweights->clear();
+    for (unsigned int i=0; i<EvtHandle->weights().size(); i++) {
+      int id_i = stoi( EvtHandle->weights()[i].id );
+      for( unsigned int j = 0; j<pdf_indices->size(); j++ ) {
+        int id_j = pdf_indices->at(j);
+        if( id_i == id_j ){
+          float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
+          //   std::cout << "pdf_weight=" << pdf_weight  << std::endl;
+          inpdfweights->push_back( pdf_weight );
+        }
+      }
+    }
       }
       else {
-	if (debugLevel) std::cout << "PDF weights not saved in CMSSW. Do post-facto reweighting" << std::endl;
+    if (debugLevel) std::cout << "PDF weights not saved in CMSSW. Do post-facto reweighting" << std::endl;
       }
     }
   }
@@ -3051,7 +3051,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
         mFakeVectorTree["FakeCandVetoNum"]=FakeCandVetoNum;*/
 
         //std::cout << FakeCandEta[-1] << std::endl;
-        helper->Tree_Filler("fakeVectorTree");
+        //helper->Tree_Filler("fakeVectorTree");
     }
 }
 
