@@ -1,6 +1,18 @@
 import FWCore.ParameterSet.Config as cms
 
+import FWCore.ParameterSet.VarParsing as VarParsing
+
 process = cms.Process("Demo")
+options = VarParsing.VarParsing('analysis')
+options.register ('sourceFileStringInput',
+                  'default', # default value
+                  VarParsing.VarParsing.multiplicity.singleton, # singleton or list
+                  VarParsing.VarParsing.varType.string,          # string, int, or float
+                  "Name of the sample")
+# setup any defaults you want
+#options.sourceFileStringInput = 'default'
+options.parseArguments()
+
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
@@ -98,7 +110,8 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        KFactorMu = cms.string("k_faktors_mu.root"),
        KFactorTau = cms.string("k_faktors_tau.root"),
        QCDWeightTau = cms.string("qcdFakeOutput15pt_eta.root"),
-       sourceFileString = cms.string(process.source_().dumpConfig().split('\n')[2].split("/")[4]),
+       #sourceFileString = cms.string(process.source_().dumpConfig().split('\n')[2].split("/")[4]),
+       sourceFileString = cms.string(options.sourceFileStringInput),                       
        useReweighting = cms.bool(True),
        BadChargedCandidateFilter = cms.InputTag("BadChargedCandidateFilter"),
        BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
