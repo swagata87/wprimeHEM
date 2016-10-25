@@ -1,9 +1,5 @@
 # WPrimeToTau
 
---------------------------------------------
-For Bad Charged Hadron and Bad Muon Filters
---------------------------------------------
-
 export SCRAM_ARCH=slc6_amd64_gcc530
 
 cmsrel CMSSW_8_0_11
@@ -14,7 +10,7 @@ cmsenv
 
 git cms-init
 
-git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate
+git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate  (Needed for Bad Charged Hadron and Bad Muon Filters)
 
 To use the electron ID egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose, one needs to merge a code from a private CMSSW branch :
 git cms-merge-topic ikrav:egm_id_80X_v1
@@ -34,9 +30,11 @@ If you make changes here, you need to do : 'scram b' from WPrimeToTau/MiniAODAna
 The main config file is :
 WPrimeToTau/MiniAODAnalyzer/python/ConfFile_cfg.py
 
-To run the package, go to WPrimeToTau/MiniAODAnalyzer/python/ and do :
+To run the package, go to WPrimeToTau/MiniAODAnalyzer/python/ and do the following (if you are running on WJetsToLNu_HT-200To400 sample)
 
-cmsRun ConfFile_cfg.py
+cmsRun ConfFile_cfg.py sourceFileStringInput=WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
+
+Change the sourceFileStringInput accordingly.
 
 ####
 Some notes about ConfFile_cfg.py

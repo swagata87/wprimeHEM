@@ -15,9 +15,9 @@ config.Data.inputDataset = ''
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 #config.Data.unitsPerJob = 10
-config.Data.outLFNDirBase = '/store/user/%s/crab_Wprime_Oct15_v2/' % (getUsernameFromSiteDB())
+config.Data.outLFNDirBase = '/store/user/%s/crab_Wprime_Oct25/' % (getUsernameFromSiteDB())
 config.Data.publication = False
-config.Data.outputDatasetTag = 'WPrimeToTaus_Oct15_v2'
+config.Data.outputDatasetTag = 'WPrimeToTaus_Oct25'
 config.Site.storageSite = 'T2_DE_RWTH'
 
 if __name__ == '__main__':
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     # We want to put all the CRAB project directories from the tasks we submit here into one common directory.
     # That's why we need to set this parameter (here or above in the configuration file, it does not matter, we will not overwrite it).
-    config.General.workArea = 'crab_projects'
+    config.General.workArea = 'crab_projects_Oct25'
 
     def submit(config):
         try:
@@ -46,184 +46,158 @@ if __name__ == '__main__':
 ##
 ## ZJets
 ##
-    config.General.requestName = 'ZJetsToNuNu_HT-100To200_13TeV-madgraph'
-    config.Data.inputDataset = '/ZJetsToNuNu_HT-100To200_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
-    submit(config)
+#    config.General.requestName = 'ZJetsToNuNu_HT-100To200_13TeV-madgraph'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=ZJetsToNuNu_HT-100To200_13TeV-madgraph']
+#    config.Data.inputDataset = '/ZJetsToNuNu_HT-100To200_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
+#    config.Data.unitsPerJob = 1
+#    submit(config)
 
     config.General.requestName = 'ZJetsToNuNu_HT-200To400_13TeV-madgraph'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=ZJetsToNuNu_HT-200To400_13TeV-madgraph']
     config.Data.inputDataset = '/ZJetsToNuNu_HT-200To400_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'ZJetsToNuNu_HT-400To600_13TeV-madgraph'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=ZJetsToNuNu_HT-400To600_13TeV-madgraph']
     config.Data.inputDataset = '/ZJetsToNuNu_HT-400To600_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'ZJetsToNuNu_HT-600To800_13TeV-madgraph'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=ZJetsToNuNu_HT-600To800_13TeV-madgraph']
     config.Data.inputDataset = '/ZJetsToNuNu_HT-600To800_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'ZJetsToNuNu_HT-800To1200_13TeV-madgraph'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=ZJetsToNuNu_HT-800To1200_13TeV-madgraph']
     config.Data.inputDataset = '/ZJetsToNuNu_HT-800To1200_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'ZJetsToNuNu_HT-1200To2500_13TeV-madgraph'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=ZJetsToNuNu_HT-1200To2500_13TeV-madgraph']
     config.Data.inputDataset = '/ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph']
     config.Data.inputDataset = '/ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
 ##
 ## QCD
 ##
     config.General.requestName = 'QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
 ##
 ## Wjets HT binned sample ##
 ##
-    config.General.requestName = 'WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
-    config.Data.inputDataset = '/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
-    submit(config)
+#    config.General.requestName = 'WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
+#    config.Data.inputDataset = '/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
+#    config.Data.unitsPerJob = 1
+#    submit(config)
 
     config.General.requestName = 'WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
-
-###
-## W mass binned sample ##
-###
-
-    config.General.requestName = 'WToTauNu_M-100_TuneCUETP8M1_13TeV-pythia8-tauola'
-    config.Data.inputDataset = '/WToTauNu_M-100_TuneCUETP8M1_13TeV-pythia8-tauola/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
-    submit(config)
-
-    config.General.requestName = 'WToTauNu_M-200_TuneCUETP8M1_13TeV-pythia8-tauola'
-    config.Data.inputDataset = '/WToTauNu_M-200_TuneCUETP8M1_13TeV-pythia8-tauola/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
-    submit(config)
-
-    config.General.requestName = 'WToTauNu_M-500_TuneCUETP8M1_13TeV-pythia8-tauola'
-    config.Data.inputDataset = '/WToTauNu_M-500_TuneCUETP8M1_13TeV-pythia8-tauola/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
-    submit(config)
-
-    config.General.requestName = 'WToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola'
-    config.Data.inputDataset = '/WToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
-    submit(config)
-
-    config.General.requestName = 'WToTauNu_M-2000_TuneCUETP8M1_13TeV-pythia8-tauola'
-    config.Data.inputDataset = '/WToTauNu_M-2000_TuneCUETP8M1_13TeV-pythia8-tauola/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
-    submit(config)
-
-    config.General.requestName = 'WToTauNu_M-3000_TuneCUETP8M1_13TeV-pythia8-tauola'
-    config.Data.inputDataset = '/WToTauNu_M-3000_TuneCUETP8M1_13TeV-pythia8-tauola/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
-    submit(config)
-
-    config.General.requestName = 'WToTauNu_M-4000_TuneCUETP8M1_13TeV-pythia8-tauola'
-    config.Data.inputDataset = '/WToTauNu_M-4000_TuneCUETP8M1_13TeV-pythia8-tauola/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
-    submit(config)
-
-    config.General.requestName = 'WToTauNu_M-5000_TuneCUETP8M1_13TeV-pythia8-tauola'
-    config.Data.inputDataset = '/WToTauNu_M-5000_TuneCUETP8M1_13TeV-pythia8-tauola/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
-    submit(config)
-
-    config.General.requestName = 'WToTauNu_M-6000_TuneCUETP8M1_13TeV-pythia8-tauola'
-    config.Data.inputDataset = '/WToTauNu_M-6000_TuneCUETP8M1_13TeV-pythia8-tauola/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
-    submit(config)
-
 
 ##
 ## WJets flat sample ##
 ##
-#    config.General.requestName = 'WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
-#    config.Data.inputDataset = '/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-#    config.Data.unitsPerJob = 5
-#    submit(config)
+    config.General.requestName = 'WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
+    config.Data.inputDataset = '/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
+    config.Data.unitsPerJob = 2
+    submit(config)
 
 ## DY ##
     config.General.requestName = 'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
     config.General.requestName = 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
     config.Data.inputDataset = '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-    config.Data.unitsPerJob = 3
+    config.Data.unitsPerJob = 2
     submit(config)
 
 ##
