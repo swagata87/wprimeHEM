@@ -306,6 +306,8 @@ private:
   std::string pdfid_2;
   std::string tag_;
   bool RunOnData;
+  bool doTrees;
+  bool doFakeHist;
   bool doPDFuncertainty;
   std::string generatorName_;
   int debugLevel;
@@ -413,6 +415,8 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   pdfName_(iConfig.getParameter<std::string>("pdfName")),
   tag_(iConfig.getUntrackedParameter<std::string>( "tag", "initrwgt" )),
   RunOnData(iConfig.getParameter<bool>("RunOnData_")),
+  doTrees(iConfig.getParameter<bool>("doTrees_")),
+  doFakeHist(iConfig.getParameter<bool>("doFakeHist_")),
   doPDFuncertainty(iConfig.getParameter<bool>("doPDFuncertainty_")),
   generatorName_(iConfig.getParameter<std::string>("generatorName")),
   debugLevel(iConfig.getParameter<int>("debugLevel_"))
@@ -492,31 +496,33 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
 
   ///qcd histos
   int nstages=8;
-  helper->CreateHisto(nstages,"Tau_fake_pt",  8000, 0, 8000, "p_{T} [GeV]");
-  helper->CreateHisto(nstages,"Tau_nofake_pt",  8000, 0, 8000, "p_{T} [GeV]");
-  helper->CreateHisto("Tau_fake_pt_decay", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
-  helper->CreateHisto("Tau_nofake_pt_decay", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
-  helper->CreateHisto("Tau_fake_pt_eta", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
-  helper->CreateHisto("Tau_nofake_pt_eta", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
-  //Tau_nofake_pt_met = testDir.make<TH2D>("Tau_nofake_pt_met", "Tau_nofake_pt_met", 8000, 0, 8000, 8000, 0, 8000 );
-  //Tau_fake_pt_met = testDir.make<TH2D>("Tau_fake_pt_met", "Tau_fake_pt_met", 8000, 0, 8000, 8000, 0, 8000 );
-  helper->CreateHisto("Tau_fake_pt_met", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
-  helper->CreateHisto("Tau_nofake_pt_met", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
-  helper->CreateHisto(nstages,"Tau_fake_pt_true",  8000, 0, 8000, "p_{T} [GeV]");
-  helper->CreateHisto(nstages,"Tau_nofake_pt_true",  8000, 0, 8000, "p_{T} [GeV]");
-  helper->CreateHisto("Tau_fake_pt_decay_true", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
-  helper->CreateHisto("Tau_nofake_pt_decay_true", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
-  helper->CreateHisto("Tau_fake_pt_eta_true", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
-  helper->CreateHisto("Tau_nofake_pt_eta_true", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
-  //Tau_fake_pt_met_true = testDir.make<TH2D>("Tau_fake_pt_met_true", "Tau_fake_pt_met_true", 8000, 0, 8000, 8000, 0, 8000);
-  //Tau_nofake_pt_met_true = testDir.make<TH2D>("Tau_nofake_pt_met_true", "Tau_nofake_pt_met_true", 8000, 0, 8000, 8000, 0, 8000);
-  helper->CreateHisto("Tau_fake_pt_met_true", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
-  helper->CreateHisto("Tau_nofake_pt_met_true", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
-  if(not RunOnData){
+  if (doFakeHist) {
+    helper->CreateHisto(nstages,"Tau_fake_pt",  8000, 0, 8000, "p_{T} [GeV]");
+    helper->CreateHisto(nstages,"Tau_nofake_pt",  8000, 0, 8000, "p_{T} [GeV]");
+    helper->CreateHisto("Tau_fake_pt_decay", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
+    helper->CreateHisto("Tau_nofake_pt_decay", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
+    helper->CreateHisto("Tau_fake_pt_eta", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
+    helper->CreateHisto("Tau_nofake_pt_eta", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
+    //Tau_nofake_pt_met = testDir.make<TH2D>("Tau_nofake_pt_met", "Tau_nofake_pt_met", 8000, 0, 8000, 8000, 0, 8000 );
+    //Tau_fake_pt_met = testDir.make<TH2D>("Tau_fake_pt_met", "Tau_fake_pt_met", 8000, 0, 8000, 8000, 0, 8000 );
+    helper->CreateHisto("Tau_fake_pt_met", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
+    helper->CreateHisto("Tau_nofake_pt_met", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
+    helper->CreateHisto(nstages,"Tau_fake_pt_true",  8000, 0, 8000, "p_{T} [GeV]");
+    helper->CreateHisto(nstages,"Tau_nofake_pt_true",  8000, 0, 8000, "p_{T} [GeV]");
+    helper->CreateHisto("Tau_fake_pt_decay_true", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
+    helper->CreateHisto("Tau_nofake_pt_decay_true", 8000, 0, 8000, 20, 0, 20, "p_{T} [GeV]", "decay mode");
+    helper->CreateHisto("Tau_fake_pt_eta_true", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
+    helper->CreateHisto("Tau_nofake_pt_eta_true", 8000, 0, 8000, 20, -5, 5, "p_{T} [GeV]", "eta");
+    //Tau_fake_pt_met_true = testDir.make<TH2D>("Tau_fake_pt_met_true", "Tau_fake_pt_met_true", 8000, 0, 8000, 8000, 0, 8000);
+    //Tau_nofake_pt_met_true = testDir.make<TH2D>("Tau_nofake_pt_met_true", "Tau_nofake_pt_met_true", 8000, 0, 8000, 8000, 0, 8000);
+    helper->CreateHisto("Tau_fake_pt_met_true", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
+    helper->CreateHisto("Tau_nofake_pt_met_true", 800, 0, 8000, 800, 0, 8000, "p_{T} [GeV]", "MET");
+    if(not RunOnData){
       for(std::string gen : {"lightquark","gluon","bquark","lightlepton","unmatched"}){
-          helper->CreateHisto(nstages,Form("Tau_fake_pt_%s",gen.c_str()),  8000, 0, 8000, "p_{T} [GeV]");
-          helper->CreateHisto(nstages,Form("Tau_nofake_pt_%s",gen.c_str()),  8000, 0, 8000, "p_{T} [GeV]");
+	helper->CreateHisto(nstages,Form("Tau_fake_pt_%s",gen.c_str()),  8000, 0, 8000, "p_{T} [GeV]");
+	helper->CreateHisto(nstages,Form("Tau_nofake_pt_%s",gen.c_str()),  8000, 0, 8000, "p_{T} [GeV]");
       }
+    }
   }
   m_do_complicated_tau_stuff=false;
 
@@ -1482,7 +1488,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        }
    }
    Fill_Tree(tau_NoShift,met,final_weight,"");
-   helper->Tree_Filler("reweighttree");
+   if (useReweighting) helper->Tree_Filler("reweighttree");
    //}
 
 
@@ -1683,34 +1689,35 @@ MiniAODAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) 
 
 void MiniAODAnalyzer::Create_Trees(){
   //these are the variables used in the tree of the old analysis
+  if (doTrees) {
+    //Kinematics
+    mLeptonTree["mt"]=0;
+    mLeptonTree["delta_phi"]=0;
+    mLeptonTree["pt"]=0;
+    mLeptonTree["met"]=0;
+    mLeptonTree["lepton_phi"]=0;
+    mLeptonTree["lepton_eta"]=0;
+    mLeptonTree["met_phi"]=0;
+    mLeptonTree["jet1_et"]=0;
+    mLeptonTree["jet1_phi"]=0;
+    mLeptonTree["jet1_eta"]=0;
+    mLeptonTree["bjet1"]=0;
+    mLeptonTree["highEtEleTrig"]=0;
+    mLeptonTree["kfak"]=0;
+    
+    //PDF
+    mLeptonTree["id1"]=999;
+    mLeptonTree["id2"]=999;
+    mLeptonTree["x1"]=999;
+    mLeptonTree["x2"]=999;
+    mLeptonTree["qscale"]=-1;
+    
+    //general
+    mLeptonTree["ThisWeight"]=0;
+    mLeptonTree["lepton_type"]=0;
+  }
 
-  //Kinematics
-  mLeptonTree["mt"]=0;
-  mLeptonTree["delta_phi"]=0;
-  mLeptonTree["pt"]=0;
-  mLeptonTree["met"]=0;
-  mLeptonTree["lepton_phi"]=0;
-  mLeptonTree["lepton_eta"]=0;
-  mLeptonTree["met_phi"]=0;
-  mLeptonTree["jet1_et"]=0;
-  mLeptonTree["jet1_phi"]=0;
-  mLeptonTree["jet1_eta"]=0;
-  mLeptonTree["bjet1"]=0;
-  mLeptonTree["highEtEleTrig"]=0;
-  mLeptonTree["kfak"]=0;
-
-  //PDF
-  mLeptonTree["id1"]=999;
-  mLeptonTree["id2"]=999;
-  mLeptonTree["x1"]=999;
-  mLeptonTree["x2"]=999;
-  mLeptonTree["qscale"]=-1;
-
-  //general
-  mLeptonTree["ThisWeight"]=0;
-  mLeptonTree["lepton_type"]=0;
-
-  helper->Tree_Creater( &mLeptonTree, "slimtree");
+  if (doTrees)  helper->Tree_Creater( &mLeptonTree, "slimtree");
 
   if(useReweighting==true){
     mReweightTree["gen_mt_JetEnUp"]=-1;
@@ -1833,71 +1840,75 @@ void MiniAODAnalyzer::Create_Trees(){
     //    mReweightTree["met_"+mSystName[std::to_string(i)]]=-1;
   }
 
+  if (useReweighting)  helper->Tree_Creater( &mReweightTree, "reweighttree");
 
-  helper->Tree_Creater( &mReweightTree, "reweighttree");
-
-  mQCDTree["lepton_n"]=0;
-  mQCDTree["pt"]=0;
-  mQCDTree["mt"]=0;
-  mQCDTree["eta"]=0;
-  mQCDTree["met"]=0;
-  mQCDTree["iso"]=0;
-  mQCDTree["nvert"]=0;
-  mQCDTree["mtpos"]=0;
-  mQCDTree["mtneg"]=0;
-  mQCDTree["delta_phi"]=0;
-  mQCDTree["ThisWeight"]=0;
-  mQCDTree["QCDWeight"]=0;
-  mQCDTree["lepton_type"]=0;
-  mQCDTree["decay_mode"]=0;
-  mQCDTree["metTriggerd"]=0;
-
-  for(unsigned int ilep=1;ilep<3; ilep++){
-    mQCDTree[ Form("mt_%d", ilep)   ]=0;
-    mQCDTree[ Form("pt_%d", ilep)]=0;
-    mQCDTree[ Form("eta_%d", ilep)]=0;
-    mQCDTree[ Form("delta_phi_%d", ilep)]=0;
-    mQCDTree[ Form("decay_mode_%d", ilep)]=0;
-    //if(m_do_complicated_tau_stuff){
-    //for(auto idisc : d_mydisc){
-    //mQCDTree[Form("%s_%d", idisc.c_str() ,ilep ) ]=0;
-    //}
-    //}
+  if (doTrees) {
+    mQCDTree["lepton_n"]=0;
+    mQCDTree["pt"]=0;
+    mQCDTree["mt"]=0;
+    mQCDTree["eta"]=0;
+    mQCDTree["met"]=0;
+    mQCDTree["iso"]=0;
+    mQCDTree["nvert"]=0;
+    mQCDTree["mtpos"]=0;
+    mQCDTree["mtneg"]=0;
+    mQCDTree["delta_phi"]=0;
+    mQCDTree["ThisWeight"]=0;
+    mQCDTree["QCDWeight"]=0;
+    mQCDTree["lepton_type"]=0;
+    mQCDTree["decay_mode"]=0;
+    mQCDTree["metTriggerd"]=0;
+    
+    for(unsigned int ilep=1;ilep<3; ilep++){
+      mQCDTree[ Form("mt_%d", ilep)   ]=0;
+      mQCDTree[ Form("pt_%d", ilep)]=0;
+      mQCDTree[ Form("eta_%d", ilep)]=0;
+      mQCDTree[ Form("delta_phi_%d", ilep)]=0;
+      mQCDTree[ Form("decay_mode_%d", ilep)]=0;
+      //if(m_do_complicated_tau_stuff){
+      //for(auto idisc : d_mydisc){
+      //mQCDTree[Form("%s_%d", idisc.c_str() ,ilep ) ]=0;
+      //}
+      //}
+    }
   }
-/*        if(m_do_complicated_tau_stuff){
-            for(auto idisc : d_mydisc){
-                mQCDTree[idisc]=0;
-            }
-        }
-*/
-  helper->Tree_Creater( &mQCDTree, "qcdtree");
-
-  mFakeTree["mt"]=0;
-  mFakeTree["delta_phi"]=0;
-  mFakeTree["pt"]=0;
-  mFakeTree["met"]=0;
-  mFakeTree["phi"]=0;
-  mFakeTree["eta"]=0;
-  mFakeTree["met_phi"]=0;
-
-  mFakeTree["decay_mode"]=0;
-  mFakeTree["iso"]=0;
-  mFakeTree["tau_n"]=0;
-  mFakeTree["truth_match"]=0;
-
-  mFakeTree["lepton_type"]=0;
-  mFakeTree["lepton_mt"]=0;
-  mFakeTree["lepton_delta_phi"]=0;
-  mFakeTree["lepton_pt"]=0;
-  mFakeTree["lepton_eta"]=0;
-  mFakeTree["lepton_phi"]=0;
-  mFakeTree["lepton_trigger"]=0;
-
-
-  //general
-  mFakeTree["ThisWeight"]=0;
-  helper->Tree_Creater( &mFakeTree, "fakeTree");
-
+  /*        if(m_do_complicated_tau_stuff){
+	    for(auto idisc : d_mydisc){
+	    mQCDTree[idisc]=0;
+	    }
+	    }
+  */
+  if (doTrees)  helper->Tree_Creater( &mQCDTree, "qcdtree");
+  
+  if (doTrees) {
+    mFakeTree["mt"]=0;
+    mFakeTree["delta_phi"]=0;
+    mFakeTree["pt"]=0;
+    mFakeTree["met"]=0;
+    mFakeTree["phi"]=0;
+    mFakeTree["eta"]=0;
+    mFakeTree["met_phi"]=0;
+    
+    mFakeTree["decay_mode"]=0;
+    mFakeTree["iso"]=0;
+    mFakeTree["tau_n"]=0;
+    mFakeTree["truth_match"]=0;
+    
+    mFakeTree["lepton_type"]=0;
+    mFakeTree["lepton_mt"]=0;
+    mFakeTree["lepton_delta_phi"]=0;
+    mFakeTree["lepton_pt"]=0;
+    mFakeTree["lepton_eta"]=0;
+    mFakeTree["lepton_phi"]=0;
+    mFakeTree["lepton_trigger"]=0;
+    
+    
+    //general
+    mFakeTree["ThisWeight"]=0;
+  }
+  
+  if (doTrees)  helper->Tree_Creater( &mFakeTree, "fakeTree");
+  
 
   //mFakeVectorTree["test"]=0;
   //std::vector<float> vec(20);
@@ -1923,30 +1934,31 @@ void MiniAODAnalyzer::Create_Trees(){
   //mFakeVectorTree["FakeCandIso"]=0;
   //mFakeVectorTree["FakeCandNoIso"]=0;
   //mFakeVectorTree["FakeCandVetoNum"]=0;
-  helper->Tree_Creater( &mFakeVectorTree, "fakeVectorTree");
+  if (doTrees)  helper->Tree_Creater( &mFakeVectorTree, "fakeVectorTree");
     ///needs to be fixed
   //for (size_t i=0;i<str.size();i++) helper->SetFakeBranches("fakeVectorTree",str[i].c_str(),&(vecOfVec[i]));
   //for (size_t i=0;i<str.size();i++) helper->SetFakeBranches("fakeVectorTree","FakeCandPt",&vecOfVec[i]);
   //for (size_t i=0;i<str.size();i++) helper->SetFakeBranches("fakeVectorTree","FakeCandPt",&FakeCandPt);
 
-  helper->SetFakeBranches("fakeVectorTree","FakeCandPt",FakeCandPt);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandPhi",FakeCandPhi);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandEta",FakeCandEta);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandDeltaPhi",FakeCandDeltaPhi);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandMET",FakeCandMET);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandMETPhi",FakeCandMETPhi);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandIso",FakeCandIso);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandNoIso",FakeCandNoIso);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandVetoNum",FakeCandVetoNum);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandDecayMode",FakeCandDecayMode);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonType",FakeCandLeptonType);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonMt",FakeCandLeptonMt);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonDeltaPhi",FakeCandLeptonDeltaPhi);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonPt",FakeCandLeptonPt);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonEta",FakeCandLeptonEta);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonPhi",FakeCandLeptonPhi);
-  helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonTrigger",FakeCandLeptonTrigger);
-
+  if (doTrees) {
+    helper->SetFakeBranches("fakeVectorTree","FakeCandPt",FakeCandPt);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandPhi",FakeCandPhi);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandEta",FakeCandEta);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandDeltaPhi",FakeCandDeltaPhi);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandMET",FakeCandMET);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandMETPhi",FakeCandMETPhi);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandIso",FakeCandIso);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandNoIso",FakeCandNoIso);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandVetoNum",FakeCandVetoNum);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandDecayMode",FakeCandDecayMode);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonType",FakeCandLeptonType);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonMt",FakeCandLeptonMt);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonDeltaPhi",FakeCandLeptonDeltaPhi);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonPt",FakeCandLeptonPt);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonEta",FakeCandLeptonEta);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonPhi",FakeCandLeptonPhi);
+    helper->SetFakeBranches("fakeVectorTree","FakeCandLeptonTrigger",FakeCandLeptonTrigger);
+  }
   //helper->SetFakeBranches("fakeVectorTree","FakeCandLorentz",&FakeCandLorentz);
 }
 
@@ -2036,7 +2048,7 @@ void MiniAODAnalyzer::Fill_Tree(TLorentzVector sel_lepton, const pat::MET sel_me
     }else{
         mLeptonTree["highEtEleTrig"]=0;
     }*/
-    helper->Tree_Filler("slimtree");
+    if (doTrees) helper->Tree_Filler("slimtree");
 }
 
 //void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, const pat::MET sel_met, double weight){
@@ -2081,7 +2093,7 @@ void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lept
                 //}
             //}
         }
-        helper->Tree_Filler("qcdtree");
+	if (doTrees)  helper->Tree_Filler("qcdtree");
     }else{
         //if(!std::isfinite(qcd_weight[qcd_lepton->getPdgNumber()][ifake])){
             //cout<<qcd_weight[qcd_lepton->getPdgNumber()][ifake]<<" "<<ifake<<endl;
@@ -2150,7 +2162,7 @@ void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lept
             i_qcd++;
             //std::cout << "in" << std::endl;
         }
-        helper->Tree_Filler("qcdtree");
+	if (doTrees) helper->Tree_Filler("qcdtree");
     }
 }
 
@@ -2897,109 +2909,108 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
                 mFakeTree["ThisWeight"]=weight;
 
 
-                helper->Tree_Filler("fakeTree");
+		if (doTrees) helper->Tree_Filler("fakeTree");
                 if(PassTauID_NonIsolated(tau)){
-                    helper->Fill(0,"Tau_fake_pt",tau.pt(),weight);
-                    if(muonBool)
-                        helper->Fill(1,"Tau_fake_pt",muoCandi.pt(),weight);
-                    if(eleBool)
-                        helper->Fill(2,"Tau_fake_pt",eleCandi.pt(),weight);
-                    helper->Fill( "Tau_fake_pt_eta",tau.pt(),tau.eta(),weight );
-                    helper->Fill( "Tau_fake_pt_met",tau.pt(),sel_met.pt(),weight );
-                    helper->Fill( "Tau_fake_pt_decay",tau.pt(),tau.decayMode(),weight );
+		  if (doFakeHist) helper->Fill(0,"Tau_fake_pt",tau.pt(),weight);
+		  if(muonBool) {
+		    if (doFakeHist) helper->Fill(1,"Tau_fake_pt",muoCandi.pt(),weight);
+		  }
+		  if(eleBool) {
+		    if (doFakeHist) helper->Fill(2,"Tau_fake_pt",eleCandi.pt(),weight);
+		  }
+		  if (doFakeHist)  helper->Fill( "Tau_fake_pt_eta",tau.pt(),tau.eta(),weight );
+		  if (doFakeHist)  helper->Fill( "Tau_fake_pt_met",tau.pt(),sel_met.pt(),weight );
+		  if (doFakeHist)  helper->Fill( "Tau_fake_pt_decay",tau.pt(),tau.decayMode(),weight );
                    //if(not RunOnData and GetTruthMatch("Tau",tau) ){
                    if(not RunOnData  ){
                        GetTruthMatch("Tau",tau);
-                        if(muonBool)
-                            helper->Fill(1,"Tau_fake_pt_true",muoCandi.pt(),weight);
-                            helper->Fill(3,"Tau_fake_pt_true",tau.pt(),weight);
-                        if(eleBool)
-                            helper->Fill(2,"Tau_fake_pt_true",eleCandi.pt(),weight);
-                            helper->Fill(4,"Tau_fake_pt_true",tau.pt(),weight);
-                        helper->Fill(0,"Tau_fake_pt_true",tau.pt(),weight);
-                        helper->Fill( "Tau_fake_pt_eta_true",tau.pt(),tau.eta(),weight );
-                        helper->Fill( "Tau_fake_pt_met_true",tau.pt(),sel_met.pt(),weight );
-                        helper->Fill( "Tau_fake_pt_decay_true",tau.pt(),tau.decayMode(),weight );
+		       if(muonBool) {
+			 if (doFakeHist) helper->Fill(1,"Tau_fake_pt_true",muoCandi.pt(),weight);
+		       }
+		       if (doFakeHist) helper->Fill(3,"Tau_fake_pt_true",tau.pt(),weight);
+		       if(eleBool) {
+                          if (doFakeHist)  helper->Fill(2,"Tau_fake_pt_true",eleCandi.pt(),weight);
+		       }
+		       if (doFakeHist)  helper->Fill(4,"Tau_fake_pt_true",tau.pt(),weight);
+                       if (doFakeHist)  helper->Fill(0,"Tau_fake_pt_true",tau.pt(),weight);
+                       if (doFakeHist)  helper->Fill( "Tau_fake_pt_eta_true",tau.pt(),tau.eta(),weight );
+                       if (doFakeHist)  helper->Fill( "Tau_fake_pt_met_true",tau.pt(),sel_met.pt(),weight );
+                       if (doFakeHist)  helper->Fill( "Tau_fake_pt_decay_true",tau.pt(),tau.decayMode(),weight );
                     }else if(not RunOnData ){
                         reco::GenParticle* genMatch= GetTruthMatchAllFlavor(tau);
                         if(genMatch){
                             //lightquarks
                             if(abs(genMatch->pdgId())<5){
-                                helper->Fill(0,"Tau_fake_pt_lightquark",tau.pt(),weight);
+                               if (doFakeHist)  helper->Fill(0,"Tau_fake_pt_lightquark",tau.pt(),weight);
                                 //HistClass::Fill( "Tau_fake_pt_eta_lightquark",tau.pt(),tau.eta(),weight );
                                 //HistClass::Fill( "Tau_fake_pt_met_lightquark",tau.pt(),sel_met.pt(),weight );
                             //b quarks
                             }else if(abs(genMatch->pdgId())==5){
-                                helper->Fill(0,"Tau_fake_pt_bquark",tau.pt(),weight);
+                              if (doFakeHist)   helper->Fill(0,"Tau_fake_pt_bquark",tau.pt(),weight);
                                 //HistClass::Fill( "Tau_fake_pt_eta_bquark",tau.pt(),tau.eta(),weight );
                                 //HistClass::Fill( "Tau_fake_pt_met_bquark",tau.pt(),sel_met.pt(),weight );
                             }else if(abs(genMatch->pdgId())==9 or abs(genMatch->pdgId())==21){
-                                helper->Fill(0,"Tau_fake_pt_gluon",tau.pt(),weight);
+                              if (doFakeHist)   helper->Fill(0,"Tau_fake_pt_gluon",tau.pt(),weight);
                                 //HistClass::Fill( "Tau_fake_pt_eta_gluon",tau.pt(),tau.eta(),weight );
                                 //HistClass::Fill( "Tau_fake_pt_met_gluon",tau.pt(),sel_met.pt(),weight );
                             }else if(abs(genMatch->pdgId())==11 or abs(genMatch->pdgId())==13){
-                                 helper->Fill(0,"Tau_fake_pt_lightlepton",tau.pt(),weight);
+                               if (doFakeHist)   helper->Fill(0,"Tau_fake_pt_lightlepton",tau.pt(),weight);
                                 //HistClass::Fill( "Tau_fake_pt_eta_gluon",tau.pt(),tau.eta(),weight );
                                 //HistClass::Fill( "Tau_fake_pt_met_gluon",tau.pt(),sel_met.pt(),weight );
                             }else{
-                                helper->Fill(0,"Tau_fake_pt_unmatched",tau.pt(),weight);
-                                std::cout<<"unassociated match: "<<genMatch->pdgId()<<std::endl;
+                              if (doFakeHist)   helper->Fill(0,"Tau_fake_pt_unmatched",tau.pt(),weight);
+			      std::cout<<"unassociated match: "<<genMatch->pdgId()<<std::endl;
                             }
-
                         }
-
-
                     }
                 }
                 else if(PassTauID(tau)){
-                    helper->Fill(0,"Tau_nofake_pt",tau.pt(),weight);
-                    if(muonBool)
-                        helper->Fill(1,"Tau_nofake_pt",muoCandi.pt(),weight);
-                        helper->Fill(3,"Tau_nofake_pt",tau.pt(),weight);
-                    if(eleBool)
-                        helper->Fill(2,"Tau_nofake_pt",eleCandi.pt(),weight);
-                        helper->Fill(4,"Tau_nofake_pt",tau.pt(),weight);
-                    helper->Fill( "Tau_nofake_pt_eta",tau.pt(),tau.eta(), weight );
-                    helper->Fill( "Tau_fake_pt_met",tau.pt(),sel_met.pt(),weight );
-                    if(tau.decayMode())
-                        helper->Fill( "Tau_nofake_pt_decay",tau.pt(),tau.decayMode(), weight );
+                  if (doFakeHist)   helper->Fill(0,"Tau_nofake_pt",tau.pt(),weight);
+		  if(muonBool) {
+		    if (doFakeHist)  helper->Fill(1,"Tau_nofake_pt",muoCandi.pt(),weight);
+		  }
+		  if (doFakeHist)  helper->Fill(3,"Tau_nofake_pt",tau.pt(),weight);
+		  if(eleBool) {
+		    if (doFakeHist)  helper->Fill(2,"Tau_nofake_pt",eleCandi.pt(),weight);
+		  }
+		  if (doFakeHist)  helper->Fill(4,"Tau_nofake_pt",tau.pt(),weight);
+		  if (doFakeHist)  helper->Fill( "Tau_nofake_pt_eta",tau.pt(),tau.eta(), weight );
+                  if (doFakeHist)  helper->Fill( "Tau_fake_pt_met",tau.pt(),sel_met.pt(),weight );
+		  if(tau.decayMode())
+		    if (doFakeHist) helper->Fill( "Tau_nofake_pt_decay",tau.pt(),tau.decayMode(), weight );
                     if(not RunOnData and GetTruthMatch("Tau",tau) ){
-                        helper->Fill(0,"Tau_nofake_pt_true",tau.pt(),weight);
-                        helper->Fill( "Tau_nofake_pt_eta_true",tau.pt(),tau.eta(), weight );
-                        helper->Fill( "Tau_fake_pt_met_true",tau.pt(),sel_met.pt(),weight );
+		      if (doFakeHist)  helper->Fill(0,"Tau_nofake_pt_true",tau.pt(),weight);
+                      if (doFakeHist)  helper->Fill( "Tau_nofake_pt_eta_true",tau.pt(),tau.eta(), weight );
+                      if (doFakeHist)  helper->Fill( "Tau_fake_pt_met_true",tau.pt(),sel_met.pt(),weight );
                         if(tau.decayMode())
-                            helper->Fill( "Tau_nofake_pt_decay_true",tau.pt(),tau.decayMode(), weight );
+                          if (doFakeHist) helper->Fill( "Tau_nofake_pt_decay_true",tau.pt(),tau.decayMode(), weight );
                     }else if(not RunOnData ){
                         reco::GenParticle* genMatch= GetTruthMatchAllFlavor(tau);
                         if(genMatch){
                             //lightquarks
                             if(abs(genMatch->pdgId())<5){
-                                helper->Fill(0,"Tau_nofake_pt_lightquark",tau.pt(),weight);
+			      if (doFakeHist)  helper->Fill(0,"Tau_nofake_pt_lightquark",tau.pt(),weight);
                                 //helper->Fill( "Tau_nofake_pt_eta_lightquark",tau.pt(),tau.eta(),weight );
                                 //helper->Fill( "Tau_nofake_pt_met_lightquark",tau.pt(),sel_met.pt(),weight );
                             //b quarks
                             }else if(abs(genMatch->pdgId())==5){
-                                helper->Fill(0,"Tau_nofake_pt_bquark",tau.pt(),weight);
+			      if (doFakeHist)  helper->Fill(0,"Tau_nofake_pt_bquark",tau.pt(),weight);
                                 //helper->Fill( "Tau_nofake_pt_eta_bquark",tau.pt(),tau.eta(),weight );
                                 //helper->Fill( "Tau_nofake_pt_met_bquark",tau.pt(),sel_met.pt(),weight );
                             }else if(abs(genMatch->pdgId())==9 or abs(genMatch->pdgId())==21){
-                                helper->Fill(0,"Tau_nofake_pt_gluon",tau.pt(),weight);
+			      if (doFakeHist)  helper->Fill(0,"Tau_nofake_pt_gluon",tau.pt(),weight);
                                 //helper->Fill( "Tau_nofake_pt_eta_gluon",tau.pt(),tau.eta(),weight );
                                 //helper->Fill( "Tau_nofake_pt_met_gluon",tau.pt(),sel_met.pt(),weight );
                             }else if(abs(genMatch->pdgId())==11 or abs(genMatch->pdgId())==13){
-                                 helper->Fill(0,"Tau_nofake_pt_lightlepton",tau.pt(),weight);
+			      if (doFakeHist)  helper->Fill(0,"Tau_nofake_pt_lightlepton",tau.pt(),weight);
                                 //helper->Fill( "Tau_nofake_pt_eta_gluon",tau.pt(),tau.eta(),weight );
                                 //helper->Fill( "Tau_nofake_pt_met_gluon",tau.pt(),sel_met.pt(),weight );
                             }else{
-                                helper->Fill(0,"Tau_nofake_pt_unmatched",tau.pt(),weight);
+			      if (doFakeHist)  helper->Fill(0,"Tau_nofake_pt_unmatched",tau.pt(),weight);
                                 std::cout<<"unassociated match: "<<genMatch->pdgId()<<std::endl;
                             }
-
                         }
-
-
                     }
-
                 }
             }/*else{//do complicated tau stuff
                 for(std::vector<std::string>::iterator disc_it = d_mydisc.begin(); disc_it != d_mydisc.end(); disc_it++){
