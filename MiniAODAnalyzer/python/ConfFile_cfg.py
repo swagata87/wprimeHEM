@@ -47,7 +47,7 @@ my_id_modules = [
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
@@ -71,7 +71,8 @@ process.source = cms.Source("PoolSource",
 #      '/store/data/Run2016B/Tau/MINIAOD/PromptReco-v2/000/273/158/00000/D464EE02-D919-E611-8D74-02163E013917.root',
 #      '/store/data/Run2016B/Tau/MINIAOD/PromptReco-v2/000/273/290/00000/4C630F9E-191A-E611-AEB5-02163E013716.root'
 #        '/store/data/Run2016B/Tau/MINIAOD/01Jul2016-v2/20000/02C0A083-734F-E611-A834-549F35AF44AF.root'
-      '/store/data/Run2016E/Tau/MINIAOD/PromptReco-v2/000/276/831/00000/0CFBD536-074D-E611-84B7-02163E011E85.root'
+#      '/store/data/Run2016E/Tau/MINIAOD/PromptReco-v2/000/276/831/00000/0CFBD536-074D-E611-84B7-02163E011E85.root'
+        '/store/data/Run2016E/SingleMuon/MINIAOD/PromptReco-v2/000/276/831/00000/06AD57AB-5A4D-E611-80F2-02163E014448.root'
     )
 )
 

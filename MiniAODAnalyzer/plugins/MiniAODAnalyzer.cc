@@ -114,7 +114,9 @@ private:
   bool PassTauID_NonIsolated(const pat::Tau &tau);
   bool PassTauID_NonIsolated(const pat::Tau &tau, std::string idcheck);
   bool PassTauAcceptance(TLorentzVector tau);
+  bool PassTauAcceptanceForTrigEff(TLorentzVector tau); 
   bool FindTauIDEfficiency(const edm::Event&,TLorentzVector gen_p4);
+  bool FindTauTrigEfficiency(bool passRefTrigger, bool passAnaTrigger, int nTau, double met, double tauPt, double tauEta);
   bool PassFinalCuts(int nGoodTau_, double met_val_, double met_phi_, double tau_pt_, double tau_phi_);
   bool PassFinalCuts(TLorentzVector part1, const pat::MET part2, pat::MET::METUncertainty metUncert);
   bool PassFinalCuts(TLorentzVector part1, const pat::MET part2);
@@ -262,6 +264,7 @@ private:
   //trigger for ele + muon
   bool passEleTrig;
   bool passMuonTrig;
+  bool passMuonTrig_ForEff=false;
 
   //reweighting stuff
   bool useReweighting;
@@ -318,6 +321,12 @@ private:
   TH1I *h1_nGenTau;
   TH1F *h1_TauPt_reco;
   TH1F *h1_TauEta_reco;
+  TH1F *h1_TauPt_TrigEff_Deno;
+  TH1F *h1_TauPt_TrigEff_Num;
+  TH1F *h1_TauEta_TrigEff_Deno;
+  TH1F *h1_TauEta_TrigEff_Num;
+  TH1F *h1_met_TrigEff_Deno;
+  TH1F *h1_met_TrigEff_Num;
   TH1F *h1_TauPt_goodreco;
   TH1F *h1_TauEta_goodreco;
   TH1F *h1_TauPt_Stage1;
@@ -445,6 +454,12 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_TauPt_Gen = histoDir.make<TH1F>("tauPt_Gen", "TauPt_Gen", 1000, 0, 4000);
   h1_TauPt_reco = histoDir.make<TH1F>("tauPt_reco", "TauPt_reco", 1000, 0, 4000);
   h1_TauPt_goodreco = histoDir.make<TH1F>("tauPt_goodreco", "TauPt_goodreco", 1000, 0, 4000);
+  h1_TauPt_TrigEff_Deno = histoDir.make<TH1F>("tauPt_TrigEff_Deno", "TauPt_TrigEff_Deno", 2000, 0, 2000);
+  h1_TauPt_TrigEff_Num  = histoDir.make<TH1F>("tauPt_TrigEff_Num", "TauPt_TrigEff_Num", 2000, 0, 2000);
+  h1_TauEta_TrigEff_Deno = histoDir.make<TH1F>("tauEta_TrigEff_Deno", "TauEta_TrigEff_Deno", 48, -2.4, 2.4);
+  h1_TauEta_TrigEff_Num  = histoDir.make<TH1F>("tauEta_TrigEff_Num", "TauEta_TrigEff_Num", 48, -2.4, 2.4);
+  h1_met_TrigEff_Deno = histoDir.make<TH1F>("met_TrigEff_Deno", "MET_TrigEff_Deno", 2000, 0, 2000);
+  h1_met_TrigEff_Num  = histoDir.make<TH1F>("met_TrigEff_Num", "MET_TrigEff_Num", 2000, 0, 2000);
   h1_TauEta_reco = histoDir.make<TH1F>("tauEta_reco", "TauEta_reco", 48, -2.4, 2.4);
   h1_TauEta_goodreco = histoDir.make<TH1F>("tauEta_goodreco", "TauEta_goodreco", 48, -2.4, 2.4);
   h1_TauPt_Stage1 = histoDir.make<TH1F>("tauPt_Stage1", "TauPt_Stage1", 1000, 0, 4000);
@@ -821,8 +836,6 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   }
 
   h1_nGenTau->Fill(nGenTau);
-  if (nGenTau==1) FindTauIDEfficiency(iEvent,tauGen_p4[0]);
-
 
   ///--PDF weight--///
   //  edm::Handle<LHEEventProduct> EvtHandle ;
@@ -905,10 +918,13 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    bool passTauTrig=0;
    //   std::cout << "=== TRIGGER PATHS === " << std::endl;
    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     // std::cout << "Trigger " << names.triggerName(i) <<
-     // ", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
-     //  ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)")
-     //        << std::endl;
+     /*
+     if (triggerBits->accept(i) ) { 
+       std::cout << "Trigger " << names.triggerName(i) <<
+	 ", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
+	 ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)")
+		 << std::endl;
+		 }*/
      if ( (names.triggerName(i)).find("HLT_LooseIsoPFTau50_Trk30_eta2p1_MET90") != std::string::npos ) {
        // std::cout << names.triggerName(i) << std::endl;
        passTauTrig=triggerBits->accept(i) ;
@@ -920,6 +936,20 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
           (names.triggerName(i)).find("HLT_IsoMu24_eta2p1_IterTrk02_v") != std::string::npos
      ) {
        passMuonTrig=triggerBits->accept(i) ;
+     }
+     //// Muon Trigger for Tau-trigger efficiency measurements ////
+     if ( ((names.triggerName(i)).find("HLT_Mu30_TkMu11_v") != std::string::npos) or
+          ((names.triggerName(i)).find("HLT_Mu40_TkMu11_v") != std::string::npos) or
+          ((names.triggerName(i)).find("HLT_Mu45_eta2p1_v") != std::string::npos) or
+	  ((names.triggerName(i)).find("HLT_Mu50_v") != std::string::npos) or
+          ((names.triggerName(i)).find("HLT_IsoMu22_eta2p1_v") != std::string::npos) or
+	  ((names.triggerName(i)).find("HLT_IsoMu22_v") != std::string::npos) or
+	  ((names.triggerName(i)).find("HLT_IsoMu24_eta2p1_v") != std::string::npos) or
+	  ((names.triggerName(i)).find("HLT_IsoMu24_v") != std::string::npos)   
+     ) {
+       //       std::cout << "Checking Muon trigger " << names.triggerName(i) << " Status " << triggerBits->accept(i)  <<  std::endl;
+       passMuonTrig_ForEff=triggerBits->accept(i) ;
+       if (passMuonTrig_ForEff==true) break;
      }
      if ( (names.triggerName(i)).find("HLT_Ele115_CaloIdVT_GsfTrkIdT_v") != std::string::npos or
           (names.triggerName(i)).find("HLT_Ele105_CaloIdVT_GsfTrkIdT_v") != std::string::npos or
@@ -1101,8 +1131,11 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    //edm::Handle<pat::TauCollection> taus;///in header now
    int nGoodTau=0;
+   int nGoodTauTrig=0;
    double tau_pt[10]={0};
    double tau_phi[10]={0};
+   double tau_pt_trig[10]={0};
+   double tau_eta_trig[10]={0};
    // int nGoodNonIsoTau=0;
    //   double tau_pt_nonIso[10]={0};
    // double tau_phi_nonIso[10]={0};
@@ -1135,28 +1168,35 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        tau_NoShift.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
        tau_ScaleUp.SetPxPyPzE((1+tauScaleShift)*(tau.px()),(1+tauScaleShift)*(tau.py()),(1+tauScaleShift)*(tau.pz()),(1+tauScaleShift)*(tau.energy()));
        tau_ScaleDown.SetPxPyPzE((1-tauScaleShift)*(tau.px()),(1-tauScaleShift)*(tau.py()),(1-tauScaleShift)*(tau.pz()),(1-tauScaleShift)*(tau.energy()));
-
+       
        if (PassTauAcceptance(tau_NoShift)==true) {
-     // std::cout << "Tau selected" << std::endl;
-     tau_pt[nGoodTau]=tau_NoShift.Pt();
-     tau_phi[nGoodTau]=tau_NoShift.Phi();
-     nGoodTau++;
+	 // std::cout << "Tau selected" << std::endl;
+	 tau_pt[nGoodTau]=tau_NoShift.Pt();
+	 tau_phi[nGoodTau]=tau_NoShift.Phi();
+	 nGoodTau++;
        }
 
        //-Syst Up-//
        if (PassTauAcceptance(tau_ScaleUp)==true) {
-     // std::cout << "Tau selected" << std::endl;
-     tau_pt_ScaleUp[nGoodTau_ScaleUp]=tau_ScaleUp.Pt();
-     tau_phi_ScaleUp[nGoodTau_ScaleUp]=tau_ScaleUp.Phi();
-     nGoodTau_ScaleUp++;
+	 // std::cout << "Tau selected" << std::endl;
+	 tau_pt_ScaleUp[nGoodTau_ScaleUp]=tau_ScaleUp.Pt();
+	 tau_phi_ScaleUp[nGoodTau_ScaleUp]=tau_ScaleUp.Phi();
+	 nGoodTau_ScaleUp++;
        }
-
+       
        //-Syst Down-//
        if (PassTauAcceptance(tau_ScaleDown)==true) {
-     // std::cout << "Tau selected" << std::endl;
-     tau_pt_ScaleDown[nGoodTau_ScaleDown]=tau_ScaleDown.Pt();
-     tau_phi_ScaleDown[nGoodTau_ScaleDown]=tau_ScaleDown.Phi();
-     nGoodTau_ScaleDown++;
+	 // std::cout << "Tau selected" << std::endl;
+	 tau_pt_ScaleDown[nGoodTau_ScaleDown]=tau_ScaleDown.Pt();
+	 tau_phi_ScaleDown[nGoodTau_ScaleDown]=tau_ScaleDown.Phi();
+	 nGoodTau_ScaleDown++;
+       }
+
+       //-For Trigger Efficiency-//
+       if (PassTauAcceptanceForTrigEff(tau_NoShift)==true) {
+	 tau_pt_trig[nGoodTauTrig]=tau_NoShift.Pt();
+	 tau_eta_trig[nGoodTauTrig]=tau_NoShift.Eta();
+	 nGoodTauTrig++;
        }
      }
    }
@@ -1204,7 +1244,14 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      " tauID_SF_down=" << tauID_SF_syst_down << std::endl;
    */
    h1_nGoodTau_Reco->Fill(nGoodTau,final_weight);
-
+   if (nGenTau==1) FindTauIDEfficiency(iEvent,tauGen_p4[0]);
+   
+   if (RunOnData) {
+     //     std::cout << "passMuonTrig_ForEff=" << passMuonTrig_ForEff << " nGoodTauTrig=" << nGoodTauTrig 
+     //	       << " tauPt1=" << tau_pt_trig[0] << " tauEta1=" << tau_eta_trig[0] 
+     //        << " MET=" << met_val << std::endl;
+     FindTauTrigEfficiency(passMuonTrig_ForEff, passTauTrig, nGoodTauTrig, met_val, tau_pt_trig[0], tau_eta_trig[0]);
+   }   
    //---------------//
    //---Selection---//
    //---------------//
@@ -1548,6 +1595,19 @@ bool MiniAODAnalyzer::PassFinalCuts(int nGoodTau_,TLorentzVector part1, const pa
     return PassFinalCuts(nGoodTau_,part2.pt(),part2.phi(),part1.Pt(),part1.Phi());
 }
 
+bool MiniAODAnalyzer::FindTauTrigEfficiency(bool passRefTrigger, bool passAnaTrigger, int nTau, double met, double tauPt, double tauEta) {
+  // Denominator //
+  if (passRefTrigger && (nTau>0) && (met>90) ) h1_TauPt_TrigEff_Deno->Fill(tauPt,final_weight);
+  if (passRefTrigger && (nTau>0) && (met>90) ) h1_TauEta_TrigEff_Deno->Fill(tauEta,final_weight);
+  if (passRefTrigger && (nTau>0) && (met>90) ) h1_met_TrigEff_Deno->Fill(met,final_weight);
+
+  // Numerator //
+  if (passRefTrigger && (nTau>0) && (met>90) && passAnaTrigger ) h1_TauPt_TrigEff_Num->Fill(tauPt,final_weight); 
+  if (passRefTrigger && (nTau>0) && (met>90) && passAnaTrigger ) h1_TauEta_TrigEff_Num->Fill(tauEta,final_weight); 
+  if (passRefTrigger && (nTau>0) && (met>90) && passAnaTrigger ) h1_met_TrigEff_Num->Fill(met,final_weight); 
+
+  return true;
+}
 
 bool MiniAODAnalyzer::FindTauIDEfficiency(const edm::Event& iEvent, TLorentzVector gen_p4) {
   edm::Handle<pat::TauCollection> taus;
@@ -1619,7 +1679,8 @@ bool MiniAODAnalyzer::PassTauID_NonIsolated(const pat::Tau &tau, std::string idc
 
     return passTauID_NonIso_;
 }
-bool MiniAODAnalyzer::PassTauAcceptance(TLorentzVector tau)
+
+bool MiniAODAnalyzer::PassTauAcceptance(TLorentzVector tau) // For analysis //
 {
   bool passTauAcc_=true;
   //  std::cout << "Inside PassTauAcceptance -> TAU pt=" << tau.Pt() << " energy=" << tau.Energy() << std::endl;
@@ -1630,6 +1691,19 @@ bool MiniAODAnalyzer::PassTauAcceptance(TLorentzVector tau)
   if ( fabs(tau.PseudoRapidity()) > 2.1 ) passTauAcc_=false;
 
   return passTauAcc_;
+}
+
+bool MiniAODAnalyzer::PassTauAcceptanceForTrigEff(TLorentzVector tau) // For Trigger Efficiency //
+{
+  bool passTauAcc1_=true;
+  //  std::cout << "Inside PassTauAcceptance -> TAU pt=" << tau.Pt() << " energy=" << tau.Energy() << std::endl;
+  //----pT----//
+  if ( tau.Pt() < 50 ) passTauAcc1_=false;
+
+  //----Eta----//
+  if ( fabs(tau.PseudoRapidity()) > 2.1 ) passTauAcc1_=false;
+
+  return passTauAcc1_;
 }
 
 // ------------ method called once each job just before starting event loop  ------------
