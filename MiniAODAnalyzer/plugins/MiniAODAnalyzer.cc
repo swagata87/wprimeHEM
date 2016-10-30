@@ -262,8 +262,8 @@ private:
   std::vector<TLorentzVector> *FakeCandLorentz = new std::vector<TLorentzVector>;
 
   //trigger for ele + muon
-  bool passEleTrig;
-  bool passMuonTrig;
+  bool passEleTrig=false;
+  bool passMuonTrig=false;
   bool passMuonTrig_ForEff=false;
 
   //reweighting stuff
@@ -936,6 +936,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
           (names.triggerName(i)).find("HLT_IsoMu24_eta2p1_IterTrk02_v") != std::string::npos
      ) {
        passMuonTrig=triggerBits->accept(i) ;
+       if (passMuonTrig==true) break;
      }
      //// Muon Trigger for Tau-trigger efficiency measurements ////
      if ( ((names.triggerName(i)).find("HLT_Mu30_TkMu11_v") != std::string::npos) or
@@ -957,6 +958,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
           (names.triggerName(i)).find("HLT_Ele27_eta2p1_WPLoose_Gsf_v") != std::string::npos
      ) {
        passEleTrig=triggerBits->accept(i) ;
+       if (passEleTrig==true) break;
      }
    }
    if (!RunOnData) passTauTrig=1;
