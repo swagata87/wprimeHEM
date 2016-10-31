@@ -7,7 +7,7 @@ config.General.transferLogs = True
 
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'ConfFile_cfg.py'
-config.JobType.outputFiles = ['hist_analysis.root']
+config.JobType.outputFiles = ['hist_analysis.root','SelectedDataEvents.txt']
 config.JobType.inputFiles = ['MC_pileup.root','Data_pileup_normalized.root','Data_pileup_normalized_UP.root','Data_pileup_normalized_DOWN.root', 'k_faktors_ele.root', 'k_faktors_mu.root', 'k_faktors_tau.root','METFilters_cff.py', 'qcdFakeOutput15pt_eta.root']
 
 config.Data.inputDataset = ''

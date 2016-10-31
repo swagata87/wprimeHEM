@@ -72,6 +72,8 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <iostream>
+#include <fstream>
 
 //#include "stdlib.h"
 // cant set lorentzvetor branch without this
@@ -387,9 +389,11 @@ private:
   double final_weight_kfact_DOWN=1;
   double final_weight_tauIDSF_UP=1;
   double final_weight_tauIDSF_DOWN=1;
-  int Event;
+  unsigned long Event;
   double dphi_tau_met;
   //  int num_PU_vertices;
+
+  std::ofstream myfile;
 
 };
 
@@ -759,7 +763,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  std::cout << "\n\n --EVENT-- " << Event << std::endl;
+  //  std::cout << "\n\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
@@ -802,22 +806,22 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	for (unsigned int i = 0; i < statusCodes.size(); i++) {
 	  if (statusCodes[i] == 2) {
 	    if (lheParticleInfo.IDUP[i] == 6) { 
-	      std::cout << "ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
+	      //  std::cout << "ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
 	      top=allParticles[i];
 	      ntop++;
 	    }
 	    if (lheParticleInfo.IDUP[i] == -6) { 
-	      std::cout << "ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
+	      //   std::cout << "ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
 	      antitop=allParticles[i];
 	      nantitop++;
 	    }
 	  }
 	}
-	std::cout << "ntop, nantitop = " << ntop << ", " << nantitop << std::endl; 
+	//	std::cout << "ntop, nantitop = " << ntop << ", " << nantitop << std::endl; 
 	if ( (ntop==1) && (nantitop==1) ) {
 	  genMTT = sqrt( (top[4]*top[4])+(antitop[4]*antitop[4])+(2*top[3]*antitop[3])-2*( (top[0]*antitop[0]) + (top[1]*antitop[1]) + (top[2]*antitop[2]) ) );
 	}
-	std::cout << "MTT=" << genMTT << std::endl;
+	//	std::cout << "MTT=" << genMTT << std::endl;
       } 
     } // if (EvtHandle.isValid() ) ends
   }
@@ -839,10 +843,10 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     //    Handle<edm::View<pat::PackedGenParticle> > packed;
     //    iEvent.getByToken(packedGenToken_,packed);
     if ( Overlap(pruned, genHT, genMTT) ) {
-      if (sourceFileString.find("WJetsToLNu_Tune") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " Wmass=" << getWmass(pruned) << " HT=" << genHT << std::endl ;
-      if (sourceFileString.find("WToTau") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " Wmass=" << getWmass(pruned) << std::endl ;
-      if (sourceFileString.find("TT_") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " MTT" << genMTT << std::endl ;
-      
+      //      if (sourceFileString.find("WJetsToLNu_Tune") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " Wmass=" << getWmass(pruned) << " HT=" << genHT << std::endl ;
+      //   if (sourceFileString.find("WToTau") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " Wmass=" << getWmass(pruned) << std::endl ;
+      //   if (sourceFileString.find("TT_") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " MTT" << genMTT << std::endl ;
+ 
       return;
     }
     ///-- W k-factor --///
@@ -1174,6 +1178,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    int nGoodTauTrig=0;
    double tau_pt[10]={0};
    double tau_phi[10]={0};
+   double tau_eta[10]={0};
    double tau_pt_trig[10]={0};
    double tau_eta_trig[10]={0};
    // int nGoodNonIsoTau=0;
@@ -1213,6 +1218,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 // std::cout << "Tau selected" << std::endl;
 	 tau_pt[nGoodTau]=tau_NoShift.Pt();
 	 tau_phi[nGoodTau]=tau_NoShift.Phi();
+	 tau_eta[nGoodTau]=tau_NoShift.Eta();
 	 nGoodTau++;
        }
 
@@ -1310,173 +1316,179 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        //** Stage1 = final stage (all cuts applied) **//
        //
        if ( (PassFinalCuts(nGoodTau, met_val,met_phi,tau_pt[0],tau_phi[0]) == true) ) {
-     h1_recoVtx_NoPUWt->Fill(recoVtx,mc_event_weight);
-     h1_recoVtx_WithPUWt->Fill(recoVtx,final_weight);
-     h1_TauPt_Stage1->Fill(tau_pt[0],final_weight);
-     //std::cout << "*Standard* dphi_tau_met=" << dphi_tau_met << std::endl;
-     double MT=  sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_tau_met)));
-     std::cout << "MT = " << MT << std::endl;
-     h1_MT_Stage1->Fill(MT,final_weight);
-
-     //--PU Systematics--//
-     if (!RunOnData) {
-       h1_MT_Stage1_pileupUncertUp->Fill(MT,final_weight_PUweight_UP);
-       h1_MT_Stage1_pileupUncertDown->Fill(MT,final_weight_PUweight_DOWN);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_PUweight_UP,   "pileupUncertUp");
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_PUweight_DOWN, "pileupUncertDown");
-     }
-
-     //--k-fact Systematics--//
-     if (!RunOnData) {
-       if (k_fak_stored != 100) {
-         h1_MT_Stage1_kFactorUp->Fill(MT,final_weight_kfact_UP);
-         h1_MT_Stage1_kFactorDown->Fill(MT,final_weight_kfact_DOWN);
-         if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_kfact_UP,   "kFactorUp");
-         if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_kfact_DOWN, "kFactorDown");
+	 h1_recoVtx_NoPUWt->Fill(recoVtx,mc_event_weight);
+	 h1_recoVtx_WithPUWt->Fill(recoVtx,final_weight);
+	 h1_TauPt_Stage1->Fill(tau_pt[0],final_weight);
+	 //std::cout << "*Standard* dphi_tau_met=" << dphi_tau_met << std::endl;
+	 double MT=  sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_tau_met)));
+	 // std::cout << "MT = " << MT << std::endl;
+	 if ( RunOnData && (MT>700.0) ) { 
+	   myfile << "#####\n\n " << sourceFileString << "  Event " << Event << "  Run " << Run <<  "\n" 
+		  << "  MT=" << MT << "  MET=" << met_val << "  MET_phi=" << met_phi 
+		  << "  TauPt=" << tau_pt[0] << "  TauPhi=" << tau_phi[0] << "  TauEta=" << tau_eta[0]
+		  << "\n\n" ; 
+	 }
+	 h1_MT_Stage1->Fill(MT,final_weight);
+	 
+	 //--PU Systematics--//
+	 if (!RunOnData) {
+	   h1_MT_Stage1_pileupUncertUp->Fill(MT,final_weight_PUweight_UP);
+	   h1_MT_Stage1_pileupUncertDown->Fill(MT,final_weight_PUweight_DOWN);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_PUweight_UP,   "pileupUncertUp");
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_PUweight_DOWN, "pileupUncertDown");
+	 }
+	 
+	 //--k-fact Systematics--//
+	 if (!RunOnData) {
+	   if (k_fak_stored != 100) {
+	     h1_MT_Stage1_kFactorUp->Fill(MT,final_weight_kfact_UP);
+	     h1_MT_Stage1_kFactorDown->Fill(MT,final_weight_kfact_DOWN);
+	     if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_kfact_UP,   "kFactorUp");
+	     if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_kfact_DOWN, "kFactorDown");
+	   }
+	 }
+	 
+	 //---Tau ID SF Systematics---//
+	 if (!RunOnData) {
+	   h1_MT_Stage1_TauIDSFUp->Fill(MT,final_weight_tauIDSF_UP);
+	   h1_MT_Stage1_TauIDSFDown->Fill(MT,final_weight_tauIDSF_DOWN);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_PUweight_UP,   "TauIDSFUp");
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_PUweight_DOWN, "TauIDSFDown");
+	 }
+	 
+	 if (!RunOnData) {
+	   if ( doPDFuncertainty) {
+	     //--PDF Systematics--//
+	     // std::cout << "Evt selected. Size of inpdfweights = " << inpdfweights.size() << std::endl;
+	     int imem=0;
+	     for (std::vector<double>::iterator it = inpdfweights->begin() ; it != inpdfweights->end(); ++it) {
+	       //std::cout << "weight = " << *it << std::endl;
+	       double final_wt_with_pdf = (*it)*final_weight;
+	       h1_MT_Stage1_pdfWt[imem]->Fill(MT,final_wt_with_pdf);
+	       //      std::cout << "final_wt_with_pdf " << final_wt_with_pdf << std::endl ;
+	       imem++;
+	     }
+	   }
+	 }
        }
-     }
-
-     //---Tau ID SF Systematics---//
-     if (!RunOnData) {
-       h1_MT_Stage1_TauIDSFUp->Fill(MT,final_weight_tauIDSF_UP);
-       h1_MT_Stage1_TauIDSFDown->Fill(MT,final_weight_tauIDSF_DOWN);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_PUweight_UP,   "TauIDSFUp");
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_PUweight_DOWN, "TauIDSFDown");
-     }
-
-     if (!RunOnData) {
-       if ( doPDFuncertainty) {
-         //--PDF Systematics--//
-         // std::cout << "Evt selected. Size of inpdfweights = " << inpdfweights.size() << std::endl;
-         int imem=0;
-         for (std::vector<double>::iterator it = inpdfweights->begin() ; it != inpdfweights->end(); ++it) {
-           //std::cout << "weight = " << *it << std::endl;
-           double final_wt_with_pdf = (*it)*final_weight;
-           h1_MT_Stage1_pdfWt[imem]->Fill(MT,final_wt_with_pdf);
-           //      std::cout << "final_wt_with_pdf " << final_wt_with_pdf << std::endl ;
-           imem++;
-         }
-       }
-     }
-       }
-
+       
        //--Systematics--//
        if (!RunOnData) {
-     if ( (PassFinalCuts(nGoodTau, met_val_JetEnUp,met_phi_JetEnUp,tau_pt[0],tau_phi[0] ) == true) ) {
-       //std::cout << "*metUncert_JetEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_JetEnUp = sqrt(2*tau_pt[0]*met_val_JetEnUp*(1- cos(dphi_tau_met)));  // always use the same dphi? or shifted dphi?
-       h1_MT_Stage1_metUncert_JetEnUp->Fill(MT_metUncert_JetEnUp,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::JetEnUp, "JetEnUp");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_JetEnDown,met_phi_JetEnDown,tau_pt[0],tau_phi[0]) == true) ) {
-       //std::cout << "*metUncert_JetEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_JetEnDown = sqrt(2*tau_pt[0]*met_val_JetEnDown*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_JetEnDown->Fill(MT_metUncert_JetEnDown,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::JetEnDown, "JetEnDown");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_JetResUp,met_phi_JetResUp,tau_pt[0],tau_phi[0]) == true) ) {
-       //std::cout << "*metUncert_JetResUp* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_JetResUp = sqrt(2*tau_pt[0]*met_val_JetResUp*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_JetResUp->Fill(MT_metUncert_JetResUp,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::JetResUp, "JetResUp");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_JetResDown,met_phi_JetResDown,tau_pt[0],tau_phi[0]) == true) ) {
-       // std::cout << "*metUncert_JetResDown* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_JetResDown = sqrt(2*tau_pt[0]*met_val_JetResDown*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_JetResDown->Fill(MT_metUncert_JetResDown,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::JetResDown, "JetResDown");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_MuonEnUp,met_phi_MuonEnUp,tau_pt[0],tau_phi[0]) == true) ) {
-       //std::cout << "*metUncert_MuonEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_MuonEnUp = sqrt(2*tau_pt[0]*met_val_MuonEnUp*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_MuonEnUp->Fill(MT_metUncert_MuonEnUp,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::MuonEnUp, "MuonEnUp");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_MuonEnDown,met_phi_MuonEnDown,tau_pt[0],tau_phi[0]) == true) ) {
-       // std::cout << "*metUncert_MuonEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_MuonEnDown = sqrt(2*tau_pt[0]*met_val_MuonEnDown*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_MuonEnDown->Fill(MT_metUncert_MuonEnDown,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::MuonEnDown, "MuonEnDown");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_ElectronEnUp,met_phi_ElectronEnUp,tau_pt[0],tau_phi[0]) == true) ) {
-       //std::cout << "*metUncert_ElectronEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_ElectronEnUp = sqrt(2*tau_pt[0]*met_val_ElectronEnUp*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_ElectronEnUp->Fill(MT_metUncert_ElectronEnUp,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::ElectronEnUp, "ElectronEnUp");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_ElectronEnDown,met_phi_ElectronEnDown,tau_pt[0],tau_phi[0]) == true) ) {
-       //std::cout << "*metUncert_ElectronEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_ElectronEnDown = sqrt(2*tau_pt[0]*met_val_ElectronEnDown*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_ElectronEnDown->Fill(MT_metUncert_ElectronEnDown,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::ElectronEnDown, "ElectronEnDown");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_TauEnUp,met_phi_TauEnUp,tau_pt[0],tau_phi[0]) == true) ) {
-       //std::cout << "*metUncert_TauEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_TauEnUp = sqrt(2*tau_pt[0]*met_val_TauEnUp*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_TauEnUp->Fill(MT_metUncert_TauEnUp,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::TauEnUp, "TauEnUp");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_TauEnDown,met_phi_TauEnDown,tau_pt[0],tau_phi[0]) == true) ) {
-       //std::cout << "*metUncert_TauEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_TauEnDown = sqrt(2*tau_pt[0]*met_val_TauEnDown*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_TauEnDown->Fill(MT_metUncert_TauEnDown,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::TauEnDown, "TauEnDown");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_PhotonEnUp,met_phi_PhotonEnUp,tau_pt[0],tau_phi[0]) == true) ) {
-       //std::cout << "*metUncert_PhotonEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_PhotonEnUp = sqrt(2*tau_pt[0]*met_val_PhotonEnUp*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_PhotonEnUp->Fill(MT_metUncert_PhotonEnUp,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::PhotonEnUp, "PhotonEnUp");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_PhotonEnDown,met_phi_PhotonEnDown,tau_pt[0],tau_phi[0]) == true) ) {
-       //std::cout << "*metUncert_PhotonEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_PhotonEnDown = sqrt(2*tau_pt[0]*met_val_PhotonEnDown*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_PhotonEnDown->Fill(MT_metUncert_PhotonEnDown,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::PhotonEnDown, "PhotonEnDown");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_UnclusteredEnUp,met_phi_UnclusteredEnUp,tau_pt[0],tau_phi[0]) == true) ) {
-       //std::cout << "*metUncert_UnclusteredEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_UnclusteredEnUp = sqrt(2*tau_pt[0]*met_val_UnclusteredEnUp*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_UnclusteredEnUp->Fill(MT_metUncert_UnclusteredEnUp,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::UnclusteredEnUp, "UnclusteredEnUp");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau, met_val_UnclusteredEnDown,met_phi_UnclusteredEnDown,tau_pt[0],tau_phi[0]) == true) ) {
-       //std::cout << "*metUncert_UnclusteredEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_metUncert_UnclusteredEnDown = sqrt(2*tau_pt[0]*met_val_UnclusteredEnDown*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_metUncert_UnclusteredEnDown->Fill(MT_metUncert_UnclusteredEnDown,final_weight);
-       if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::UnclusteredEnDown, "UnclusteredEnDown");
-     }
-     ///--Tau Scale--///
-     if ( (PassFinalCuts(nGoodTau_ScaleUp, met_val, met_phi, tau_pt_ScaleUp[0], tau_phi_ScaleUp[0]) == true) ) {
-       //std::cout << "*Tau Scale Up* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_TauScaleUp = sqrt(2*tau_pt_ScaleUp[0]*met_val*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_TauScaleUp->Fill(MT_TauScaleUp,final_weight);
-       if (nGoodTau_ScaleUp==1) setShiftedTree(tau_ScaleUp, met, final_weight, "TauScaleUp");
-     }
-     ///
-     if ( (PassFinalCuts(nGoodTau_ScaleDown, met_val, met_phi, tau_pt_ScaleDown[0], tau_phi_ScaleDown[0]) == true) ) {
-       //std::cout << "*Tau Scale Down* dphi_tau_met=" << dphi_tau_met << std::endl;
-       double MT_TauScaleDown = sqrt(2*tau_pt_ScaleDown[0]*met_val*(1- cos(dphi_tau_met)));
-       h1_MT_Stage1_TauScaleDown->Fill(MT_TauScaleDown,final_weight);
-       if (nGoodTau_ScaleDown==1) setShiftedTree(tau_ScaleDown, met, final_weight, "TauScaleDown");
-     }
+	 if ( (PassFinalCuts(nGoodTau, met_val_JetEnUp,met_phi_JetEnUp,tau_pt[0],tau_phi[0] ) == true) ) {
+	   //std::cout << "*metUncert_JetEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_JetEnUp = sqrt(2*tau_pt[0]*met_val_JetEnUp*(1- cos(dphi_tau_met)));  // always use the same dphi? or shifted dphi?
+	   h1_MT_Stage1_metUncert_JetEnUp->Fill(MT_metUncert_JetEnUp,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::JetEnUp, "JetEnUp");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_JetEnDown,met_phi_JetEnDown,tau_pt[0],tau_phi[0]) == true) ) {
+	   //std::cout << "*metUncert_JetEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_JetEnDown = sqrt(2*tau_pt[0]*met_val_JetEnDown*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_JetEnDown->Fill(MT_metUncert_JetEnDown,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::JetEnDown, "JetEnDown");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_JetResUp,met_phi_JetResUp,tau_pt[0],tau_phi[0]) == true) ) {
+	   //std::cout << "*metUncert_JetResUp* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_JetResUp = sqrt(2*tau_pt[0]*met_val_JetResUp*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_JetResUp->Fill(MT_metUncert_JetResUp,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::JetResUp, "JetResUp");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_JetResDown,met_phi_JetResDown,tau_pt[0],tau_phi[0]) == true) ) {
+	   // std::cout << "*metUncert_JetResDown* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_JetResDown = sqrt(2*tau_pt[0]*met_val_JetResDown*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_JetResDown->Fill(MT_metUncert_JetResDown,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::JetResDown, "JetResDown");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_MuonEnUp,met_phi_MuonEnUp,tau_pt[0],tau_phi[0]) == true) ) {
+	   //std::cout << "*metUncert_MuonEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_MuonEnUp = sqrt(2*tau_pt[0]*met_val_MuonEnUp*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_MuonEnUp->Fill(MT_metUncert_MuonEnUp,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::MuonEnUp, "MuonEnUp");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_MuonEnDown,met_phi_MuonEnDown,tau_pt[0],tau_phi[0]) == true) ) {
+	   // std::cout << "*metUncert_MuonEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_MuonEnDown = sqrt(2*tau_pt[0]*met_val_MuonEnDown*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_MuonEnDown->Fill(MT_metUncert_MuonEnDown,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::MuonEnDown, "MuonEnDown");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_ElectronEnUp,met_phi_ElectronEnUp,tau_pt[0],tau_phi[0]) == true) ) {
+	   //std::cout << "*metUncert_ElectronEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_ElectronEnUp = sqrt(2*tau_pt[0]*met_val_ElectronEnUp*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_ElectronEnUp->Fill(MT_metUncert_ElectronEnUp,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::ElectronEnUp, "ElectronEnUp");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_ElectronEnDown,met_phi_ElectronEnDown,tau_pt[0],tau_phi[0]) == true) ) {
+	   //std::cout << "*metUncert_ElectronEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_ElectronEnDown = sqrt(2*tau_pt[0]*met_val_ElectronEnDown*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_ElectronEnDown->Fill(MT_metUncert_ElectronEnDown,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::ElectronEnDown, "ElectronEnDown");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_TauEnUp,met_phi_TauEnUp,tau_pt[0],tau_phi[0]) == true) ) {
+	   //std::cout << "*metUncert_TauEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_TauEnUp = sqrt(2*tau_pt[0]*met_val_TauEnUp*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_TauEnUp->Fill(MT_metUncert_TauEnUp,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::TauEnUp, "TauEnUp");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_TauEnDown,met_phi_TauEnDown,tau_pt[0],tau_phi[0]) == true) ) {
+	   //std::cout << "*metUncert_TauEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_TauEnDown = sqrt(2*tau_pt[0]*met_val_TauEnDown*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_TauEnDown->Fill(MT_metUncert_TauEnDown,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::TauEnDown, "TauEnDown");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_PhotonEnUp,met_phi_PhotonEnUp,tau_pt[0],tau_phi[0]) == true) ) {
+	   //std::cout << "*metUncert_PhotonEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_PhotonEnUp = sqrt(2*tau_pt[0]*met_val_PhotonEnUp*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_PhotonEnUp->Fill(MT_metUncert_PhotonEnUp,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::PhotonEnUp, "PhotonEnUp");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_PhotonEnDown,met_phi_PhotonEnDown,tau_pt[0],tau_phi[0]) == true) ) {
+	   //std::cout << "*metUncert_PhotonEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_PhotonEnDown = sqrt(2*tau_pt[0]*met_val_PhotonEnDown*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_PhotonEnDown->Fill(MT_metUncert_PhotonEnDown,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::PhotonEnDown, "PhotonEnDown");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_UnclusteredEnUp,met_phi_UnclusteredEnUp,tau_pt[0],tau_phi[0]) == true) ) {
+	   //std::cout << "*metUncert_UnclusteredEnUp* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_UnclusteredEnUp = sqrt(2*tau_pt[0]*met_val_UnclusteredEnUp*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_UnclusteredEnUp->Fill(MT_metUncert_UnclusteredEnUp,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::UnclusteredEnUp, "UnclusteredEnUp");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau, met_val_UnclusteredEnDown,met_phi_UnclusteredEnDown,tau_pt[0],tau_phi[0]) == true) ) {
+	   //std::cout << "*metUncert_UnclusteredEnDown* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_metUncert_UnclusteredEnDown = sqrt(2*tau_pt[0]*met_val_UnclusteredEnDown*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_metUncert_UnclusteredEnDown->Fill(MT_metUncert_UnclusteredEnDown,final_weight);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight, pat::MET::METUncertainty::UnclusteredEnDown, "UnclusteredEnDown");
+	 }
+	 ///--Tau Scale--///
+	 if ( (PassFinalCuts(nGoodTau_ScaleUp, met_val, met_phi, tau_pt_ScaleUp[0], tau_phi_ScaleUp[0]) == true) ) {
+	   //std::cout << "*Tau Scale Up* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_TauScaleUp = sqrt(2*tau_pt_ScaleUp[0]*met_val*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_TauScaleUp->Fill(MT_TauScaleUp,final_weight);
+	   if (nGoodTau_ScaleUp==1) setShiftedTree(tau_ScaleUp, met, final_weight, "TauScaleUp");
+	 }
+	 ///
+	 if ( (PassFinalCuts(nGoodTau_ScaleDown, met_val, met_phi, tau_pt_ScaleDown[0], tau_phi_ScaleDown[0]) == true) ) {
+	   //std::cout << "*Tau Scale Down* dphi_tau_met=" << dphi_tau_met << std::endl;
+	   double MT_TauScaleDown = sqrt(2*tau_pt_ScaleDown[0]*met_val*(1- cos(dphi_tau_met)));
+	   h1_MT_Stage1_TauScaleDown->Fill(MT_TauScaleDown,final_weight);
+	   if (nGoodTau_ScaleDown==1) setShiftedTree(tau_ScaleDown, met, final_weight, "TauScaleDown");
+	 }
        }
      }
    }
-
+   
    /*
    //--------------//
    //-- Region A --// Only one non-isolated tau //
@@ -1750,6 +1762,7 @@ bool MiniAODAnalyzer::PassTauAcceptanceForTrigEff(TLorentzVector tau) // For Tri
 void
 MiniAODAnalyzer::beginJob()
 {
+  if (RunOnData) myfile.open ("SelectedDataEvents.txt");
   Create_Trees();
   helper->CreateHistoUnchangedName("h_counters", 10, 0, 11, "N_{events}");
 }
@@ -1758,26 +1771,29 @@ MiniAODAnalyzer::beginJob()
 void
 MiniAODAnalyzer::endJob()
 {
-   if ( doPDFuncertainty) {
+  
+  if (RunOnData) myfile.close();
+
+  if ( doPDFuncertainty) {
     for (int nb=0; nb<nbinMT; nb++) {
       double array[100] = {0.} ;
       double temp=0.0;
       double temp2=9.0e+100;
       for (int nh=0; nh<100; nh++) {
-    double binCon = h1_MT_Stage1_pdfWt[nh]->GetBinContent(nb);
-    array[nh]=binCon;
+	double binCon = h1_MT_Stage1_pdfWt[nh]->GetBinContent(nb);
+	array[nh]=binCon;
       }
-
+      
       for(int nh2=0;nh2<100;nh2++) {
-    if (array[nh2]>temp)  temp=array[nh2];
-    if (array[nh2]<temp2) temp2=array[nh2];
+	if (array[nh2]>temp)  temp=array[nh2];
+	if (array[nh2]<temp2) temp2=array[nh2];
       }
-
+      
       //      double nominal=h1_MT_Stage1->GetBinContent(nb);
       //      std::cout << "Nominal= "<< nominal <<  " up= " << temp << " down=" << temp2 << std::endl;
       h1_MT_Stage1_pdfUncertUp->SetBinContent(nb,temp);
       h1_MT_Stage1_pdfUncertDown->SetBinContent(nb,temp2);
-
+      
     }
   }
 }
