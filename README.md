@@ -56,6 +56,8 @@ To make PU distribution for data :
 
 pileupCalc.py -i MyAnalysisJSON.txt --inputLumiJSON pileup_latest.txt  --calcMode true --minBiasXsec 69200 --maxPileupBin 50 --numPileupBins 50  MyDataPileupHistogram.root
 
+MinBias xsec 69200 is used. For up/down systematics, minBias xsec of 72383.2 and 66016.8 is used (4.6% uncertainty).   
+
 Before running it, check if any updated/appropriate value of minBiasXsec, maxPileupBin, numPileupBins are available. 
 pileup_latest.txt for 2016 run-period can be found at /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/
 

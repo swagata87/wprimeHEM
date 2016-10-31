@@ -31,7 +31,10 @@ int MakePileUpHistMC() {
   outputFile->cd();
 
   //--//
-  TH1D* pileup = new TH1D("pileup","pileup",100,0,100); 
+  TH1D* pileup = new TH1D("pileup","pileup",100,0,100);
+
+  //-- https://github.com/cms-sw/cmssw/blob/CMSSW_8_1_X/SimGeneral/MixingModule/python/mix_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU_cfi.py --//
+ 
   double probValue[100]={0.000829312873542,
 			0.00124276120498,
 			0.00339329181587,
