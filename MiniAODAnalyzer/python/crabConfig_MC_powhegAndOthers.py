@@ -149,7 +149,20 @@ if __name__ == '__main__':
 ##
     config.General.requestName = 'TT_TuneCUETP8M1_13TeV-powheg-pythia8'
     config.JobType.pyCfgParams = ['sourceFileStringInput=TT_TuneCUETP8M1_13TeV-powheg-pythia8']
-    config.Data.inputDataset = '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext3-v2/MINIAODSIM'
+    config.Data.inputDataset = '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext4-v1/MINIAODSIM'
+    #config.Data.inputDataset = '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext3-v2/MINIAODSIM'
+    config.Data.unitsPerJob = 2
+    submit(config)
+
+    config.General.requestName = 'TT_Mtt-700to1000_TuneCUETP8M1_13TeV-powheg-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=TT_Mtt-700to1000_TuneCUETP8M1_13TeV-powheg-pythia8']
+    config.Data.inputDataset = '/TT_Mtt-700to1000_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2/MINIAODSIM'
+    config.Data.unitsPerJob = 2
+    submit(config)
+
+    config.General.requestName = 'TT_Mtt-1000toInf_TuneCUETP8M1_13TeV-powheg-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=TT_Mtt-1000toInf_TuneCUETP8M1_13TeV-powheg-pythia8']
+    config.Data.inputDataset = '/TT_Mtt-1000toInf_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext2-v1/MINIAODSIM'
     config.Data.unitsPerJob = 2
     submit(config)
 

@@ -122,7 +122,7 @@ private:
   bool PassFinalCuts(TLorentzVector part1, const pat::MET part2);
   bool PassFinalCuts(int nGoodTau_,TLorentzVector part1, const pat::MET part2);
   double GetTauIDScaleFactor(double tau_pt, std::string mode);
-  bool Overlap(edm::Handle<edm::View<reco::GenParticle>>, double);
+  bool Overlap(edm::Handle<edm::View<reco::GenParticle>>, double, double);
 
   std::vector<int> *pdf_indices = new std::vector<int>;
   std::vector<double> *inpdfweights = new std::vector<double>;
@@ -191,6 +191,7 @@ private:
   double tauID_SF_syst_up =1.0 ;
   double tauID_SF_syst_down =1.0;
   double genHT = 0.0;
+  double genMTT = 0.0;
   //discriminators
   std::vector<std::string> *d_mydisc = new std::vector<std::string> ;
   std::vector<std::string> *d_mydisc_emu = new std::vector<std::string> ;
@@ -262,8 +263,8 @@ private:
   std::vector<TLorentzVector> *FakeCandLorentz = new std::vector<TLorentzVector>;
 
   //trigger for ele + muon
-  bool passEleTrig;
-  bool passMuonTrig;
+  bool passEleTrig=false;
+  bool passMuonTrig=false;
   bool passMuonTrig_ForEff=false;
 
   //reweighting stuff
@@ -758,7 +759,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  // std::cout << "\n\n --EVENT-- " << Event << std::endl;
+  std::cout << "\n\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
@@ -766,27 +767,61 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     //Gen-HT//
     if (EvtHandle.isValid() ) {
       if (  (sourceFileString.find("WJetsToLNu") != std::string::npos) ) {
-    lhef::HEPEUP lheParticleInfo = EvtHandle->hepeup();
+	lhef::HEPEUP lheParticleInfo = EvtHandle->hepeup();
         // get the five vector
         // (Px, Py, Pz, E and M in GeV)
-    std::vector<lhef::HEPEUP::FiveVector> allParticles = lheParticleInfo.PUP;
-    std::vector<int> statusCodes = lheParticleInfo.ISTUP;
-
-        double ht = 0;
-        for (unsigned int i = 0; i < statusCodes.size(); i++) {
-      if (statusCodes[i] == 1) {
-        if (abs(lheParticleInfo.IDUP[i]) < 11 || abs(lheParticleInfo.IDUP[i]) > 16 || abs(lheParticleInfo.IDUP[i]) > 22) {
-          //std::cout << "Add particle with ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
-          ht += sqrt(pow(allParticles[i][0], 2) + pow(allParticles[i][1], 2));
-        }
-      }
-        }
-    genHT=ht;
-    //std::cout << "genHT=" << genHT << std::endl;
-      }
-    }
+	std::vector<lhef::HEPEUP::FiveVector> allParticles = lheParticleInfo.PUP;
+	std::vector<int> statusCodes = lheParticleInfo.ISTUP;
+	
+	double ht = 0;
+	for (unsigned int i = 0; i < statusCodes.size(); i++) {
+	  if (statusCodes[i] == 1) {
+	    if (abs(lheParticleInfo.IDUP[i]) < 11 || abs(lheParticleInfo.IDUP[i]) > 16 || abs(lheParticleInfo.IDUP[i]) > 22) {
+	      //   std::cout << "particle ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
+	      ht += sqrt(pow(allParticles[i][0], 2) + pow(allParticles[i][1], 2));
+	    }
+	  }
+	}
+	genHT=ht;
+	//std::cout << "genHT=" << genHT << std::endl;
+      } // if (  (sourceFileString.find("WJetsToLNu") != std::string::npos) ) ends
+      //
+      if (  (sourceFileString.find("TT_") != std::string::npos) ) {
+	lhef::HEPEUP lheParticleInfo = EvtHandle->hepeup();
+        // get the five vector
+        // (Px, Py, Pz, E and M in GeV)
+	std::vector<lhef::HEPEUP::FiveVector> allParticles = lheParticleInfo.PUP;
+	std::vector<int> statusCodes = lheParticleInfo.ISTUP;
+	//double MTT = 0;
+	lhef::HEPEUP::FiveVector top;
+	lhef::HEPEUP::FiveVector antitop;
+	top[0]=top[1]=top[2]=top[3]=top[4]=0.0;
+	antitop[0]=antitop[1]=antitop[2]=antitop[3]=antitop[4]=0.0;
+	int ntop=0;
+	int nantitop=0;
+	for (unsigned int i = 0; i < statusCodes.size(); i++) {
+	  if (statusCodes[i] == 2) {
+	    if (lheParticleInfo.IDUP[i] == 6) { 
+	      std::cout << "ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
+	      top=allParticles[i];
+	      ntop++;
+	    }
+	    if (lheParticleInfo.IDUP[i] == -6) { 
+	      std::cout << "ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
+	      antitop=allParticles[i];
+	      nantitop++;
+	    }
+	  }
+	}
+	std::cout << "ntop, nantitop = " << ntop << ", " << nantitop << std::endl; 
+	if ( (ntop==1) && (nantitop==1) ) {
+	  genMTT = sqrt( (top[4]*top[4])+(antitop[4]*antitop[4])+(2*top[3]*antitop[3])-2*( (top[0]*antitop[0]) + (top[1]*antitop[1]) + (top[2]*antitop[2]) ) );
+	}
+	std::cout << "MTT=" << genMTT << std::endl;
+      } 
+    } // if (EvtHandle.isValid() ) ends
   }
-
+  
   //-- kfactor --//
   wmass_stored=0;
 
@@ -803,8 +838,11 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     iEvent.getByToken(prunedGenToken_,pruned);
     //    Handle<edm::View<pat::PackedGenParticle> > packed;
     //    iEvent.getByToken(packedGenToken_,packed);
-    if ( Overlap(pruned, genHT) ) {
-      // std::cout << "Reject! Wmass = " << getWmass(pruned) << " sample = " << sourceFileString  << " HT=" << genHT << std::endl ;
+    if ( Overlap(pruned, genHT, genMTT) ) {
+      if (sourceFileString.find("WJetsToLNu_Tune") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " Wmass=" << getWmass(pruned) << " HT=" << genHT << std::endl ;
+      if (sourceFileString.find("WToTau") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " Wmass=" << getWmass(pruned) << std::endl ;
+      if (sourceFileString.find("TT_") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " MTT" << genMTT << std::endl ;
+      
       return;
     }
     ///-- W k-factor --///
@@ -936,6 +974,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
           (names.triggerName(i)).find("HLT_IsoMu24_eta2p1_IterTrk02_v") != std::string::npos
      ) {
        passMuonTrig=triggerBits->accept(i) ;
+       if (passMuonTrig==true) break;
      }
      //// Muon Trigger for Tau-trigger efficiency measurements ////
      if ( ((names.triggerName(i)).find("HLT_Mu30_TkMu11_v") != std::string::npos) or
@@ -957,6 +996,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
           (names.triggerName(i)).find("HLT_Ele27_eta2p1_WPLoose_Gsf_v") != std::string::npos
      ) {
        passEleTrig=triggerBits->accept(i) ;
+       if (passEleTrig==true) break;
      }
    }
    if (!RunOnData) passTauTrig=1;
@@ -2392,7 +2432,7 @@ int MiniAODAnalyzer::getWdecay(edm::Handle<edm::View<reco::GenParticle>> genPart
     return temp_id;
 }
 
-bool MiniAODAnalyzer::Overlap(edm::Handle<edm::View<reco::GenParticle>> p1, double HT) {
+bool MiniAODAnalyzer::Overlap(edm::Handle<edm::View<reco::GenParticle>> p1, double HT, double MTT) {
   if ( (sourceFileString.find("WJetsToLNu_Tune") != std::string::npos) && ( (getWmass(p1)>100) || (HT>100.0) ) ) return true;
   if ( (sourceFileString.find("WJetsToLNu_HT") != std::string::npos) && (getWmass(p1)>100) && (HT<100.0)  ) return true;
   if ( (sourceFileString.find("WToTauNu_M-100_") != std::string::npos) && ( (getWmass(p1)<100) || (getWmass(p1)>200)) ) return true;
@@ -2404,7 +2444,10 @@ bool MiniAODAnalyzer::Overlap(edm::Handle<edm::View<reco::GenParticle>> p1, doub
   if ( (sourceFileString.find("WToTauNu_M-4000_") != std::string::npos) && ( (getWmass(p1)<4000) || (getWmass(p1)>5000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-5000_") != std::string::npos) && ( (getWmass(p1)<5000) || (getWmass(p1)>6000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-6000_") != std::string::npos) && ( (getWmass(p1)<6000)) ) return true;
-
+  if ( (sourceFileString.find("TT_Tune") != std::string::npos) && (genMTT>700) ) return true;
+  if ( (sourceFileString.find("TT_Mtt-700to1000_Tune") != std::string::npos) && ( (genMTT<700) || (genMTT>1000) ) ) return true;
+  if ( (sourceFileString.find("TT_Mtt-1000toInf_Tune") != std::string::npos) && (genMTT<1000) ) return true;
+  
   return false;
 }
 
