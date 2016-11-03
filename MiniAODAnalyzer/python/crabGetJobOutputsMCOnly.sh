@@ -1,6 +1,7 @@
 #!/bin/bash
 
-cd crab_projects/
+cd crab_projects_Oct31/
+echo " " 
 echo $(pwd)
 
 for i in */; 
@@ -13,9 +14,11 @@ do
     echo " "
     echo " "
     echo "### $i"; 
-    #cd "$i/results"
-    #echo "------" $(pwd)
-    crab status $i
-    #cd ../..
+
+    if [[ $i == *"crab_Tau_Run2016"* ]]; then
+	echo "Data... Skip !"
+	continue
+    fi
+    crab getoutput $i
 done;
 
