@@ -1604,13 +1604,13 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
 double MiniAODAnalyzer::GetTauIDScaleFactor(double tau_pt, std::string mode) {
   double tauSF=1.0;
-  if (mode=="nominal") tauSF=0.83 ;
-  double flat_uncert = (0.83 * (6.0/100.0) );
+  if (mode=="nominal") tauSF=0.90 ;
+  double flat_uncert = (0.90 * (10.0/100.0) );
   double ptDep_uncert = (20.0/100.0)*(tau_pt/1000.0);
-  if (mode=="up") tauSF=(0.83+flat_uncert+ptDep_uncert);
+  if (mode=="up") tauSF=(0.90+flat_uncert+ptDep_uncert);
   if (mode=="down") {
-    tauSF=(0.83-flat_uncert-ptDep_uncert);
-    if (tauSF<0.0) tauSF=(0.83-flat_uncert);
+    tauSF=(0.90-flat_uncert-ptDep_uncert);
+    if (tauSF<0.0) tauSF=(0.90-flat_uncert);
   }
   return tauSF;
 }
