@@ -20,8 +20,8 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #  that is typically found in the DAS under the Configs for given dataset
 #  (although it can be "overridden" by requirements of a given release)
 
-#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')     # MC
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')  # DATA
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')     # MC
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')  # DATA
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
@@ -63,7 +63,7 @@ process.source = cms.Source("PoolSource",
 #        '/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/06A61384-FA1A-E611-8E7E-B083FED3F2E9.root',
 #        '/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/1EA04C7F-FA1A-E611-A203-1418774124DE.root'
 #        '/store/mc/RunIISpring16MiniAODv2/ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/70000/008C40ED-811D-E611-95E9-00259029E87C.root'
-#        '/store/mc/RunIISpring16MiniAODv2/WW_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/1C2B19A5-471B-E611-916B-008CFA111200.root'
+        '/store/mc/RunIISpring16MiniAODv2/WW_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/1C2B19A5-471B-E611-916B-008CFA111200.root'
 #        '/store/mc/RunIISpring16MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext3-v2/70000/00287FF4-0E40-E611-8D06-00266CFE78EC.root'
 #        '/store/mc/RunIISpring16MiniAODv2/TT_Mtt-700to1000_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2/60000/00D49225-7D59-E611-85F6-047D7B416516.root'
 #        '/store/mc/RunIISpring16MiniAODv2/TT_Mtt-1000toInf_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext2-v1/20000/02A0D9FA-0A41-E611-8B39-0090FAA57E54.root'
@@ -71,17 +71,17 @@ process.source = cms.Source("PoolSource",
 #      '/store/data/Run2016B/Tau/MINIAOD/PromptReco-v2/000/273/158/00000/D464EE02-D919-E611-8D74-02163E013917.root',
 #      '/store/data/Run2016B/Tau/MINIAOD/PromptReco-v2/000/273/290/00000/4C630F9E-191A-E611-AEB5-02163E013716.root'
 #        '/store/data/Run2016B/Tau/MINIAOD/01Jul2016-v2/20000/02C0A083-734F-E611-A834-549F35AF44AF.root'
-        '/store/data/Run2016E/Tau/MINIAOD/PromptReco-v2/000/276/831/00000/0CFBD536-074D-E611-84B7-02163E011E85.root'
-#        '/store/data/Run2016E/SingleMuon/MINIAOD/PromptReco-v2/000/276/831/00000/06AD57AB-5A4D-E611-80F2-02163E014448.root'
+#        '/store/data/Run2016E/Tau/MINIAOD/PromptReco-v2/000/276/831/00000/0CFBD536-074D-E611-84B7-02163E011E85.root'
+        '/store/data/Run2016E/SingleMuon/MINIAOD/PromptReco-v2/000/276/831/00000/06AD57AB-5A4D-E611-80F2-02163E014448.root'
     )
 )
 
 process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
-       doFakeHist_ = cms.bool(True),
-       doTrees_ = cms.bool(True),
-       useReweighting = cms.bool(True),
-#       RunOnData_ = cms.bool(False),
-       RunOnData_ = cms.bool(True),
+       doFakeHist_ = cms.bool(False),
+       doTrees_ = cms.bool(False),
+       useReweighting = cms.bool(False),
+       RunOnData_ = cms.bool(False),
+#       RunOnData_ = cms.bool(True),
 ### generatorName required only for madgraph and powheg. For other cases one can just write "default"
 #       generatorName = cms.string("madgraphMLM"),
        generatorName = cms.string("default"),
@@ -97,8 +97,8 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        jets = cms.InputTag("slimmedJets"),
        mets = cms.InputTag("slimmedMETs"),
        bits = cms.InputTag("TriggerResults","","HLT"),
-       bits_MET = cms.InputTag("TriggerResults","","RECO"),  ##for data
-#       bits_MET = cms.InputTag("TriggerResults","","PAT"),  ##for MC
+#       bits_MET = cms.InputTag("TriggerResults","","RECO"),  ##for data
+       bits_MET = cms.InputTag("TriggerResults","","PAT"),  ##for MC
        prescales = cms.InputTag("patTrigger"),
        packed = cms.InputTag("packedGenParticles"),
        pruned = cms.InputTag("prunedGenParticles"),

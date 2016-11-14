@@ -339,6 +339,7 @@ private:
   TH1F *h1_TauPt_RegD_Stage1;
   TH1F *h1_TauPt_GenMatchedTau_RegD_Stage1;
   TH1F *h1_MT_Stage1;
+  TH1F *h1_MET_Stage1;
   TH1F *h1_MT_RegA_Stage1;
   TH1F *h1_MT_RegC_Stage1;
   TH1F *h1_MT_GenMatchedTau_RegC_Stage1;
@@ -476,6 +477,9 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_TauPt_GenMatchedTau_RegD_Stage1 = histoDir.make<TH1F>("tauPt_GenMatchedTau_RegD_Stage1", "TauPt_GenMatchedTau_RegD_Stage1", nbinMT, xlowMT, xupMT);
   */
   h1_MT_Stage1 = histoDir.make<TH1F>("mT_Stage1", "MT_Stage1", nbinMT, xlowMT, xupMT);
+  h1_MET_Stage1 = histoDir.make<TH1F>("met_Stage1", "MET_Stage1", nbinMT, xlowMT, xupMT);
+  //h1_MET_Stage1
+
   /*
   h1_MT_RegA_Stage1 = histoDir.make<TH1F>("mT_RegA_Stage1", "MT_RegA_Stage1", nbinMT, xlowMT, xupMT);
   h1_MT_RegC_Stage1 = histoDir.make<TH1F>("mT_RegC_Stage1", "MT_RegC_Stage1", nbinMT, xlowMT, xupMT);
@@ -1331,7 +1335,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 		  << "\n\n" ; 
 	 }
 	 h1_MT_Stage1->Fill(MT,final_weight);
-	 
+	 h1_MET_Stage1->Fill(met_val,final_weight);
 	 //--PU Systematics--//
 	 if (!RunOnData) {
 	   h1_MT_Stage1_pileupUncertUp->Fill(MT,final_weight_PUweight_UP);
