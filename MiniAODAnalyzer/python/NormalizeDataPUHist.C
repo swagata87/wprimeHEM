@@ -27,7 +27,7 @@
 int NormalizeDataPUHist() {
 
   // UP //
-  TFile *file_in_up  = new TFile("MyDataPileupHistogram_72383_2_up.root");
+  TFile *file_in_up  = new TFile("MyDataPileupHistogram_UP.root");
   TFile* outputFile_up = new TFile("Data_pileup_normalized_UP.root","RECREATE");
   outputFile_up->cd();
   TH1D* pileupData_up = (TH1D*)file_in_up->Get("pileup");
@@ -38,7 +38,7 @@ int NormalizeDataPUHist() {
   delete outputFile_up;
 
   // DOWN //
-  TFile *file_in_down = new TFile("MyDataPileupHistogram_66016_8_down.root");
+  TFile *file_in_down = new TFile("MyDataPileupHistogram_DOWN.root");
   TFile* outputFile_down = new TFile("Data_pileup_normalized_DOWN.root","RECREATE");
   outputFile_down->cd();
   TH1D* pileupData_down = (TH1D*)file_in_down->Get("pileup");
@@ -49,7 +49,7 @@ int NormalizeDataPUHist() {
   delete outputFile_down;
 
   // NOMINAL //
-  TFile *file_in = new TFile("MyDataPileupHistogram_69200.root");
+  TFile *file_in = new TFile("MyDataPileupHistogram.root");
   TFile* outputFile = new TFile("Data_pileup_normalized.root","RECREATE");
   outputFile->cd();
   TH1D* pileupData = (TH1D*)file_in->Get("pileup");

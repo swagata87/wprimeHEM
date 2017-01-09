@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd crab_projects/
+cd crab_projects_SSMsigOnly_Jan7/
 echo $(pwd)
 
 for i in */; 

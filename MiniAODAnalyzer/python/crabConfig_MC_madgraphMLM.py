@@ -15,9 +15,9 @@ config.Data.inputDataset = ''
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 #config.Data.unitsPerJob = 10
-config.Data.outLFNDirBase = '/store/user/%s/crab_Wprime_Oct25/' % (getUsernameFromSiteDB())
+config.Data.outLFNDirBase = '/store/user/%s/crab_Wprime_Nov9/' % (getUsernameFromSiteDB())
 config.Data.publication = False
-config.Data.outputDatasetTag = 'WPrimeToTaus_Oct25'
+config.Data.outputDatasetTag = 'WPrimeToTaus_Nov9'
 config.Site.storageSite = 'T2_DE_RWTH'
 
 if __name__ == '__main__':
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     # We want to put all the CRAB project directories from the tasks we submit here into one common directory.
     # That's why we need to set this parameter (here or above in the configuration file, it does not matter, we will not overwrite it).
-    config.General.workArea = 'crab_projects_Oct25'
+    config.General.workArea = 'crab_projects_Nov9'
 
     def submit(config):
         try:
@@ -46,11 +46,11 @@ if __name__ == '__main__':
 ##
 ## ZJets
 ##
-#    config.General.requestName = 'ZJetsToNuNu_HT-100To200_13TeV-madgraph'
-#    config.JobType.pyCfgParams = ['sourceFileStringInput=ZJetsToNuNu_HT-100To200_13TeV-madgraph']
-#    config.Data.inputDataset = '/ZJetsToNuNu_HT-100To200_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-#    config.Data.unitsPerJob = 1
-#    submit(config)
+    config.General.requestName = 'ZJetsToNuNu_HT-100To200_13TeV-madgraph'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=ZJetsToNuNu_HT-100To200_13TeV-madgraph']
+    config.Data.inputDataset = '/ZJetsToNuNu_HT-100To200_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
+    config.Data.unitsPerJob = 1
+    submit(config)
 
     config.General.requestName = 'ZJetsToNuNu_HT-200To400_13TeV-madgraph'
     config.JobType.pyCfgParams = ['sourceFileStringInput=ZJetsToNuNu_HT-200To400_13TeV-madgraph']
@@ -136,11 +136,11 @@ if __name__ == '__main__':
 ##
 ## Wjets HT binned sample ##
 ##
-#    config.General.requestName = 'WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
-#    config.JobType.pyCfgParams = ['sourceFileStringInput=WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
-#    config.Data.inputDataset = '/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
-#    config.Data.unitsPerJob = 1
-#    submit(config)
+    config.General.requestName = 'WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']
+    config.Data.inputDataset = '/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
+    config.Data.unitsPerJob = 2
+    submit(config)
 
     config.General.requestName = 'WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
     config.JobType.pyCfgParams = ['sourceFileStringInput=WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8']

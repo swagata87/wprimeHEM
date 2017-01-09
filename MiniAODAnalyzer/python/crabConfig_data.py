@@ -13,11 +13,11 @@ config.JobType.inputFiles = ['MC_pileup.root','Data_pileup_normalized.root','Dat
 config.Data.inputDataset = ''
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'LumiBased'
-config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Cert_271036-283685_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt'
+config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt'
 #config.Data.unitsPerJob = 4
-config.Data.outLFNDirBase = '/store/user/%s/crab_Wprime_trig/' % (getUsernameFromSiteDB())
+config.Data.outLFNDirBase = '/store/user/%s/crab_Wprime_Nov9/' % (getUsernameFromSiteDB())
 config.Data.publication = False
-config.Data.outputDatasetTag = 'WPrimeToTaus_Oct29'
+config.Data.outputDatasetTag = 'WPrimeToTaus_Nov9'
 config.Site.storageSite = 'T2_DE_RWTH'
 
 if __name__ == '__main__':
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     # We want to put all the CRAB project directories from the tasks we submit here into one common directory.
     # That's why we need to set this parameter (here or above in the configuration file, it does not matter, we will not overwrite it).
-    config.General.workArea = 'crab_projects_trig'
+    config.General.workArea = 'crab_projects_Nov9'
 
     def submit(config):
         try:
@@ -42,7 +42,60 @@ if __name__ == '__main__':
     ## From now on that's what users should modify: this is the a-la-CRAB2 configuration part. ##
     #############################################################################################
 
-## Data ##
+## Data ## ReReco ##
+
+#    config.General.requestName = 'SingleMuon_Run2016B_23Sep2016_v3'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=SingleMuon_Run2016B_23Sep2016_v3']
+#    config.Data.inputDataset = '/SingleMuon/Run2016B-23Sep2016-v3/MINIAOD'
+#    config.Data.unitsPerJob = 20
+#    submit(config)
+
+#    config.General.requestName = 'Tau_Run2016B_23Sep2016_v3'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016B_23Sep2016_v3']
+#    config.Data.inputDataset = '/Tau/Run2016B-23Sep2016-v3/MINIAOD'
+#    config.Data.unitsPerJob = 14
+#    submit(config)
+
+#    config.General.requestName = 'Tau_Run2016C_23Sep2016_v1'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016C_23Sep2016_v1']
+#    config.Data.inputDataset = '/Tau/Run2016C-23Sep2016-v1/MINIAOD'
+#    config.Data.unitsPerJob = 14
+#    submit(config)
+
+#    config.General.requestName = 'Tau_Run2016D_23Sep2016_v1'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016D_23Sep2016_v1']
+#    config.Data.inputDataset = '/Tau/Run2016D-23Sep2016-v1/MINIAOD'
+#    config.Data.unitsPerJob = 14
+#    submit(config)
+
+    config.General.requestName = 'Tau_Run2016E_23Sep2016_v1'
+    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016E_23Sep2016_v1']
+    config.Data.inputDataset = '/Tau/Run2016E-23Sep2016-v1/MINIAOD'
+    config.Data.unitsPerJob = 14
+    submit(config)
+
+#    config.General.requestName = 'Tau_Run2016F_23Sep2016_v1'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016F_23Sep2016_v1']
+#    config.Data.inputDataset = '/Tau/Run2016F-23Sep2016-v1/MINIAOD'
+#    config.Data.unitsPerJob = 14
+#    submit(config)
+
+#    config.General.requestName = 'Tau_Run2016G_23Sep2016_v1'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016G_23Sep2016_v1']
+#    config.Data.inputDataset = '/Tau/Run2016G-23Sep2016-v1/MINIAOD'
+#    config.Data.unitsPerJob = 14
+#    submit(config)
+
+#    config.General.requestName = ''
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=']
+#    config.Data.inputDataset = ''
+#    config.Data.unitsPerJob = 14
+#    submit(config)
+
+
+##
+## Data ## Prompt Reco ##
+##
 
 #    config.General.requestName = 'Tau_Run2016B_PromptReco_v2'
 #    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016B_PromptReco_v2']
@@ -62,30 +115,26 @@ if __name__ == '__main__':
 #    config.Data.unitsPerJob = 12
 #    submit(config)
 
-    config.General.requestName = 'Tau_Run2016E_PromptReco_v2'
-    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016E_PromptReco_v2']
-    config.Data.inputDataset = '/Tau/Run2016E-PromptReco-v2/MINIAOD'
-    config.Data.unitsPerJob = 12
-    submit(config)
+#    config.General.requestName = 'Tau_Run2016E_PromptReco_v2'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016E_PromptReco_v2']
+#    config.Data.inputDataset = '/Tau/Run2016E-PromptReco-v2/MINIAOD'
+#    config.Data.unitsPerJob = 12
+#    submit(config)
 
-    config.General.requestName = 'Tau_Run2016F_PromptReco_v1'
-    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016F_PromptReco_v1']
-    config.Data.inputDataset = '/Tau/Run2016F-PromptReco-v1/MINIAOD'
-    config.Data.unitsPerJob = 12
-    submit(config)
+#    config.General.requestName = 'Tau_Run2016F_PromptReco_v1'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016F_PromptReco_v1']
+#    config.Data.inputDataset = '/Tau/Run2016F-PromptReco-v1/MINIAOD'
+#    config.Data.unitsPerJob = 12
+#    submit(config)
 
-    config.General.requestName = 'Tau_Run2016G_PromptReco_v1'
-    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016G_PromptReco_v1']
-    config.Data.inputDataset = '/Tau/Run2016G-PromptReco-v1/MINIAOD'
-    config.Data.unitsPerJob = 12
-    submit(config)
+#    config.General.requestName = 'Tau_Run2016G_PromptReco_v1'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016G_PromptReco_v1']
+#    config.Data.inputDataset = '/Tau/Run2016G-PromptReco-v1/MINIAOD'
+#    config.Data.unitsPerJob = 12
+#    submit(config)
 
-    config.General.requestName = 'Tau_Run2016H_PromptReco_v2'
-    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016H_PromptReco_v2']
-    config.Data.inputDataset = '/Tau/Run2016H-PromptReco-v2/MINIAOD'
-    config.Data.unitsPerJob = 12
-    submit(config)
-
-
-
-
+#    config.General.requestName = 'Tau_Run2016H_PromptReco_v2'
+#    config.JobType.pyCfgParams = ['sourceFileStringInput=Tau_Run2016H_PromptReco_v2']
+#    config.Data.inputDataset = '/Tau/Run2016H-PromptReco-v2/MINIAOD'
+#    config.Data.unitsPerJob = 12
+#    submit(config)

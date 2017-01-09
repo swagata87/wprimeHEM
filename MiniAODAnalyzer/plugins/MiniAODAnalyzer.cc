@@ -1327,7 +1327,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 h1_TauPt_Stage1->Fill(tau_pt[0],final_weight);
 	 //std::cout << "*Standard* dphi_tau_met=" << dphi_tau_met << std::endl;
 	 double MT=  sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_tau_met)));
-	 std::cout << "MT = " << MT << std::endl;
+	 //std::cout << "MT = " << MT << std::endl;
 	 if ( RunOnData && (MT>700.0) ) { 
 	   myfile << "#####\n\n " << sourceFileString << "  Event " << Event << "  Run " << Run <<  "\n" 
 		  << "  MT=" << MT << "  MET=" << met_val << "  MET_phi=" << met_phi 

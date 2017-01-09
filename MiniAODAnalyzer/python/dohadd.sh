@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd crab_projects/
+cd crab_projects_Oct25/
 echo $(pwd)
 #num=101
 #num2=0
@@ -12,6 +12,8 @@ do
     echo "### $i"; 
     cd "$i/results"
     #echo "------" $(pwd)
+    rm newhist*.root
+
     n=$(ls -1 | wc -l)
     echo $n " files"
 
@@ -26,7 +28,8 @@ do
 	#    let a=a+1
 	#    echo "do haddin " $a "iterations"
 	#fi    
-	hadd -f newhist1.root   hist_analysis_1.root    hist_analysis_10*.root 
+	hadd -f newhist0.root   hist_analysis_1.root
+	hadd -f newhist1.root   hist_analysis_10*.root 
  	hadd -f newhist2.root   hist_analysis_11*.root
 	hadd -f newhist3.root   hist_analysis_12*.root
 	hadd -f newhist4.root   hist_analysis_13*.root
@@ -37,7 +40,8 @@ do
 	hadd -f newhist9.root   hist_analysis_18*.root
 	hadd -f newhist10.root  hist_analysis_19*.root
 
-	hadd -f newhist11.root   hist_analysis_2.root    hist_analysis_20*.root 
+	hadd -f newhist11a.root  hist_analysis_2.root
+	hadd -f newhist11b.root  hist_analysis_20*.root 
  	hadd -f newhist12.root   hist_analysis_21*.root
 	hadd -f newhist13.root   hist_analysis_22*.root
 	hadd -f newhist14.root   hist_analysis_23*.root
@@ -48,7 +52,8 @@ do
 	hadd -f newhist19.root   hist_analysis_28*.root
 	hadd -f newhist20.root   hist_analysis_29*.root
 
-	hadd -f newhist21.root   hist_analysis_3.root    hist_analysis_30*.root 
+	hadd -f newhist21a.root  hist_analysis_3.root
+	hadd -f newhist21b.root  hist_analysis_30*.root 
  	hadd -f newhist22.root   hist_analysis_31*.root
 	hadd -f newhist23.root   hist_analysis_32*.root
 	hadd -f newhist24.root   hist_analysis_33*.root

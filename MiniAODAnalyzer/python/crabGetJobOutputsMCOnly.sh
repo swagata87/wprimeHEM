@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd crab_projects_Oct31/
+cd crab_projects_SSMsigOnly_Jan7/
 echo " " 
 echo $(pwd)
 
@@ -19,6 +19,6 @@ do
 	echo "Data... Skip !"
 	continue
     fi
-    crab getoutput $i
+    crab getoutput --wait=100  $i
 done;
 

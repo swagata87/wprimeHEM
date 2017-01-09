@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd crab_projects_Oct31/
+cd crab_projects_TTBulkOnly/ 
 echo $(pwd)
 #num=101
 #num2=0
