@@ -45,7 +45,7 @@ my_id_modules = [
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5000))
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(

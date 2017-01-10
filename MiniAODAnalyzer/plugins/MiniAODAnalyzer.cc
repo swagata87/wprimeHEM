@@ -123,6 +123,8 @@ private:
   bool PassFinalCuts(TLorentzVector part1, const pat::MET part2, pat::MET::METUncertainty metUncert);
   bool PassFinalCuts(TLorentzVector part1, const pat::MET part2);
   bool PassFinalCuts(int nGoodTau_,TLorentzVector part1, const pat::MET part2);
+  bool PassFinalCuts_Except_dphiTauMET(int nGoodTau_, double met_val_, double met_phi_, double tau_pt_, double tau_phi_);
+  bool PassFinalCuts_Except_pToverEtMiss(int nGoodTau_, double met_val_, double met_phi_, double tau_pt_, double tau_phi_);
   double GetTauIDScaleFactor(double tau_pt, std::string mode);
   bool Overlap(edm::Handle<edm::View<reco::GenParticle>>, double, double);
 
@@ -194,6 +196,7 @@ private:
   double tauID_SF_syst_down =1.0;
   double genHT = 0.0;
   double genMTT = 0.0;
+  //  double genMTT2 = 0.0;
   //discriminators
   std::vector<std::string> *d_mydisc = new std::vector<std::string> ;
   std::vector<std::string> *d_mydisc_emu = new std::vector<std::string> ;
@@ -319,6 +322,7 @@ private:
   int debugLevel;
   TH1I *h1_EventCount;
   TH1I *h1_EventCount2;
+  TH1F *h1_genMTT;
   TH1F *h1_TauPt_Gen;
   TH1I *h1_nGoodTau_Reco;
   TH1I *h1_nGenTau;
@@ -333,6 +337,8 @@ private:
   TH1F *h1_TauPt_goodreco;
   TH1F *h1_TauEta_goodreco;
   TH1F *h1_TauPt_Stage1;
+  TH1F *h1_pToverEtMiss_Stage1;
+  TH1F *h1_dPhi_tau_MET_Stage1;
   TH1F *h1_TauPt_RegA_Stage1;
   TH1F *h1_TauPt_RegC_Stage1;
   TH1F *h1_TauPt_GenMatchedTau_RegC_Stage1;
@@ -369,9 +375,9 @@ private:
   TH1F *h1_MT_Stage1_kFactorDown;
   TH1F *h1_MT_Stage1_TauIDSFUp;
   TH1F *h1_MT_Stage1_TauIDSFDown;
-  TH1F *h1_MET_Stage2;
+  // TH1F *h1_MET_Stage2;
   TH1F *h1_dphiTauMET_Stage2;
-  TH1F *h1_pToverEtMiss_Stage2;
+  TH1F *h1_pToverEtMiss_Stage3;
   TH1F *h1_recoVtx_NoPUWt;
   TH1F *h1_recoVtx_WithPUWt;
 
@@ -392,6 +398,8 @@ private:
   double final_weight_tauIDSF_DOWN=1;
   unsigned long Event;
   double dphi_tau_met;
+  double pToverEtMiss;
+
   //  int num_PU_vertices;
 
   std::ofstream myfile;
@@ -457,6 +465,8 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_EventCount = histoDir.make<TH1I>("eventCount", "EventCount", 10, 0, 10);
   h1_nGenTau = histoDir.make<TH1I>("nGenTau", "nGenTau", 5, -0.5, 4.5);
   h1_nGoodTau_Reco = histoDir.make<TH1I>("nGoodTauReco", "nGoodTauReco", 5, -0.5, 4.5);
+  //h1_genMTT
+  h1_genMTT = histoDir.make<TH1F>("Gen_MTT", "MTT_Gen", 2000, 0, 2000);
   h1_TauPt_Gen = histoDir.make<TH1F>("tauPt_Gen", "TauPt_Gen", 1000, 0, 4000);
   h1_TauPt_reco = histoDir.make<TH1F>("tauPt_reco", "TauPt_reco", 1000, 0, 4000);
   h1_TauPt_goodreco = histoDir.make<TH1F>("tauPt_goodreco", "TauPt_goodreco", 1000, 0, 4000);
@@ -469,6 +479,8 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_TauEta_reco = histoDir.make<TH1F>("tauEta_reco", "TauEta_reco", 48, -2.4, 2.4);
   h1_TauEta_goodreco = histoDir.make<TH1F>("tauEta_goodreco", "TauEta_goodreco", 48, -2.4, 2.4);
   h1_TauPt_Stage1 = histoDir.make<TH1F>("tauPt_Stage1", "TauPt_Stage1", 1000, 0, 4000);
+  //h1_pToverEtMiss_Stage1
+
   /*
   h1_TauPt_RegA_Stage1 = histoDir.make<TH1F>("tauPt_RegA_Stage1", "TauPt_RegA_Stage1", 1000, 0, 4000);
   h1_TauPt_RegC_Stage1 = histoDir.make<TH1F>("tauPt_RegC_Stage1", "TauPt_RegC_Stage1", 1000, 0, 4000);
@@ -509,9 +521,13 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_MT_Stage1_kFactorDown =histoDir.make<TH1F>("mT_Stage1_kFactorDown", "MT_Stage1_kFactorDown", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_TauIDSFUp =histoDir.make<TH1F>("mT_Stage1_TauIDSFUp", "MT_Stage1_TauIDSFUp", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_TauIDSFDown =histoDir.make<TH1F>("mT_Stage1_TauIDSFDown", "MT_Stage1_TauIDSFDown", nbinMT, xlowMT, xupMT);
-  h1_MET_Stage2 = histoDir.make<TH1F>("MET_stage2", "MET_Stage2", 1000, 0, 4000);
-  h1_dphiTauMET_Stage2 = histoDir.make<TH1F>("dphiTauMET_stage2", "dPhiTauMET_Stage2", 100, -1.0, 4.0);
-  h1_pToverEtMiss_Stage2 = histoDir.make<TH1F>("pToverEtMiss_stage2", "pToverEtMiss_Stage2", 1200, 0.0, 12);
+  //h1_MET_Stage2 = histoDir.make<TH1F>("MET_stage2", "MET_Stage2", 1000, 0, 4000);
+
+  h1_dphiTauMET_Stage2   = histoDir.make<TH1F>("dphi_tau_MET_Stage2", "DPhi_Tau_MET_Stage2", 800, 0, 4.0);
+  h1_pToverEtMiss_Stage3 = histoDir.make<TH1F>("pToverEtMiss_Stage3", "PToverEtMiss_Stage3", 300, 0.0, 3.0);
+
+  h1_dPhi_tau_MET_Stage1 = histoDir.make<TH1F>("dPhi_tau_MET_Stage1", "DPhi_Tau_MET_Stage1", 800, 0, 4.0);
+  h1_pToverEtMiss_Stage1 = histoDir.make<TH1F>("pToverEtMiss_Stage1", "PToverEtMiss_Stage1", 300, 0, 3.0);
 
   if ( doPDFuncertainty ) {
     h1_MT_Stage1_pdfUncertUp = histoDir.make<TH1F>("mT_Stage1_pdfUncertUp", "MT_Stage1_pdfUncertUp", nbinMT, xlowMT, xupMT);
@@ -767,7 +783,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  //  std::cout << "\n\n --EVENT-- " << Event << std::endl;
+  std::cout << "\n\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
@@ -798,8 +814,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	lhef::HEPEUP lheParticleInfo = EvtHandle->hepeup();
         // get the five vector
         // (Px, Py, Pz, E and M in GeV)
-	std::vector<lhef::HEPEUP::FiveVector> allParticles = lheParticleInfo.PUP;
-	std::vector<int> statusCodes = lheParticleInfo.ISTUP;
+	std::vector<lhef::HEPEUP::FiveVector> allParticles = lheParticleInfo.PUP; // PUP = (Px, Py, Pz, E and M in GeV) for the particle
+	std::vector<int> statusCodes = lheParticleInfo.ISTUP; // ISTUP = The status codes for the particle entries in this event. 
 	//double MTT = 0;
 	lhef::HEPEUP::FiveVector top;
 	lhef::HEPEUP::FiveVector antitop;
@@ -807,9 +823,11 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	antitop[0]=antitop[1]=antitop[2]=antitop[3]=antitop[4]=0.0;
 	int ntop=0;
 	int nantitop=0;
+	//	std::cout << "statusCodes.size() = " << statusCodes.size()  << std::endl;
 	for (unsigned int i = 0; i < statusCodes.size(); i++) {
+	  //std::cout << "particle " << i <<  "statusCode=" << statusCodes[i] << ", pdgid=" << lheParticleInfo.IDUP[i] << std::endl;
 	  if (statusCodes[i] == 2) {
-	    if (lheParticleInfo.IDUP[i] == 6) { 
+	    if (lheParticleInfo.IDUP[i] == 6) { // IDUP = The PDG id's for the particle entries in this event.
 	      //  std::cout << "ID=" << lheParticleInfo.IDUP[i] << " status=" << statusCodes[i] << std::endl;
 	      top=allParticles[i];
 	      ntop++;
@@ -824,8 +842,13 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	//	std::cout << "ntop, nantitop = " << ntop << ", " << nantitop << std::endl; 
 	if ( (ntop==1) && (nantitop==1) ) {
 	  genMTT = sqrt( (top[4]*top[4])+(antitop[4]*antitop[4])+(2*top[3]*antitop[3])-2*( (top[0]*antitop[0]) + (top[1]*antitop[1]) + (top[2]*antitop[2]) ) );
+	  /*
+	  genMTT2 = (antitop[3]+top[3])*(antitop[3]+top[3])
+	    - (antitop[0]+top[0])*(antitop[0]+top[0])
+	    - (antitop[1]+top[1])*(antitop[1]+top[1])
+	    - (antitop[2]+top[2])*(antitop[2]+top[2]); */
 	}
-	//	std::cout << "MTT=" << genMTT << std::endl;
+	//	std::cout << "MTT=" << genMTT  << std::endl;
       } 
     } // if (EvtHandle.isValid() ) ends
   }
@@ -853,6 +876,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
  
       return;
     }
+
+    h1_genMTT->Fill(genMTT);
     ///-- W k-factor --///
     k_fak_stored=applyWKfactor(1,pruned);
     if (k_fak_stored != 100) {
@@ -942,13 +967,13 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //  std::cout << "RunOnData=" << RunOnData << " MC_TrueNumInteractions=" << MC_TrueNumInteractions << " Lumi_Wt=" << Lumi_Wt << std::endl;
 
   ///-- MC event weight --///
-  double mc_event_weight=1;
+  double mc_event_weight=-20;
   if (!RunOnData) {
     Handle<GenEventInfoProduct> genEvtInfo;
     iEvent.getByToken(genEventInfoProductTagToken_, genEvtInfo );
     mc_event_weight = genEvtInfo->weight();
   }
-  //  std::cout << "RunOnData=" << RunOnData << " mc_event_weight=" << mc_event_weight << std::endl;
+  std::cout << "RunOnData=" << RunOnData << " mc_event_weight=" << mc_event_weight << std::endl;
 
 
    //---Trigger---//
@@ -1310,14 +1335,22 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    //   std::cout << "Proceed to selection cuts " << std::endl;
    if (passTauTrig && passAllMETFilters ) {
      if ( (nvtx>0) && (nTightMu==0) && (nLooseEle==0) ) {
-       //** Stage 2 (Passed trigger, MET filter, vertex-cut, lepton-veto)
-       double dphi_tau_met_S2 = deltaPhi(tau_phi[0],met_phi);
-       double pToverEtMiss_S2 = tau_pt[0]/met_val ;
        //std::cout << "pt=" << tau_pt[0] << " met=" << met_val  <<   " pToverEtMiss_S2=" << pToverEtMiss_S2 << std::endl;
-       h1_MET_Stage2->Fill(met_val,final_weight);
-       h1_dphiTauMET_Stage2->Fill(dphi_tau_met_S2,final_weight);
-       h1_pToverEtMiss_Stage2->Fill(pToverEtMiss_S2,final_weight);
+
        //
+       //** Stage 3 = Passed all other cuts, but pToverEtMiss cut not applied **//
+       //
+       if ( (PassFinalCuts_Except_pToverEtMiss(nGoodTau, met_val,met_phi,tau_pt[0],tau_phi[0]) == true) ) {
+	 h1_pToverEtMiss_Stage3->Fill(pToverEtMiss,final_weight);
+       }
+
+       //
+       //** Stage 2 = Passed all other cuts, but dphi_tau_met cut not applied **//
+       //
+       if ( (PassFinalCuts_Except_dphiTauMET(nGoodTau, met_val,met_phi,tau_pt[0],tau_phi[0]) == true) ) {
+	 h1_dphiTauMET_Stage2->Fill(dphi_tau_met,final_weight);
+       }
+
        //
        //** Stage1 = final stage (all cuts applied) **//
        //
@@ -1325,6 +1358,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 h1_recoVtx_NoPUWt->Fill(recoVtx,mc_event_weight);
 	 h1_recoVtx_WithPUWt->Fill(recoVtx,final_weight);
 	 h1_TauPt_Stage1->Fill(tau_pt[0],final_weight);
+	 h1_dPhi_tau_MET_Stage1->Fill(dphi_tau_met,final_weight);
+	 h1_pToverEtMiss_Stage1->Fill(pToverEtMiss,final_weight);
+   
 	 //std::cout << "*Standard* dphi_tau_met=" << dphi_tau_met << std::endl;
 	 double MT=  sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_tau_met)));
 	 //std::cout << "MT = " << MT << std::endl;
@@ -1626,13 +1662,41 @@ bool MiniAODAnalyzer::PassFinalCuts(int nGoodTau_, double met_val_,double met_ph
   if (nGoodTau_==1) {
     if ( met_val_>120 ) {
       dphi_tau_met = deltaPhi(tau_phi_,met_phi_);
-      double pToverEtMiss=tau_pt_/met_val_ ;
+      pToverEtMiss=tau_pt_/met_val_ ;
       if (pToverEtMiss>0.7 && pToverEtMiss<1.3) {
     // std::cout << "pToverEtMiss=" << pToverEtMiss << std::endl;
     if (fabs(dphi_tau_met)>2.4) {
       // std::cout << "dphi_tau_met=" << dphi_tau_met << std::endl;
       passed=true;
     }
+      }
+    }
+  }
+  return passed;
+}
+
+bool MiniAODAnalyzer::PassFinalCuts_Except_dphiTauMET(int nGoodTau_, double met_val_,double met_phi_,double tau_pt_,double tau_phi_) {
+  bool passed=false;
+  if (nGoodTau_==1) {
+    if ( met_val_>120 ) {
+      dphi_tau_met = deltaPhi(tau_phi_,met_phi_);
+      pToverEtMiss=tau_pt_/met_val_ ;
+      if (pToverEtMiss>0.7 && pToverEtMiss<1.3) {
+	passed=true;
+      }
+    }
+  }
+  return passed;
+}
+
+bool MiniAODAnalyzer::PassFinalCuts_Except_pToverEtMiss(int nGoodTau_, double met_val_,double met_phi_,double tau_pt_,double tau_phi_) {
+  bool passed=false;
+  if (nGoodTau_==1) {
+    if ( met_val_>120 ) {
+      dphi_tau_met = deltaPhi(tau_phi_,met_phi_);
+      pToverEtMiss=tau_pt_/met_val_ ;
+      if (fabs(dphi_tau_met)>2.4) {
+	passed=true;
       }
     }
   }
