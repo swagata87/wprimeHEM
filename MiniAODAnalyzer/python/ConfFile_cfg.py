@@ -20,7 +20,9 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #  that is typically found in the DAS under the Configs for given dataset
 #  (although it can be "overridden" by requirements of a given release)
 
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')     # MC
+#80X_mcRun2_asymptotic_2016_TrancheIV_v6
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')     # MC
+process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_TrancheIV_v6', '')     # MC
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')  # DATA
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -49,8 +51,11 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-      # '/store/mc/RunIISpring16MiniAODv2/QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/70000/7E9A7536-7A1A-E611-9149-001E67A4055F.root'
-        '/store/mc/RunIISpring16MiniAODv2/WprimeToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/00000/0A8E0285-A92B-E611-A376-00259081ED0A.root'
+## Moriond 17 samples ##
+'/store/mc/RunIISummer16MiniAODv2/WprimeToTauNu_M-1200_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/70000/006926C1-1EB7-E611-93A8-ECB1D79E5C40.root'
+##
+# '/store/mc/RunIISpring16MiniAODv2/QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/70000/7E9A7536-7A1A-E611-9149-001E67A4055F.root'
+#        '/store/mc/RunIISpring16MiniAODv2/WprimeToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/00000/0A8E0285-A92B-E611-A376-00259081ED0A.root'
 # '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/00000/046410F1-7736-E611-8F28-A0000420FE80.root',
 #        '/store/mc/RunIISpring16MiniAODv2/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/000C4CF4-CC21-E611-9D0A-0025905C54FE.root',
 #        '/store/mc/RunIISpring16MiniAODv2/WToTauNu_M-100_TuneCUETP8M1_13TeV-pythia8-tauola/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/70000/309E13C9-B42B-E611-9C97-00259073E51E.root'

@@ -1103,7 +1103,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     trig_SF_syst_down = 0.9;
    }
 
-   if (!RunOnData) passTauTrig=1;
+  //   if (!RunOnData) passTauTrig=1;
    // std::cout << "RunOnData=" << RunOnData <<  " ## passTauTrig=" << passTauTrig << std::endl;
 
    //---Trigger MET---//
