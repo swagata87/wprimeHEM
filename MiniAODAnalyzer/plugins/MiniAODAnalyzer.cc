@@ -129,7 +129,10 @@ private:
   bool Overlap(edm::Handle<edm::View<reco::GenParticle>>, double, double);
 
   std::vector<int> *pdf_indices = new std::vector<int>;
+  std::vector<int> alpha_indices;
+
   std::vector<double> *inpdfweights = new std::vector<double>;
+  std::vector<double> *alpha_s_container = new std::vector<double>;
 
   //new additions
   virtual void Create_Trees();
@@ -191,11 +194,21 @@ private:
   double k_fak=1.0;
   double k_fak_up=1.0;
   double k_fak_down=1.0;
+  //
   double tauID_SF =1.0;
   double tauID_SF_syst_up =1.0 ;
   double tauID_SF_syst_down =1.0;
+  //
+  double trig_SF =1.0;
+  double trig_SF_syst_up =1.0 ;
+  double trig_SF_syst_down =1.0;
+  //
   double genHT = 0.0;
   double genMTT = 0.0;
+
+  float alpha_s_wt_down = 1.0;
+  float alpha_s_wt_up = 1.0;
+
   //  double genMTT2 = 0.0;
   //discriminators
   std::vector<std::string> *d_mydisc = new std::vector<std::string> ;
@@ -313,6 +326,9 @@ private:
   std::string pileupData_DOWN_ ;
   std::string pdfid_1;
   std::string pdfid_2;
+  std::string alphas_id_1;
+  std::string alphas_id_2;
+
   std::string tag_;
   bool RunOnData;
   bool doTrees;
@@ -337,20 +353,13 @@ private:
   TH1F *h1_TauPt_goodreco;
   TH1F *h1_TauEta_goodreco;
   TH1F *h1_TauPt_Stage1;
+  TH1F *h1_TauEta_Stage1;
+  TH1F *h1_TauPhi_Stage1;
   TH1F *h1_pToverEtMiss_Stage1;
   TH1F *h1_dPhi_tau_MET_Stage1;
-  TH1F *h1_TauPt_RegA_Stage1;
-  TH1F *h1_TauPt_RegC_Stage1;
-  TH1F *h1_TauPt_GenMatchedTau_RegC_Stage1;
-  TH1F *h1_TauPt_RegD_Stage1;
-  TH1F *h1_TauPt_GenMatchedTau_RegD_Stage1;
   TH1F *h1_MT_Stage1;
   TH1F *h1_MET_Stage1;
-  TH1F *h1_MT_RegA_Stage1;
-  TH1F *h1_MT_RegC_Stage1;
-  TH1F *h1_MT_GenMatchedTau_RegC_Stage1;
-  TH1F *h1_MT_RegD_Stage1;
-  TH1F *h1_MT_GenMatchedTau_RegD_Stage1;
+  TH1F *h1_MET_phi_Stage1;
   TH1F *h1_MT_Stage1_metUncert_JetEnUp;
   TH1F *h1_MT_Stage1_metUncert_JetEnDown;
   TH1F *h1_MT_Stage1_metUncert_JetResUp;
@@ -375,11 +384,18 @@ private:
   TH1F *h1_MT_Stage1_kFactorDown;
   TH1F *h1_MT_Stage1_TauIDSFUp;
   TH1F *h1_MT_Stage1_TauIDSFDown;
+  TH1F *h1_MT_Stage1_trigSFUp;
+  TH1F *h1_MT_Stage1_trigSFDown;
+  //
+  TH1F *h1_MT_Stage1_alphaUp;
+  TH1F *h1_MT_Stage1_alphaDown;
+  //
   // TH1F *h1_MET_Stage2;
   TH1F *h1_dphiTauMET_Stage2;
   TH1F *h1_pToverEtMiss_Stage3;
   TH1F *h1_recoVtx_NoPUWt;
   TH1F *h1_recoVtx_WithPUWt;
+
 
   //-- These 100 histograms needed for PDF uncertainty --//
   TH1F *h1_MT_Stage1_pdfWt[100];
@@ -396,6 +412,10 @@ private:
   double final_weight_kfact_DOWN=1;
   double final_weight_tauIDSF_UP=1;
   double final_weight_tauIDSF_DOWN=1;
+  double final_weight_alpha_UP=1;
+  double final_weight_alpha_DOWN=1;
+  double final_weight_trigSF_UP=1;
+  double final_weight_trigSF_DOWN=1;
   unsigned long Event;
   double dphi_tau_met;
   double pToverEtMiss;
@@ -479,26 +499,14 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_TauEta_reco = histoDir.make<TH1F>("tauEta_reco", "TauEta_reco", 48, -2.4, 2.4);
   h1_TauEta_goodreco = histoDir.make<TH1F>("tauEta_goodreco", "TauEta_goodreco", 48, -2.4, 2.4);
   h1_TauPt_Stage1 = histoDir.make<TH1F>("tauPt_Stage1", "TauPt_Stage1", 1000, 0, 4000);
-  //h1_pToverEtMiss_Stage1
+  h1_TauEta_Stage1 = histoDir.make<TH1F>("tauEta_Stage1", "TauEta_Stage1", 480, -2.4, 2.4);
+  h1_TauPhi_Stage1 = histoDir.make<TH1F>("tauPhi_Stage1", "TauPhi_Stage1", 800, -4.0, 4.0);
 
-  /*
-  h1_TauPt_RegA_Stage1 = histoDir.make<TH1F>("tauPt_RegA_Stage1", "TauPt_RegA_Stage1", 1000, 0, 4000);
-  h1_TauPt_RegC_Stage1 = histoDir.make<TH1F>("tauPt_RegC_Stage1", "TauPt_RegC_Stage1", 1000, 0, 4000);
-  h1_TauPt_GenMatchedTau_RegC_Stage1 = histoDir.make<TH1F>("tauPt_GenMatchedTau_RegC_Stage1", "TauPt_GenMatchedTau_RegC_Stage1", 1000, 0, 1000);
-  h1_TauPt_RegD_Stage1 = histoDir.make<TH1F>("tauPt_RegD_Stage1", "TauPt_RegD_Stage1", nbinMT, xlowMT, xupMT);
-  h1_TauPt_GenMatchedTau_RegD_Stage1 = histoDir.make<TH1F>("tauPt_GenMatchedTau_RegD_Stage1", "TauPt_GenMatchedTau_RegD_Stage1", nbinMT, xlowMT, xupMT);
-  */
   h1_MT_Stage1 = histoDir.make<TH1F>("mT_Stage1", "MT_Stage1", nbinMT, xlowMT, xupMT);
   h1_MET_Stage1 = histoDir.make<TH1F>("met_Stage1", "MET_Stage1", nbinMT, xlowMT, xupMT);
+  h1_MET_phi_Stage1 = histoDir.make<TH1F>("met_phi_stage1", "MET_phi_Stage1", 800, -4.0, 4.0);
   //h1_MET_Stage1
 
-  /*
-  h1_MT_RegA_Stage1 = histoDir.make<TH1F>("mT_RegA_Stage1", "MT_RegA_Stage1", nbinMT, xlowMT, xupMT);
-  h1_MT_RegC_Stage1 = histoDir.make<TH1F>("mT_RegC_Stage1", "MT_RegC_Stage1", nbinMT, xlowMT, xupMT);
-  h1_MT_GenMatchedTau_RegC_Stage1 = histoDir.make<TH1F>("mT_GenMatchedTau_RegC_Stage1", "MT_GenMatchedTau_RegC_Stage1", nbinMT, xlowMT, xupMT);
-  h1_MT_RegD_Stage1 = histoDir.make<TH1F>("mT_RegD_Stage1", "MT_RegD_Stage1", nbinMT, xlowMT, xupMT);
-  h1_MT_GenMatchedTau_RegD_Stage1 = histoDir.make<TH1F>("mT_GenMatchedTau_RegD_Stage1", "MT_GenMatchedTau_RegD_Stage1", nbinMT, xlowMT, xupMT);
-  */
   h1_MT_Stage1_metUncert_JetEnUp = histoDir.make<TH1F>("mT_Stage1_metUncert_JetEnUp", "MT_Stage1_metUncert_JetEnUp", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_metUncert_JetEnDown = histoDir.make<TH1F>("mT_Stage1_metUncert_JetEnDown", "MT_Stage1_metUncert_JetEnDown", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_metUncert_JetResUp = histoDir.make<TH1F>("mT_Stage1_metUncert_JetResUp", "MT_Stage1_metUncert_JetResUp", nbinMT, xlowMT, xupMT);
@@ -519,9 +527,17 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_MT_Stage1_pileupUncertDown =histoDir.make<TH1F>("mT_Stage1_pileupUncertDown", "MT_Stage1_pileupUncertDown", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_kFactorUp =histoDir.make<TH1F>("mT_Stage1_kFactorUp", "MT_Stage1_kFactorUp", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_kFactorDown =histoDir.make<TH1F>("mT_Stage1_kFactorDown", "MT_Stage1_kFactorDown", nbinMT, xlowMT, xupMT);
+  //
   h1_MT_Stage1_TauIDSFUp =histoDir.make<TH1F>("mT_Stage1_TauIDSFUp", "MT_Stage1_TauIDSFUp", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_TauIDSFDown =histoDir.make<TH1F>("mT_Stage1_TauIDSFDown", "MT_Stage1_TauIDSFDown", nbinMT, xlowMT, xupMT);
-  //h1_MET_Stage2 = histoDir.make<TH1F>("MET_stage2", "MET_Stage2", 1000, 0, 4000);
+  //  TH1F *h1_MT_Stage1_trigSFUp;
+  //   TH1F *h1_MT_Stage1_trigSFDown;
+  h1_MT_Stage1_trigSFUp =histoDir.make<TH1F>("mT_Stage1_trigSFUp", "MT_Stage1_trigSFUp", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_trigSFDown =histoDir.make<TH1F>("mT_Stage1_trigSFDown", "MT_Stage1_trigSFDown", nbinMT, xlowMT, xupMT);
+
+  //
+  h1_MT_Stage1_alphaUp   = histoDir.make<TH1F>("mT_Stage1_alphaUp",   "MT_Stage1_alphaUp",   nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_alphaDown = histoDir.make<TH1F>("mT_Stage1_alphaDown", "MT_Stage1_alphaDown", nbinMT, xlowMT, xupMT);
 
   h1_dphiTauMET_Stage2   = histoDir.make<TH1F>("dphi_tau_MET_Stage2", "DPhi_Tau_MET_Stage2", 800, 0, 4.0);
   h1_pToverEtMiss_Stage3 = histoDir.make<TH1F>("pToverEtMiss_Stage3", "PToverEtMiss_Stage3", 300, 0.0, 3.0);
@@ -626,6 +642,7 @@ MiniAODAnalyzer::~MiniAODAnalyzer()
   delete  m_qcdweightFile_tau;
   delete  pdf_indices;
   delete  inpdfweights;
+  delete  alpha_s_container;
   delete  d_mydisc;
   delete  d_mydisc_emu;
   delete  d_mydisc_mu;
@@ -670,95 +687,128 @@ MiniAODAnalyzer::~MiniAODAnalyzer()
 
 void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSetup ) {
   pdf_indices->clear();
-
+  alpha_indices.clear();
+  
   if (!RunOnData ) {
     if ( doPDFuncertainty) {
       edm::Handle<LHERunInfoProduct> run;
       typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
       iRun.getByLabel( lheString , run );
+      std::cout << "LHERunInfoProduct available ?  " << run.isValid() << std::endl;
       if ( run.isValid()) {
-    LHERunInfoProduct myLHERunInfoProduct = *(run.product());
+	LHERunInfoProduct myLHERunInfoProduct = *(run.product());
         std::vector<std::string> weight_lines;
-    for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
-      std::vector<std::string> lines = iter->lines();
-      if( ( iter->tag() ).compare( tag_ ) == 0 ) {
-        weight_lines = iter->lines();
-      }
-      if (debugLevel>3) {
-        for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
-          std::cout   << "LINE " << lines.at(iLine);
-        }
-      }
-    }
-    int pdfidx = 0;
-    pdfidx = run->heprup().PDFSUP.first;
-    if (generatorName_=="powheg" && pdfidx==-1) pdfidx=260000;
-    //std::cout << "This sample was generated with the following PDFs : "   << pdfidx <<   std::endl;
-    pdfid_1 = boost::lexical_cast<std::string>(pdfidx + 1);
-    pdfid_2 = boost::lexical_cast<std::string>(pdfidx + 100);
-    std::stringstream ss;
-    std::copy(weight_lines.begin(), weight_lines.end(),std::ostream_iterator<std::string>(ss,""));
-    boost::property_tree::ptree pt;
-    read_xml( ss , pt);
+	for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
+	  std::vector<std::string> lines = iter->lines();
+	  if( ( iter->tag() ).compare( tag_ ) == 0 ) {
+	    weight_lines = iter->lines();
+	  }
+	  if (debugLevel>3) {
+	    for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
+	      std::cout   << "LINE " << lines.at(iLine);
+	    }
+	  }
+	}
+	int pdfidx = 0;
+	pdfidx = run->heprup().PDFSUP.first;
+	if (generatorName_=="powheg" && pdfidx==-1) pdfidx=260000;
+	std::cout << "This sample was generated with the following PDFs : "   << pdfidx <<   std::endl;
+	pdfid_1 = boost::lexical_cast<std::string>(pdfidx + 1);
+	pdfid_2 = boost::lexical_cast<std::string>(pdfidx + 100);
+	std::cout << "PDFs min and max id for MC replicas: " << pdfid_1 << "   " << pdfid_2 << std::endl;
+	
+	//alpha_s
+	// --- Get alphas id
+	//pdf 263000 -> No alpha_s uncertainty
+	if (pdfidx == 292200){
+	  alphas_id_1 = "292301";
+	  alphas_id_2 = "292302";
+	}
+	
+	if (pdfidx == 292000){
+	  alphas_id_1 = "292101";
+	  alphas_id_2 = "292102";
+	}
+	
+	if (pdfidx == 260000){
+	  alphas_id_1 = "265000";
+	  alphas_id_2 = "266000";
+	}
+	
+	if (pdfidx == 260400){
+	  alphas_id_1 = "265400";
+	  alphas_id_2 = "266400";
+	}
+	std::cout << "alpha_S min and max id  : " << alphas_id_1 << "   " << alphas_id_2 << std::endl;
+	
+	
+	std::stringstream ss;
+	std::copy(weight_lines.begin(), weight_lines.end(),std::ostream_iterator<std::string>(ss,""));
+	boost::property_tree::ptree pt;
+	read_xml( ss , pt);
+	
+	// --- Name of the weightgroup
+	//  string scalevar = "scale_variation";
+	std::string pdfvar="";
+	if (generatorName_=="powheg") {
+	  pdfvar = "PDF_variation";
+	}
+	else if (generatorName_=="madgraphMLM") {
+	  pdfvar = pdfName_;
+	}
+	
+	if( (generatorName_=="madgraphMLM") && (pdfidx==263000) && (pdfvar != "NNPDF30_lo_as_0130.LHgrid") )
+	  throw cms::Exception("WrongPDFname")
+	    << "Wrong pdf name provided. ID=" << pdfidx << " NAME=" << pdfvar   ;
+	
+	if( (generatorName_=="madgraphMLM") && (pdfidx != 263000) && (pdfvar == "NNPDF30_lo_as_0130.LHgrid") )
+	  throw cms::Exception("WrongPDFname")
+	    << "Wrong pdf name provided. ID=" << pdfidx << " NAME=" << pdfvar   ;
+	//      std::cout << "generatorName_=" << generatorName_ << " pdfvar=" << pdfvar << std::endl;
+	
+	BOOST_FOREACH( boost::property_tree::ptree::value_type const& v, pt.get_child("") ) {
+	  //std::cout << "v.first=" << v.first  << std::endl;
+	  
+	  if (v.first == "weightgroup"){
+	    boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second ;
+	    
+	    boost::optional<std::string> weightgroupname1 = v.second.get_optional<std::string>("<xmlattr>.name");
+	    boost::optional<std::string> weightgroupname2 = v.second.get_optional<std::string>("<xmlattr>.type");
+	    //std::cout << "weightgroupname1=" << weightgroupname1 << " weightgroupname2=" << weightgroupname2 << std::endl;
+	    if ( (weightgroupname1 && weightgroupname1.get() == pdfvar)  || (weightgroupname2 && weightgroupname2.get() == pdfvar)) {
+	      BOOST_FOREACH(boost::property_tree::ptree::value_type &vs,subtree) {
+		//    std::cout << "vs.first=" << vs.first << " vs.second="  << vs.second << std::endl;
+		if (vs.first == "weight") {
+		  //std::cout << vs.first <<  "   " << vs.second.get<std::string>("<xmlattr>.id")  << "  " << vs.second.data()<< std::endl;
+		  std::string strwid  = vs.second.get<std::string>("<xmlattr>.id");
+		  std::string strw    = vs.second.data();
+		  int id = stoi(strwid);
+		  std::vector<std::string> strs;
+		  if (generatorName_=="madgraphMLM") boost::split(strs, strw, boost::is_any_of(" "));
+		  if (generatorName_=="powheg") boost::split(strs, strw, boost::is_any_of("="));
+		  int pdf_wt_index  = 999;
+		  if (generatorName_=="powheg") {
+		    pdf_wt_index = stoi(strs.back());
+		  }
+		  else if (generatorName_=="madgraphMLM") {
+		    pdf_wt_index = pdfidx+ (stoi(strs.back())) +1 ;
+		  }
+		  //        std::cout << "id=" << id  << "  pdf_wt_index = " << pdf_wt_index << std::endl;
+		  if ( (pdf_wt_index >= stoi(pdfid_1) ) && (pdf_wt_index <= stoi(pdfid_2)) ){
+		    pdf_indices->push_back( id );
+		  }
 
-    // --- Name of the weightgroup
-    //  string scalevar = "scale_variation";
-    std::string pdfvar="";
-    if (generatorName_=="powheg") {
-      pdfvar = "PDF_variation";
-    }
-    else if (generatorName_=="madgraphMLM") {
-      pdfvar = pdfName_;
-    }
-
-    if( (generatorName_=="madgraphMLM") && (pdfidx==263000) && (pdfvar != "NNPDF30_lo_as_0130.LHgrid") )
-      throw cms::Exception("WrongPDFname")
-        << "Wrong pdf name provided. ID=" << pdfidx << " NAME=" << pdfvar   ;
-
-    if( (generatorName_=="madgraphMLM") && (pdfidx != 263000) && (pdfvar == "NNPDF30_lo_as_0130.LHgrid") )
-      throw cms::Exception("WrongPDFname")
-        << "Wrong pdf name provided. ID=" << pdfidx << " NAME=" << pdfvar   ;
-    //      std::cout << "generatorName_=" << generatorName_ << " pdfvar=" << pdfvar << std::endl;
-
-    BOOST_FOREACH( boost::property_tree::ptree::value_type const& v, pt.get_child("") ) {
-      //std::cout << "v.first=" << v.first  << std::endl;
-
-      if (v.first == "weightgroup"){
-        boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second ;
-
-        boost::optional<std::string> weightgroupname1 = v.second.get_optional<std::string>("<xmlattr>.name");
-        boost::optional<std::string> weightgroupname2 = v.second.get_optional<std::string>("<xmlattr>.type");
-        //std::cout << "weightgroupname1=" << weightgroupname1 << " weightgroupname2=" << weightgroupname2 << std::endl;
-        if ( (weightgroupname1 && weightgroupname1.get() == pdfvar)  || (weightgroupname2 && weightgroupname2.get() == pdfvar)) {
-          BOOST_FOREACH(boost::property_tree::ptree::value_type &vs,subtree) {
-        //    std::cout << "vs.first=" << vs.first << " vs.second="  << vs.second << std::endl;
-        if (vs.first == "weight") {
-          //std::cout << vs.first <<  "   " << vs.second.get<std::string>("<xmlattr>.id")  << "  " << vs.second.data()<< std::endl;
-          std::string strwid  = vs.second.get<std::string>("<xmlattr>.id");
-          std::string strw    = vs.second.data();
-          int id = stoi(strwid);
-          std::vector<std::string> strs;
-          if (generatorName_=="madgraphMLM") boost::split(strs, strw, boost::is_any_of(" "));
-          if (generatorName_=="powheg") boost::split(strs, strw, boost::is_any_of("="));
-          int pdf_wt_index  = 999;
-          if (generatorName_=="powheg") {
-            pdf_wt_index = stoi(strs.back());
-          }
-          else if (generatorName_=="madgraphMLM") {
-            pdf_wt_index = pdfidx+ (stoi(strs.back())) +1 ;
-          }
-          //        std::cout << "id=" << id  << "  pdf_wt_index = " << pdf_wt_index << std::endl;
-          if ( (pdf_wt_index >= stoi(pdfid_1) ) && (pdf_wt_index <= stoi(pdfid_2)) ){
-            pdf_indices->push_back( id );
-          }
-        }
-          }
-        }
-      }
-    }
+		  if (pdf_wt_index == stoi(alphas_id_1) || pdf_wt_index == stoi(alphas_id_2)){
+		    alpha_indices.push_back( id );
+		  }
+		}
+	      }
+	    }
+	  }
+	}
       }
       else {
-    if (debugLevel>3)   std::cout << "PDF weights not saved in CMSSW. Do post-facto reweighting" << std::endl;
+	if (debugLevel>3)   std::cout << "PDF weights not saved in CMSSW. Do post-facto reweighting" << std::endl;
       }
     }
   }
@@ -914,26 +964,40 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     // iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
     if  ( (EvtHandle.isValid()) ) {
       if ( doPDFuncertainty) {
-    inpdfweights->clear();
-    for (unsigned int i=0; i<EvtHandle->weights().size(); i++) {
-      int id_i = stoi( EvtHandle->weights()[i].id );
-      for( unsigned int j = 0; j<pdf_indices->size(); j++ ) {
-        int id_j = pdf_indices->at(j);
-        if( id_i == id_j ){
-          float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
-          //   std::cout << "pdf_weight=" << pdf_weight  << std::endl;
-          inpdfweights->push_back( pdf_weight );
-        }
+	inpdfweights->clear();
+	for (unsigned int i=0; i<EvtHandle->weights().size(); i++) {
+	  int id_i = stoi( EvtHandle->weights()[i].id );
+	  for( unsigned int j = 0; j<pdf_indices->size(); j++ ) {
+	    int id_j = pdf_indices->at(j);
+	    if( id_i == id_j ){
+	      float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
+	      //    std::cout << "pdf_weight=" << pdf_weight  << std::endl;
+	      inpdfweights->push_back( pdf_weight );
+	    }
+	  }
+
+	  if ( !alpha_indices.empty() ) {
+	    std::cout << "alpha_indices is not empty " << std::endl;
+	    for( unsigned int k = 0; k < alpha_indices.size(); k++ ){
+	      int id_k = alpha_indices[k];
+	      if(id_i == id_k ){
+		float alpha = EvtHandle->weights()[i].wgt;
+		std::cout << "alpha_s wt = " << alpha << std::endl;
+		alpha_s_container->push_back(alpha);
+	      }
+	    }
+	  }
+	  else std::cout << "alpha_s uncertainty not available " << std::endl;
+	}
       }
-    }
-      }
-      else {
-    if (debugLevel) std::cout << "PDF weights not saved in CMSSW. Do post-facto reweighting" << std::endl;
-      }
+      
+      //      else {
+      //	if (debugLevel) std::cout << "PDF weights not saved in CMSSW. Do post-facto reweighting" << std::endl;
+      // }
     }
   }
-
-
+  
+  
   //-- probValue --//
   //-- https://github.com/cms-sw/cmssw/blob/CMSSW_8_1_X/SimGeneral/MixingModule/python/mix_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU_cfi.py --//
   //----------//
@@ -1032,6 +1096,13 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        if (passEleTrig==true) break;
      }
    }
+
+  if (!RunOnData) {
+    trig_SF = 1.0;
+    trig_SF_syst_up = 1.1;
+    trig_SF_syst_down = 0.9;
+   }
+
    if (!RunOnData) passTauTrig=1;
    // std::cout << "RunOnData=" << RunOnData <<  " ## passTauTrig=" << passTauTrig << std::endl;
 
@@ -1289,14 +1360,16 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    //--Final Weight--//
    //----------------//
    if (!RunOnData) {
-     final_weight               = Lumi_Wt * mc_event_weight * k_fak * tauID_SF ;
+     final_weight               = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * trig_SF;
      // syst //
-     final_weight_PUweight_UP   = Lumi_Wt_UP * mc_event_weight * k_fak * tauID_SF ;
-     final_weight_PUweight_DOWN = Lumi_Wt_DOWN * mc_event_weight * k_fak * tauID_SF ;
-     final_weight_kfact_UP      = Lumi_Wt * mc_event_weight * k_fak_up * tauID_SF ;
-     final_weight_kfact_DOWN    = Lumi_Wt * mc_event_weight * k_fak_down * tauID_SF ;
-     final_weight_tauIDSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_up ;
-     final_weight_tauIDSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_down ;
+     final_weight_PUweight_UP   = Lumi_Wt_UP * mc_event_weight * k_fak * tauID_SF * trig_SF;
+     final_weight_PUweight_DOWN = Lumi_Wt_DOWN * mc_event_weight * k_fak * tauID_SF * trig_SF;
+     final_weight_kfact_UP      = Lumi_Wt * mc_event_weight * k_fak_up * tauID_SF * trig_SF;
+     final_weight_kfact_DOWN    = Lumi_Wt * mc_event_weight * k_fak_down * tauID_SF * trig_SF;
+     final_weight_tauIDSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_up * trig_SF;
+     final_weight_tauIDSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_down * trig_SF;
+     final_weight_trigSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * trig_SF_syst_up;
+     final_weight_trigSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * trig_SF_syst_down;
    }
    else {
      final_weight               = 1.0;
@@ -1306,6 +1379,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      final_weight_kfact_DOWN    = 1.0;
      final_weight_tauIDSF_UP    = 1.0;
      final_weight_tauIDSF_DOWN  = 1.0;
+     final_weight_trigSF_UP = 1.0;
+     final_weight_trigSF_DOWN = 1.0;
    }
    /*
    std::cout << "Data ? " << RunOnData <<
@@ -1358,6 +1433,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 h1_recoVtx_NoPUWt->Fill(recoVtx,mc_event_weight);
 	 h1_recoVtx_WithPUWt->Fill(recoVtx,final_weight);
 	 h1_TauPt_Stage1->Fill(tau_pt[0],final_weight);
+	 h1_TauEta_Stage1->Fill(tau_eta[0],final_weight);
+	 h1_TauPhi_Stage1->Fill(tau_phi[0],final_weight);
 	 h1_dPhi_tau_MET_Stage1->Fill(dphi_tau_met,final_weight);
 	 h1_pToverEtMiss_Stage1->Fill(pToverEtMiss,final_weight);
    
@@ -1370,8 +1447,10 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 		  << "  TauPt=" << tau_pt[0] << "  TauPhi=" << tau_phi[0] << "  TauEta=" << tau_eta[0]
 		  << "\n\n" ; 
 	 }
+	 std::cout << "Final weight = " << final_weight << " MT = " << MT << std::endl;
 	 h1_MT_Stage1->Fill(MT,final_weight);
 	 h1_MET_Stage1->Fill(met_val,final_weight);
+	 h1_MET_phi_Stage1->Fill(met_phi,final_weight);
 	 //--PU Systematics--//
 	 if (!RunOnData) {
 	   h1_MT_Stage1_pileupUncertUp->Fill(MT,final_weight_PUweight_UP);
@@ -1394,8 +1473,17 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 if (!RunOnData) {
 	   h1_MT_Stage1_TauIDSFUp->Fill(MT,final_weight_tauIDSF_UP);
 	   h1_MT_Stage1_TauIDSFDown->Fill(MT,final_weight_tauIDSF_DOWN);
-	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_PUweight_UP,   "TauIDSFUp");
-	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_PUweight_DOWN, "TauIDSFDown");
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_tauIDSF_UP,   "TauIDSFUp");
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_tauIDSF_DOWN, "TauIDSFDown");
+	 }
+
+	 //final_weight_trigSF_UP
+	 if (!RunOnData) {
+	   std::cout << "final_weight_trigSF_UP " << final_weight_trigSF_UP << " final_weight_trigSF_DOWN " << final_weight_trigSF_DOWN << std::endl;
+	   h1_MT_Stage1_trigSFUp->Fill(MT,final_weight_trigSF_UP);
+	   h1_MT_Stage1_trigSFDown->Fill(MT,final_weight_trigSF_DOWN);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_trigSF_UP,   "trigSFUp");
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_trigSF_DOWN, "trigSFDown");
 	 }
 	 
 	 if (!RunOnData) {
@@ -1410,6 +1498,27 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	       //      std::cout << "final_wt_with_pdf " << final_wt_with_pdf << std::endl ;
 	       imem++;
 	     }
+	     
+	     // std::cout << "alpha_s_container->at(0) = " << alpha_s_container->at(0) << " alpha_s_container->at(1) = " << alpha_s_container->at(1) << std::endl;
+	    
+	     if ( !alpha_indices.empty() ) {
+	       if  ( alpha_s_container->at(0) < alpha_s_container->at(1) ) { 
+		 alpha_s_wt_down = alpha_s_container->at(0) ;
+		 alpha_s_wt_up   = alpha_s_container->at(1);
+	       }
+	       
+	       if  ( alpha_s_container->at(0) > alpha_s_container->at(1) ) { 
+		 alpha_s_wt_up = alpha_s_container->at(0) ;
+		 alpha_s_wt_down   = alpha_s_container->at(1);
+	       }
+	     }
+	     final_weight_alpha_UP   = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_up ;
+	     final_weight_alpha_DOWN = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_down ;
+	     std::cout << "final_weight_alpha_UP = " << final_weight_alpha_UP << " final_weight_alpha_DOWN=" << final_weight_alpha_DOWN << std::endl;
+
+	     h1_MT_Stage1_alphaUp->Fill(MT,final_weight_alpha_UP);
+	     h1_MT_Stage1_alphaDown->Fill(MT,final_weight_alpha_DOWN);
+
 	   }
 	 }
        }
@@ -1531,82 +1640,6 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      }
    }
    
-   /*
-   //--------------//
-   //-- Region A --// Only one non-isolated tau //
-   //--------------//
-   if (passTauTrig && passAllMETFilters ) {
-     if ( (nvtx>0) && (nTightMu==0) && (nLooseEle==0) ) {
-       // Stage1 = final stage (all cuts applied) //
-       if ( (PassFinalCuts(nGoodNonIsoTau,met_val,met_phi,tau_pt_nonIso[0],tau_phi_nonIso[0]) == true) ) {
-         h1_TauPt_RegA_Stage1->Fill(tau_pt_nonIso[0],final_weight);
-         //std::cout << "*Standard* dphi_tau_met=" << dphi_tau_met << std::endl;
-         double MT_RegA =  sqrt(2*tau_pt_nonIso[0]*met_val*(1- cos(dphi_tau_met)));
-         h1_MT_RegA_Stage1->Fill(MT_RegA,final_weight);
-
-       }
-     }
-   }
-
-*/
-
-   /*
-   //--------------//
-   //-- Region C --// One non-isolated tau + one isolated e/mu
-   //--------------//
-   if (passTauTrig && passAllMETFilters ) {
-     if ( (nvtx>0)  &&  ((nTightMu+nLooseEle)==1)  ) {
-       if ( (PassFinalCuts(nGoodNonIsoTau,met_val,met_phi,tau_pt_nonIso[0],tau_phi_nonIso[0]) == true) ) {
-         h1_TauPt_RegC_Stage1->Fill(tau_pt_nonIso[0],final_weight);
-         double MT_RegC =  sqrt(2*tau_pt_nonIso[0]*met_val*(1- cos(dphi_tau_met)));
-         h1_MT_RegC_Stage1->Fill(MT_RegC,final_weight);
-
-     if (!RunOnData) {
-       double DR_min_C=999;
-       ///   std::cout << "\n nGenTau=" << nGenTau << std::endl;
-       for (int i=0; i<nGenTau; i++) {
-         double deltaR_tau_gen_reco_C = tauGen_p4[i].DeltaR(tau_nonIso);
-         if (DR_min_C>deltaR_tau_gen_reco_C) DR_min_C=deltaR_tau_gen_reco_C;
-       }
-       if (DR_min_C<0.4) {
-         // Genmatched tau
-         h1_TauPt_GenMatchedTau_RegC_Stage1->Fill(tau_pt_nonIso[0],final_weight);
-         h1_MT_GenMatchedTau_RegC_Stage1->Fill(MT_RegC,final_weight);
-
-       }
-     }
-       }
-     }
-   }
-   */
-
-   /*
-   //--------------//
-   //-- Region D --// One isolated tau + one isolated e/mu
-   //--------------//
-   if (passTauTrig && passAllMETFilters ) {
-     if ( (nvtx>0)  &&  ((nTightMu+nLooseEle)==1)  ) {
-       if ( (PassFinalCuts(nGoodTau,met_val,met_phi,tau_pt[0],tau_phi[0]) == true) ) {
-         h1_TauPt_RegD_Stage1->Fill(tau_pt[0],final_weight);
-         //std::cout << "*Standard* dphi_tau_met=" << dphi_tau_met << std::endl;
-         double MT_RegD =  sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_tau_met)));
-         h1_MT_RegD_Stage1->Fill(MT_RegD,final_weight);
-         if (!RunOnData) {
-       double DR_min=999;
-       for (int i=0; i<nGenTau; i++) {
-         double deltaR_tau_gen_reco = tauGen_p4[i].DeltaR(tau_NoShift);
-         if (DR_min>deltaR_tau_gen_reco) DR_min=deltaR_tau_gen_reco;
-       }
-       if (DR_min<0.4) {
-         // Genmatched tau
-         h1_TauPt_GenMatchedTau_RegD_Stage1->Fill(tau_pt[0],final_weight);
-         h1_MT_GenMatchedTau_RegD_Stage1->Fill(MT_RegD,final_weight);
-       }
-     }
-       }
-     }
-   }
-   */
    bool doQCDAna=true;
    qcd_lepton_ele->clear();
    qcd_weight_ele->clear();
@@ -1660,7 +1693,7 @@ double MiniAODAnalyzer::GetTauIDScaleFactor(double tau_pt, std::string mode) {
 bool MiniAODAnalyzer::PassFinalCuts(int nGoodTau_, double met_val_,double met_phi_,double tau_pt_,double tau_phi_) {
   bool passed=false;
   if (nGoodTau_==1) {
-    if ( met_val_>120 ) {
+    if ( met_val_>200 ) {
       dphi_tau_met = deltaPhi(tau_phi_,met_phi_);
       pToverEtMiss=tau_pt_/met_val_ ;
       if (pToverEtMiss>0.7 && pToverEtMiss<1.3) {
@@ -1678,7 +1711,7 @@ bool MiniAODAnalyzer::PassFinalCuts(int nGoodTau_, double met_val_,double met_ph
 bool MiniAODAnalyzer::PassFinalCuts_Except_dphiTauMET(int nGoodTau_, double met_val_,double met_phi_,double tau_pt_,double tau_phi_) {
   bool passed=false;
   if (nGoodTau_==1) {
-    if ( met_val_>120 ) {
+    if ( met_val_>200 ) {
       dphi_tau_met = deltaPhi(tau_phi_,met_phi_);
       pToverEtMiss=tau_pt_/met_val_ ;
       if (pToverEtMiss>0.7 && pToverEtMiss<1.3) {
@@ -1692,7 +1725,7 @@ bool MiniAODAnalyzer::PassFinalCuts_Except_dphiTauMET(int nGoodTau_, double met_
 bool MiniAODAnalyzer::PassFinalCuts_Except_pToverEtMiss(int nGoodTau_, double met_val_,double met_phi_,double tau_pt_,double tau_phi_) {
   bool passed=false;
   if (nGoodTau_==1) {
-    if ( met_val_>120 ) {
+    if ( met_val_>200 ) {
       dphi_tau_met = deltaPhi(tau_phi_,met_phi_);
       pToverEtMiss=tau_pt_/met_val_ ;
       if (fabs(dphi_tau_met)>2.4) {
@@ -2707,7 +2740,7 @@ bool MiniAODAnalyzer::check_single_tau_kinematics(pat::Tau lepton, const pat::ME
     bool passedPtMet=false;
     bool passedDeltaPhi=false;
 
-    double m_met_cut=120;
+    double m_met_cut=200;
     double m_delta_phi_cut=2.4;
     double m_pt_met_min_cut=0.7;
     double m_pt_met_max_cut=1.3;
