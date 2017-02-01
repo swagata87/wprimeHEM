@@ -2625,8 +2625,8 @@ bool MiniAODAnalyzer::Overlap(edm::Handle<edm::View<reco::GenParticle>> p1, doub
   if ( (sourceFileString.find("WJetsToLNu_Tune") != std::string::npos) && ( (getWmass(p1)>100) || (HT>100.0) ) ) return true;
   if ( (sourceFileString.find("WJetsToLNu_HT") != std::string::npos) && (getWmass(p1)>100) && (HT<100.0)  ) return true;
   if ( (sourceFileString.find("WToTauNu_M-100_") != std::string::npos) && ( (getWmass(p1)<100) || (getWmass(p1)>200)) ) return true;
-  if ( (sourceFileString.find("WToTauNu_M-200_") != std::string::npos) && ( (getWmass(p1)<200) || (getWmass(p1)>1000)) ) return true;
-  //if ( (sourceFileString.find("WToTauNu_M-500_") != std::string::npos) && ( (getWmass(p1)<500) || (getWmass(p1)>1000)) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-200_") != std::string::npos) && ( (getWmass(p1)<200) || (getWmass(p1)>500)) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-500_") != std::string::npos) && ( (getWmass(p1)<500) || (getWmass(p1)>1000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-1000_") != std::string::npos) && ( (getWmass(p1)<1000) || (getWmass(p1)>2000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-2000_") != std::string::npos) && ( (getWmass(p1)<2000) || (getWmass(p1)>3000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-3000_") != std::string::npos) && ( (getWmass(p1)<3000) || (getWmass(p1)>4000)) ) return true;
