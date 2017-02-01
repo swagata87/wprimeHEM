@@ -396,6 +396,14 @@ private:
   TH1F *h1_recoVtx_NoPUWt;
   TH1F *h1_recoVtx_WithPUWt;
 
+  //N-1 
+  TH1F *h1_MT_passTauTrig;
+  TH1F *h1_MT_passAllMETFilters;
+  TH1F *h1_MT_leptonVeto;
+  TH1F *h1_MT_nGoodTau;
+  TH1F *h1_MT_met_val;
+  TH1F *h1_MT_pTbyET;
+  TH1F *h1_MT_dphi;
 
   //-- These 100 histograms needed for PDF uncertainty --//
   TH1F *h1_MT_Stage1_pdfWt[100];
@@ -405,6 +413,7 @@ private:
   int xupMT=8000;
   //
   int Run;
+  double  final_wt_NOPU=1;
   double final_weight=1;
   double final_weight_PUweight_UP=1;
   double final_weight_PUweight_DOWN=1;
@@ -501,7 +510,16 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_TauPt_Stage1 = histoDir.make<TH1F>("tauPt_Stage1", "TauPt_Stage1", 1000, 0, 4000);
   h1_TauEta_Stage1 = histoDir.make<TH1F>("tauEta_Stage1", "TauEta_Stage1", 480, -2.4, 2.4);
   h1_TauPhi_Stage1 = histoDir.make<TH1F>("tauPhi_Stage1", "TauPhi_Stage1", 800, -4.0, 4.0);
+  /// N-1
+  h1_MT_passTauTrig       = histoDir.make<TH1F>("MT_passTauTrig_1",       "MT_passTauTrig",       1600, 0, 8000); // 1
+  h1_MT_passAllMETFilters = histoDir.make<TH1F>("MT_passAllMETFilters_2", "MT_passAllMETFilters", 1600, 0, 8000); // 2
+  h1_MT_leptonVeto        = histoDir.make<TH1F>("MT_leptonVeto_3",        "MT_leptonVeto",        1600, 0, 8000); // 3
+  h1_MT_nGoodTau          = histoDir.make<TH1F>("MT_nGoodTau_4",          "MT_nGoodTau",          1600, 0, 8000); // 4
+  h1_MT_met_val           = histoDir.make<TH1F>("MT_met_val_5",           "MT_met_val",           1600, 0, 8000); // 5
+  h1_MT_pTbyET            = histoDir.make<TH1F>("MT_pTbyET_6",            "MT_pTbyET",            1600, 0, 8000); // 6
+  h1_MT_dphi              = histoDir.make<TH1F>("MT_dphi_7",              "MT_dphi",              1600, 0, 8000); // 7
 
+  ///
   h1_MT_Stage1 = histoDir.make<TH1F>("mT_Stage1", "MT_Stage1", nbinMT, xlowMT, xupMT);
   h1_MET_Stage1 = histoDir.make<TH1F>("met_Stage1", "MET_Stage1", nbinMT, xlowMT, xupMT);
   h1_MET_phi_Stage1 = histoDir.make<TH1F>("met_phi_stage1", "MET_phi_Stage1", 800, -4.0, 4.0);
@@ -764,7 +782,7 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
 	if( (generatorName_=="madgraphMLM") && (pdfidx != 263000) && (pdfvar == "NNPDF30_lo_as_0130.LHgrid") )
 	  throw cms::Exception("WrongPDFname")
 	    << "Wrong pdf name provided. ID=" << pdfidx << " NAME=" << pdfvar   ;
-	//      std::cout << "generatorName_=" << generatorName_ << " pdfvar=" << pdfvar << std::endl;
+	//std::cout << "generatorName_=" << generatorName_ << " pdfvar=" << pdfvar << std::endl;
 	
 	BOOST_FOREACH( boost::property_tree::ptree::value_type const& v, pt.get_child("") ) {
 	  //std::cout << "v.first=" << v.first  << std::endl;
@@ -774,10 +792,10 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
 	    
 	    boost::optional<std::string> weightgroupname1 = v.second.get_optional<std::string>("<xmlattr>.name");
 	    boost::optional<std::string> weightgroupname2 = v.second.get_optional<std::string>("<xmlattr>.type");
-	    //std::cout << "weightgroupname1=" << weightgroupname1 << " weightgroupname2=" << weightgroupname2 << std::endl;
+	    // std::cout << "weightgroupname1=" << weightgroupname1 << " weightgroupname2=" << weightgroupname2 << std::endl;
 	    if ( (weightgroupname1 && weightgroupname1.get() == pdfvar)  || (weightgroupname2 && weightgroupname2.get() == pdfvar)) {
 	      BOOST_FOREACH(boost::property_tree::ptree::value_type &vs,subtree) {
-		//    std::cout << "vs.first=" << vs.first << " vs.second="  << vs.second << std::endl;
+	        // std::cout << "vs.first=" << vs.first << " vs.second="  << vs.second << std::endl;
 		if (vs.first == "weight") {
 		  //std::cout << vs.first <<  "   " << vs.second.get<std::string>("<xmlattr>.id")  << "  " << vs.second.data()<< std::endl;
 		  std::string strwid  = vs.second.get<std::string>("<xmlattr>.id");
@@ -793,13 +811,15 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
 		  else if (generatorName_=="madgraphMLM") {
 		    pdf_wt_index = pdfidx+ (stoi(strs.back())) +1 ;
 		  }
-		  //        std::cout << "id=" << id  << "  pdf_wt_index = " << pdf_wt_index << std::endl;
+		  // std::cout << "id=" << id  << "  pdf_wt_index = " << pdf_wt_index << std::endl;
 		  if ( (pdf_wt_index >= stoi(pdfid_1) ) && (pdf_wt_index <= stoi(pdfid_2)) ){
 		    pdf_indices->push_back( id );
 		  }
-
-		  if (pdf_wt_index == stoi(alphas_id_1) || pdf_wt_index == stoi(alphas_id_2)){
-		    alpha_indices.push_back( id );
+		  
+		  if ( !alphas_id_1.empty() && !alphas_id_2.empty() ) {
+		    if (pdf_wt_index == stoi(alphas_id_1) || pdf_wt_index == stoi(alphas_id_2)){
+		      alpha_indices.push_back( id );
+		    }
 		  }
 		}
 	      }
@@ -833,7 +853,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  std::cout << "\n\n --EVENT-- " << Event << std::endl;
+  // std::cout << "\n\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
@@ -919,8 +939,10 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     iEvent.getByToken(prunedGenToken_,pruned);
     //    Handle<edm::View<pat::PackedGenParticle> > packed;
     //    iEvent.getByToken(packedGenToken_,packed);
+    //   if (sourceFileString.find("WJetsToLNu_Tune") != std::string::npos) 
+    std::cout << " Wmass=" << getWmass(pruned) << std::endl;
     if ( Overlap(pruned, genHT, genMTT) ) {
-      //      if (sourceFileString.find("WJetsToLNu_Tune") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " Wmass=" << getWmass(pruned) << " HT=" << genHT << std::endl ;
+      //HT=" << genHT << std::endl ;
       //   if (sourceFileString.find("WToTau") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " Wmass=" << getWmass(pruned) << std::endl ;
       //   if (sourceFileString.find("TT_") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " MTT" << genMTT << std::endl ;
  
@@ -961,6 +983,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   ///--PDF weight--///
   //  edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
+    //  std::cout << "EvtHandle.isValid() = " << EvtHandle.isValid() << " This is needed for pdf weights" << std::endl;
     // iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
     if  ( (EvtHandle.isValid()) ) {
       if ( doPDFuncertainty) {
@@ -971,23 +994,23 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	    int id_j = pdf_indices->at(j);
 	    if( id_i == id_j ){
 	      float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
-	      //    std::cout << "pdf_weight=" << pdf_weight  << std::endl;
+	      // std::cout << "pdf_weight=" << pdf_weight  << std::endl;
 	      inpdfweights->push_back( pdf_weight );
 	    }
 	  }
 
 	  if ( !alpha_indices.empty() ) {
-	    std::cout << "alpha_indices is not empty " << std::endl;
+	    // std::cout << "alpha_indices is not empty " << std::endl;
 	    for( unsigned int k = 0; k < alpha_indices.size(); k++ ){
 	      int id_k = alpha_indices[k];
 	      if(id_i == id_k ){
 		float alpha = EvtHandle->weights()[i].wgt;
-		std::cout << "alpha_s wt = " << alpha << std::endl;
+		// std::cout << "alpha_s wt = " << alpha << std::endl;
 		alpha_s_container->push_back(alpha);
 	      }
 	    }
 	  }
-	  else std::cout << "alpha_s uncertainty not available " << std::endl;
+	  //	  else std::cout << "alpha_s uncertainty not available " << std::endl;
 	}
       }
       
@@ -1037,7 +1060,11 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     iEvent.getByToken(genEventInfoProductTagToken_, genEvtInfo );
     mc_event_weight = genEvtInfo->weight();
   }
-  std::cout << "RunOnData=" << RunOnData << " mc_event_weight=" << mc_event_weight << std::endl;
+
+  if (RunOnData) {
+    mc_event_weight=1.0;
+  }
+  //  std::cout << "RunOnData=" << RunOnData << " mc_event_weight=" << mc_event_weight << std::endl;
 
 
    //---Trigger---//
@@ -1361,6 +1388,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    //----------------//
    if (!RunOnData) {
      final_weight               = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * trig_SF;
+     final_wt_NOPU = mc_event_weight * k_fak * tauID_SF * trig_SF;
+
      // syst //
      final_weight_PUweight_UP   = Lumi_Wt_UP * mc_event_weight * k_fak * tauID_SF * trig_SF;
      final_weight_PUweight_DOWN = Lumi_Wt_DOWN * mc_event_weight * k_fak * tauID_SF * trig_SF;
@@ -1373,6 +1402,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    }
    else {
      final_weight               = 1.0;
+     final_wt_NOPU =1.0;
      final_weight_PUweight_UP   = 1.0;
      final_weight_PUweight_DOWN = 1.0;
      final_weight_kfact_UP      = 1.0;
@@ -1430,7 +1460,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        //** Stage1 = final stage (all cuts applied) **//
        //
        if ( (PassFinalCuts(nGoodTau, met_val,met_phi,tau_pt[0],tau_phi[0]) == true) ) {
-	 h1_recoVtx_NoPUWt->Fill(recoVtx,mc_event_weight);
+	 h1_recoVtx_NoPUWt->Fill(recoVtx,final_wt_NOPU);
 	 h1_recoVtx_WithPUWt->Fill(recoVtx,final_weight);
 	 h1_TauPt_Stage1->Fill(tau_pt[0],final_weight);
 	 h1_TauEta_Stage1->Fill(tau_eta[0],final_weight);
@@ -1447,7 +1477,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 		  << "  TauPt=" << tau_pt[0] << "  TauPhi=" << tau_phi[0] << "  TauEta=" << tau_eta[0]
 		  << "\n\n" ; 
 	 }
-	 std::cout << "Final weight = " << final_weight << " MT = " << MT << std::endl;
+	 //	 std::cout << "Final weight = " << final_weight << " MT = " << MT << std::endl;
 	 h1_MT_Stage1->Fill(MT,final_weight);
 	 h1_MET_Stage1->Fill(met_val,final_weight);
 	 h1_MET_phi_Stage1->Fill(met_phi,final_weight);
@@ -1479,7 +1509,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
 	 //final_weight_trigSF_UP
 	 if (!RunOnData) {
-	   std::cout << "final_weight_trigSF_UP " << final_weight_trigSF_UP << " final_weight_trigSF_DOWN " << final_weight_trigSF_DOWN << std::endl;
+	   //	   std::cout << "final_weight_trigSF_UP " << final_weight_trigSF_UP << " final_weight_trigSF_DOWN " << final_weight_trigSF_DOWN << std::endl;
 	   h1_MT_Stage1_trigSFUp->Fill(MT,final_weight_trigSF_UP);
 	   h1_MT_Stage1_trigSFDown->Fill(MT,final_weight_trigSF_DOWN);
 	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_trigSF_UP,   "trigSFUp");
@@ -1514,7 +1544,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	     }
 	     final_weight_alpha_UP   = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_up ;
 	     final_weight_alpha_DOWN = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_down ;
-	     std::cout << "final_weight_alpha_UP = " << final_weight_alpha_UP << " final_weight_alpha_DOWN=" << final_weight_alpha_DOWN << std::endl;
+	     //	     std::cout << "final_weight_alpha_UP = " << final_weight_alpha_UP << " final_weight_alpha_DOWN=" << final_weight_alpha_DOWN << std::endl;
 
 	     h1_MT_Stage1_alphaUp->Fill(MT,final_weight_alpha_UP);
 	     h1_MT_Stage1_alphaDown->Fill(MT,final_weight_alpha_DOWN);
@@ -1639,7 +1669,33 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        }
      }
    }
-   
+
+   /// N-1 Cut-flow ///
+
+   if (passTauTrig && (nGoodTau>0) && (met_val>0) && (nvtx>0) ) {
+     double dphi_all =  deltaPhi(tau_phi[0],met_phi);
+     double MT_all = sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_all)));
+     h1_MT_passTauTrig->Fill(MT_all,final_weight); // 1
+     if (passAllMETFilters) {
+       h1_MT_passAllMETFilters->Fill(MT_all,final_weight); // 2
+       if ( (nTightMu==0) && (nLooseEle==0) ) {
+	 h1_MT_leptonVeto->Fill(MT_all,final_weight); // 3                                                                                                                      
+	 if (nGoodTau==1) {
+	   h1_MT_nGoodTau->Fill(MT_all,final_weight); // 4
+	   if (met_val>200) {
+	     h1_MT_met_val->Fill(MT_all,final_weight); // 5
+	     double pTbyET = tau_pt[0]/met_val ;
+	     if ( (pTbyET>0.7) && (pTbyET<1.3) ) {
+	       h1_MT_pTbyET->Fill(MT_all,final_weight); // 6
+	       if (fabs(dphi_all)>2.4) {
+		 h1_MT_dphi->Fill(MT_all,final_weight); // 7
+	       }
+	     }
+	   }
+	 } 
+       }
+     }
+   }
    bool doQCDAna=true;
    qcd_lepton_ele->clear();
    qcd_weight_ele->clear();
@@ -1899,6 +1955,20 @@ MiniAODAnalyzer::endJob()
       
     }
   }
+
+  TFileDirectory CutFlowDir = fs->mkdir("CutFlowDir");
+  TH1F *cutflow = CutFlowDir.make<TH1F>("cutflow", "cutflow", 11, 0, 10);
+  cutflow->SetBinContent(1, (h1_MT_passTauTrig->Integral()) );
+  cutflow->SetBinContent(2, (h1_MT_passAllMETFilters->Integral()) );
+  cutflow->SetBinContent(3, (h1_MT_leptonVeto->Integral()) );
+  cutflow->SetBinContent(4, (h1_MT_nGoodTau->Integral()) );
+  cutflow->SetBinContent(5, (h1_MT_met_val->Integral()) );
+  cutflow->SetBinContent(6, (h1_MT_pTbyET->Integral()) );
+  cutflow->SetBinContent(7, (h1_MT_dphi->Integral()) );
+
+  cutflow->Write();
+
+
 }
 
 
@@ -2499,7 +2569,7 @@ double MiniAODAnalyzer::minDphiMET(std::vector<pat::Jet> JetList, const pat::MET
 
 double MiniAODAnalyzer::applyWKfactor(int mode, edm::Handle<edm::View<reco::GenParticle>> genPart){
 
-    WtoInt=sourceFileString.find("Wto");
+    WtoInt=sourceFileString.find("WTo");
     WJetsInt=sourceFileString.find("WJets");
     //std::cout << std::endl<< sourceFileString << " "<< WtoInt
     //<< " " << WJetsInt    <<  " " << std::string::npos << std::endl;
@@ -2555,17 +2625,17 @@ bool MiniAODAnalyzer::Overlap(edm::Handle<edm::View<reco::GenParticle>> p1, doub
   if ( (sourceFileString.find("WJetsToLNu_Tune") != std::string::npos) && ( (getWmass(p1)>100) || (HT>100.0) ) ) return true;
   if ( (sourceFileString.find("WJetsToLNu_HT") != std::string::npos) && (getWmass(p1)>100) && (HT<100.0)  ) return true;
   if ( (sourceFileString.find("WToTauNu_M-100_") != std::string::npos) && ( (getWmass(p1)<100) || (getWmass(p1)>200)) ) return true;
-  if ( (sourceFileString.find("WToTauNu_M-200_") != std::string::npos) && ( (getWmass(p1)<200) || (getWmass(p1)>500)) ) return true;
-  if ( (sourceFileString.find("WToTauNu_M-500_") != std::string::npos) && ( (getWmass(p1)<500) || (getWmass(p1)>1000)) ) return true;
+  if ( (sourceFileString.find("WToTauNu_M-200_") != std::string::npos) && ( (getWmass(p1)<200) || (getWmass(p1)>1000)) ) return true;
+  //if ( (sourceFileString.find("WToTauNu_M-500_") != std::string::npos) && ( (getWmass(p1)<500) || (getWmass(p1)>1000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-1000_") != std::string::npos) && ( (getWmass(p1)<1000) || (getWmass(p1)>2000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-2000_") != std::string::npos) && ( (getWmass(p1)<2000) || (getWmass(p1)>3000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-3000_") != std::string::npos) && ( (getWmass(p1)<3000) || (getWmass(p1)>4000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-4000_") != std::string::npos) && ( (getWmass(p1)<4000) || (getWmass(p1)>5000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-5000_") != std::string::npos) && ( (getWmass(p1)<5000) || (getWmass(p1)>6000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-6000_") != std::string::npos) && ( (getWmass(p1)<6000)) ) return true;
-  if ( (sourceFileString.find("TT_Tune") != std::string::npos) && (genMTT>700) ) return true;
-  if ( (sourceFileString.find("TT_Mtt-700to1000_Tune") != std::string::npos) && ( (genMTT<700) || (genMTT>1000) ) ) return true;
-  if ( (sourceFileString.find("TT_Mtt-1000toInf_Tune") != std::string::npos) && (genMTT<1000) ) return true;
+  //  if ( (sourceFileString.find("TT_Tune") != std::string::npos) && (genMTT>700) ) return true;
+  //  if ( (sourceFileString.find("TT_Mtt-700to1000_Tune") != std::string::npos) && ( (genMTT<700) || (genMTT>1000) ) ) return true;
+  //  if ( (sourceFileString.find("TT_Mtt-1000toInf_Tune") != std::string::npos) && (genMTT<1000) ) return true;
   
   return false;
 }
