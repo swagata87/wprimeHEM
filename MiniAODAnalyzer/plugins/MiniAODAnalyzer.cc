@@ -1649,6 +1649,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    qcd_weight_tau->clear();
    if (doQCDAna) QCDAnalyse(met);
    //if (not RunOnData)
+   tauGenMatchMap.clear();
+   tauGenMatchMapAllFlav.clear();
    QCDAnalyseTau(met,final_weight,pruned);
    //if(tau_NoShift.Pt()>80 && calcMT(tau_NoShift,met)>50){
    iEvent.getByToken(jetToken_, jets);
@@ -3370,7 +3372,7 @@ reco::GenParticle* MiniAODAnalyzer::GetTruthMatchAllFlavor(auto lepton) {
     }
 
     tauGenMatchMapAllFlav[&lepton]=gen_match;
-    return tauGenMatchMap[&lepton];
+    return tauGenMatchMapAllFlav[&lepton];
 }
 
 /*
