@@ -395,7 +395,12 @@ private:
   TH1F *h1_pToverEtMiss_Stage3;
   TH1F *h1_recoVtx_NoPUWt;
   TH1F *h1_recoVtx_WithPUWt;
-
+  //TauID
+  //  TH1F *h1_TauID_decayModeFindingNewDMs;
+  //  TH1F *h1_TauID_byMediumIsolationMVArun2v1DBnewDMwLT;
+  //  TH1F *h1_TauID_againstElectronLooseMVA6;
+  //  TH1F *h1_TauID_againstMuonLoose3;
+  
   //N-1 
   TH1F *h1_MT_passTauTrig;
   TH1F *h1_MT_passAllMETFilters;
@@ -552,7 +557,12 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   //   TH1F *h1_MT_Stage1_trigSFDown;
   h1_MT_Stage1_trigSFUp =histoDir.make<TH1F>("mT_Stage1_trigSFUp", "MT_Stage1_trigSFUp", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_trigSFDown =histoDir.make<TH1F>("mT_Stage1_trigSFDown", "MT_Stage1_trigSFDown", nbinMT, xlowMT, xupMT);
-
+  //
+  //  h1_TauID_decayModeFindingNewDMs = histoDir.make<TH1F>("decayModeFindingNewDMs", "TauID_decayModeFindingNewDMs", 30, -1, 2);
+  //  h1_TauID_byMediumIsolationMVArun2v1DBnewDMwLT = histoDir.make<TH1F>("byMediumIsolationMVArun2v1DBnewDMwLT", "TauID_byMediumIsolationMVArun2v1DBnewDMwLT", 30, -1, 2);
+  //  h1_TauID_againstElectronLooseMVA6 = histoDir.make<TH1F>("againstElectronLooseMVA6", "TauID_againstElectronLooseMVA6", 30, -1, 2);
+  //  h1_TauID_againstMuonLoose3 = histoDir.make<TH1F>("againstMuonLoose3", "TauID_againstMuonLoose3", 30, -1, 2);
+ 
   //
   h1_MT_Stage1_alphaUp   = histoDir.make<TH1F>("mT_Stage1_alphaUp",   "MT_Stage1_alphaUp",   nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_alphaDown = histoDir.make<TH1F>("mT_Stage1_alphaDown", "MT_Stage1_alphaDown", nbinMT, xlowMT, xupMT);
@@ -743,21 +753,26 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
 	  alphas_id_2 = "292302";
 	}
 	
-	if (pdfidx == 292000){
+	else if (pdfidx == 292000){
 	  alphas_id_1 = "292101";
 	  alphas_id_2 = "292102";
 	}
 	
-	if (pdfidx == 260000){
+	else if (pdfidx == 260000){
 	  alphas_id_1 = "265000";
 	  alphas_id_2 = "266000";
 	}
 	
-	if (pdfidx == 260400){
+	else if (pdfidx == 260400){
 	  alphas_id_1 = "265400";
 	  alphas_id_2 = "266400";
 	}
-	std::cout << "alpha_S min and max id  : " << alphas_id_1 << "   " << alphas_id_2 << std::endl;
+	/*
+	else {
+	  alphas_id_1 = "0";
+          alphas_id_2 = "0";
+	  }*/
+       	std::cout << "alpha_S min and max id  : " << alphas_id_1 << "   " << alphas_id_2 << std::endl;
 	
 	
 	std::stringstream ss;
@@ -792,7 +807,7 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
 	    
 	    boost::optional<std::string> weightgroupname1 = v.second.get_optional<std::string>("<xmlattr>.name");
 	    boost::optional<std::string> weightgroupname2 = v.second.get_optional<std::string>("<xmlattr>.type");
-	    // std::cout << "weightgroupname1=" << weightgroupname1 << " weightgroupname2=" << weightgroupname2 << std::endl;
+	    std::cout << "weightgroupname1=" << weightgroupname1 << " weightgroupname2=" << weightgroupname2 << std::endl;
 	    if ( (weightgroupname1 && weightgroupname1.get() == pdfvar)  || (weightgroupname2 && weightgroupname2.get() == pdfvar)) {
 	      BOOST_FOREACH(boost::property_tree::ptree::value_type &vs,subtree) {
 	        // std::cout << "vs.first=" << vs.first << " vs.second="  << vs.second << std::endl;
@@ -816,8 +831,10 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
 		    pdf_indices->push_back( id );
 		  }
 		  
+		  std::cout << "alphas_id_1.empty() = " << alphas_id_1.empty() << "  alphas_id_2.empty() = " << alphas_id_2.empty() << std::endl;
 		  if ( !alphas_id_1.empty() && !alphas_id_2.empty() ) {
 		    if (pdf_wt_index == stoi(alphas_id_1) || pdf_wt_index == stoi(alphas_id_2)){
+		      std::cout << "push back " << id << " into alpha_indices " << std::endl;
 		      alpha_indices.push_back( id );
 		    }
 		  }
@@ -940,7 +957,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     //    Handle<edm::View<pat::PackedGenParticle> > packed;
     //    iEvent.getByToken(packedGenToken_,packed);
     //   if (sourceFileString.find("WJetsToLNu_Tune") != std::string::npos) 
-    std::cout << " Wmass=" << getWmass(pruned) << std::endl;
+    //std::cout << " Wmass=" << getWmass(pruned) << std::endl;
     if ( Overlap(pruned, genHT, genMTT) ) {
       //HT=" << genHT << std::endl ;
       //   if (sourceFileString.find("WToTau") != std::string::npos) std::cout << "Reject! sample = " << sourceFileString << " Wmass=" << getWmass(pruned) << std::endl ;
@@ -980,44 +997,41 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   h1_nGenTau->Fill(nGenTau);
 
+
   ///--PDF weight--///
   //  edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
-    //  std::cout << "EvtHandle.isValid() = " << EvtHandle.isValid() << " This is needed for pdf weights" << std::endl;
+    //std::cout << "EvtHandle.isValid() = " << EvtHandle.isValid() << " This is needed for pdf and alpha_s weights" << std::endl;
     // iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
     if  ( (EvtHandle.isValid()) ) {
       if ( doPDFuncertainty) {
 	inpdfweights->clear();
+	alpha_s_container->clear();
 	for (unsigned int i=0; i<EvtHandle->weights().size(); i++) {
 	  int id_i = stoi( EvtHandle->weights()[i].id );
 	  for( unsigned int j = 0; j<pdf_indices->size(); j++ ) {
 	    int id_j = pdf_indices->at(j);
 	    if( id_i == id_j ){
 	      float pdf_weight = (EvtHandle->weights()[i].wgt)/(EvtHandle->originalXWGTUP());
-	      // std::cout << "pdf_weight=" << pdf_weight  << std::endl;
+	      std::cout << "pdf_weight=" << pdf_weight  << std::endl;
 	      inpdfweights->push_back( pdf_weight );
 	    }
 	  }
-
+	  std::cout << "alpha_indices.empty() = " << alpha_indices.empty() << std::endl;
 	  if ( !alpha_indices.empty() ) {
-	    // std::cout << "alpha_indices is not empty " << std::endl;
+	    std::cout << "alpha_indices is not empty " << std::endl;
 	    for( unsigned int k = 0; k < alpha_indices.size(); k++ ){
 	      int id_k = alpha_indices[k];
 	      if(id_i == id_k ){
 		float alpha = EvtHandle->weights()[i].wgt;
-		// std::cout << "alpha_s wt = " << alpha << std::endl;
+		std::cout << "alpha_s wt = " << alpha << std::endl;
 		alpha_s_container->push_back(alpha);
 	      }
 	    }
 	  }
-	  //	  else std::cout << "alpha_s uncertainty not available " << std::endl;
 	}
       }
-      
-      //      else {
-      //	if (debugLevel) std::cout << "PDF weights not saved in CMSSW. Do post-facto reweighting" << std::endl;
-      // }
-    }
+    }   /// Event Handle valid ?
   }
   
   
@@ -1328,6 +1342,12 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    iEvent.getByToken(tauToken_, taus);
 
    for (const pat::Tau &tau : *taus) {
+     /*     
+     float val_decayModeFindingNewDMs = tau.tauID("decayModeFindingNewDMs");
+     float val_byMediumIsolationMVArun2v1DBnewDMwLT = tau.tauID("byMediumIsolationMVArun2v1DBnewDMwLT");
+     float val_againstElectronLooseMVA6 = tau.tauID("againstElectronLooseMVA6");
+     float val_againstMuonLoose3 = tau.tauID("againstMuonLoose3");
+     */
      /*
        if (PassTauID_NonIsolated(tau)==true) {
        tau_nonIso.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
@@ -1481,6 +1501,12 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 h1_MT_Stage1->Fill(MT,final_weight);
 	 h1_MET_Stage1->Fill(met_val,final_weight);
 	 h1_MET_phi_Stage1->Fill(met_phi,final_weight);
+	 //
+	 //	 h1_TauID_decayModeFindingNewDMs->Fill(tau.tauID("decayModeFindingNewDMs"),final_weight);
+	 //	 h1_TauID_byMediumIsolationMVArun2v1DBnewDMwLT->Fill(tau.tauID("byMediumIsolationMVArun2v1DBnewDMwLT"),final_weight);
+	 //	 h1_TauID_againstElectronLooseMVA6->Fill(tau.tauID("againstElectronLooseMVA6"),final_weight);
+	 //	 h1_TauID_againstMuonLoose3->Fill(tau.tauID("againstMuonLoose3"),final_weight);
+	 //
 	 //--PU Systematics--//
 	 if (!RunOnData) {
 	   h1_MT_Stage1_pileupUncertUp->Fill(MT,final_weight_PUweight_UP);
@@ -1517,35 +1543,41 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 }
 	 
 	 if (!RunOnData) {
-	   if ( doPDFuncertainty) {
-	     //--PDF Systematics--//
-	     // std::cout << "Evt selected. Size of inpdfweights = " << inpdfweights.size() << std::endl;
-	     int imem=0;
-	     for (std::vector<double>::iterator it = inpdfweights->begin() ; it != inpdfweights->end(); ++it) {
-	       //std::cout << "weight = " << *it << std::endl;
-	       double final_wt_with_pdf = (*it)*final_weight;
-	       h1_MT_Stage1_pdfWt[imem]->Fill(MT,final_wt_with_pdf);
-	       //      std::cout << "final_wt_with_pdf " << final_wt_with_pdf << std::endl ;
-	       imem++;
-	     }
-	     
-	     // std::cout << "alpha_s_container->at(0) = " << alpha_s_container->at(0) << " alpha_s_container->at(1) = " << alpha_s_container->at(1) << std::endl;
-	    
-	     if ( !alpha_indices.empty() ) {
-	       if  ( alpha_s_container->at(0) < alpha_s_container->at(1) ) { 
-		 alpha_s_wt_down = alpha_s_container->at(0) ;
-		 alpha_s_wt_up   = alpha_s_container->at(1);
+	   if (EvtHandle.isValid() ) {
+	     if ( doPDFuncertainty) {
+	       //--PDF Systematics--//
+	       std::cout << "Evt selected. Size of inpdfweights = " << inpdfweights->size() << std::endl;
+	       int imem=0;
+	       for (std::vector<double>::iterator it = inpdfweights->begin() ; it != inpdfweights->end(); ++it) {
+		 //std::cout << "weight = " << *it << std::endl;
+		 double final_wt_with_pdf = (*it)*final_weight;
+		 h1_MT_Stage1_pdfWt[imem]->Fill(MT,final_wt_with_pdf);
+		 //      std::cout << "final_wt_with_pdf " << final_wt_with_pdf << std::endl ;
+		 imem++;
 	       }
 	       
-	       if  ( alpha_s_container->at(0) > alpha_s_container->at(1) ) { 
-		 alpha_s_wt_up = alpha_s_container->at(0) ;
-		 alpha_s_wt_down   = alpha_s_container->at(1);
+	       
+	       std::cout << "Evt selected. Size of alpha_s_container = " << alpha_s_container->size() << std::endl;
+	       std::cout << "alpha_s_container->at(0) = " << alpha_s_container->at(0) << std::endl;
+	       std::cout << "alpha_s_container->at(1) = " << alpha_s_container->at(1) << std::endl;
+	       
+	       if ( alpha_s_container->size() != 0) {
+		 if  ( alpha_s_container->at(0) <= alpha_s_container->at(1) ) { 
+		   alpha_s_wt_down = alpha_s_container->at(0) ;
+		   alpha_s_wt_up   = alpha_s_container->at(1);
+		 }
+		 
+		 if  ( alpha_s_container->at(0) > alpha_s_container->at(1) ) { 
+		   alpha_s_wt_up = alpha_s_container->at(0) ;
+		   alpha_s_wt_down   = alpha_s_container->at(1);
+		 }
 	       }
 	     }
+
 	     final_weight_alpha_UP   = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_up ;
 	     final_weight_alpha_DOWN = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_down ;
-	     //	     std::cout << "final_weight_alpha_UP = " << final_weight_alpha_UP << " final_weight_alpha_DOWN=" << final_weight_alpha_DOWN << std::endl;
-
+	     std::cout << "final_weight_alpha_UP = " << final_weight_alpha_UP << " final_weight_alpha_DOWN=" << final_weight_alpha_DOWN << std::endl;
+	     
 	     h1_MT_Stage1_alphaUp->Fill(MT,final_weight_alpha_UP);
 	     h1_MT_Stage1_alphaDown->Fill(MT,final_weight_alpha_DOWN);
 
@@ -3397,7 +3429,7 @@ reco::GenParticle* MiniAODAnalyzer::GetTruthMatch(std::string name, auto lepton)
     for (auto part_i: *pruned){
         if (part_temp_id != (TMath::Abs(part_i.pdgId())) ) continue;
         double test_delta_r = DeltaR(lepton,part_i);
-        std::cout << "delta r " << test_delta_r << std::endl;
+	// std::cout << "delta r " << test_delta_r << std::endl;
         if (test_delta_r < temp_delta_r) {
             temp_delta_r = test_delta_r;
             gen_match = (&part_i);
