@@ -3197,8 +3197,8 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
                 FakeCandMETPhi->push_back(sel_met.phi());
                 mFakeTree["iso"]=PassTauID(tau);
                 FakeCandIso->push_back(PassTauID(tau));
-                mFakeTree["noiso"]=PassTauID(tau);
-                FakeCandNoIso->push_back(PassTauID(tau));
+                mFakeTree["noiso"]=PassTauID_NonIsolated(tau);
+                FakeCandNoIso->push_back(PassTauID_NonIsolated(tau));
                 mFakeTree["tau_n"]=numVetoTau;
                 FakeCandVetoNum->push_back(numVetoTau);
                 mFakeTree["decay_mode"]=tau.decayMode();
@@ -3464,7 +3464,7 @@ reco::GenParticle* MiniAODAnalyzer::GetTruthMatchAllFlavor(auto lepton) {
     double temp_delta_r = 0.5;
     reco::GenParticle* gen_match=0;
     for (auto part_i: *pruned){
-        if (fabs(lepton.pt()-part_i.pt())/part_i.pt()<0.5 && abs(part_i.pdgId())<22 && abs(part_i.pdgId())!=12 && abs(part_i.pdgId())!=14 && abs(part_i.pdgId())!=16) {
+        if ( abs(part_i.pdgId())<22 && abs(part_i.pdgId())!=12 && abs(part_i.pdgId())!=14 && abs(part_i.pdgId())!=16 && fabs(lepton.pt()-part_i.pt())/part_i.pt()<0.5 ) {
             double test_delta_r = DeltaR(lepton,part_i);
             if (test_delta_r < temp_delta_r ) {
                 temp_delta_r = test_delta_r;
