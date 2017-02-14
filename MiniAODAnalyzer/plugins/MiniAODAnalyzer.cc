@@ -339,19 +339,20 @@ private:
   TH1I *h1_EventCount;
   TH1I *h1_EventCount2;
   TH1F *h1_genMTT;
-  TH1F *h1_TauPt_Gen;
+  TH1F *h1_TauPt_Gen_den;
+  TH1F *h1_TauPt_Gen_num_tot;
   TH1I *h1_nGoodTau_Reco;
   TH1I *h1_nGenTau;
-  TH1F *h1_TauPt_reco;
-  TH1F *h1_TauEta_reco;
+  //  TH1F *h1_TauPt_reco;
+  // TH1F *h1_TauEta_reco;
   TH1F *h1_TauPt_TrigEff_Deno;
   TH1F *h1_TauPt_TrigEff_Num;
   TH1F *h1_TauEta_TrigEff_Deno;
   TH1F *h1_TauEta_TrigEff_Num;
   TH1F *h1_met_TrigEff_Deno;
   TH1F *h1_met_TrigEff_Num;
-  TH1F *h1_TauPt_goodreco;
-  TH1F *h1_TauEta_goodreco;
+  // TH1F *h1_TauPt_goodreco;
+  //  TH1F *h1_TauEta_goodreco;
   TH1F *h1_TauPt_Stage1;
   TH1F *h1_TauEta_Stage1;
   TH1F *h1_TauPhi_Stage1;
@@ -501,17 +502,18 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_nGoodTau_Reco = histoDir.make<TH1I>("nGoodTauReco", "nGoodTauReco", 5, -0.5, 4.5);
   //h1_genMTT
   h1_genMTT = histoDir.make<TH1F>("Gen_MTT", "MTT_Gen", 2000, 0, 2000);
-  h1_TauPt_Gen = histoDir.make<TH1F>("tauPt_Gen", "TauPt_Gen", 1000, 0, 4000);
-  h1_TauPt_reco = histoDir.make<TH1F>("tauPt_reco", "TauPt_reco", 1000, 0, 4000);
-  h1_TauPt_goodreco = histoDir.make<TH1F>("tauPt_goodreco", "TauPt_goodreco", 1000, 0, 4000);
+  h1_TauPt_Gen_den = histoDir.make<TH1F>("tauPt_Gen_den", "TauPt_Gen", 1000, 0, 8000);
+  h1_TauPt_Gen_num_tot = histoDir.make<TH1F>("tauPt_Gen_num_tot", "TauPt_Gen", 1000, 0, 8000);
+  //  h1_TauPt_reco = histoDir.make<TH1F>("tauPt_reco", "TauPt_reco", 1000, 0, 4000);
+  // h1_TauPt_goodreco = histoDir.make<TH1F>("tauPt_goodreco", "TauPt_goodreco", 1000, 0, 4000);
   h1_TauPt_TrigEff_Deno = histoDir.make<TH1F>("tauPt_TrigEff_Deno", "TauPt_TrigEff_Deno", 2000, 0, 2000);
   h1_TauPt_TrigEff_Num  = histoDir.make<TH1F>("tauPt_TrigEff_Num", "TauPt_TrigEff_Num", 2000, 0, 2000);
   h1_TauEta_TrigEff_Deno = histoDir.make<TH1F>("tauEta_TrigEff_Deno", "TauEta_TrigEff_Deno", 48, -2.4, 2.4);
   h1_TauEta_TrigEff_Num  = histoDir.make<TH1F>("tauEta_TrigEff_Num", "TauEta_TrigEff_Num", 48, -2.4, 2.4);
   h1_met_TrigEff_Deno = histoDir.make<TH1F>("met_TrigEff_Deno", "MET_TrigEff_Deno", 2000, 0, 2000);
   h1_met_TrigEff_Num  = histoDir.make<TH1F>("met_TrigEff_Num", "MET_TrigEff_Num", 2000, 0, 2000);
-  h1_TauEta_reco = histoDir.make<TH1F>("tauEta_reco", "TauEta_reco", 48, -2.4, 2.4);
-  h1_TauEta_goodreco = histoDir.make<TH1F>("tauEta_goodreco", "TauEta_goodreco", 48, -2.4, 2.4);
+  // h1_TauEta_reco = histoDir.make<TH1F>("tauEta_reco", "TauEta_reco", 48, -2.4, 2.4);
+  // h1_TauEta_goodreco = histoDir.make<TH1F>("tauEta_goodreco", "TauEta_goodreco", 48, -2.4, 2.4);
   h1_TauPt_Stage1 = histoDir.make<TH1F>("tauPt_Stage1", "TauPt_Stage1", 1000, 0, 4000);
   h1_TauEta_Stage1 = histoDir.make<TH1F>("tauEta_Stage1", "TauEta_Stage1", 480, -2.4, 2.4);
   h1_TauPhi_Stage1 = histoDir.make<TH1F>("tauPhi_Stage1", "TauPhi_Stage1", 800, -4.0, 4.0);
@@ -870,7 +872,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  // std::cout << "\n\n --EVENT-- " << Event << std::endl;
+  std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
@@ -945,6 +947,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   ///----///
   int nGenTau=0;
+  int nGenTauJet=0;
   TLorentzVector tauGen_p4[10];
   const Candidate * MyTau;
   // const Candidate * MyTauSel=0;
@@ -979,14 +982,37 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
     for(size_t i=0; i<pruned->size();i++){
       if(   (abs((*pruned)[i].pdgId())==15) && ( ((*pruned)[i].status()==2) )) {
-    MyTau = &(*pruned)[i];
-    if ( (MyTau->pt()>20.0)  &&  (fabs(MyTau->eta())<2.3)  )  {
-      // MyTauSel=MyTau;
-      TauPt_Gen=MyTau->pt();
-      h1_TauPt_Gen->Fill(TauPt_Gen);
-      tauGen_p4[nGenTau].SetPxPyPzE(MyTau->px(),MyTau->py(),MyTau->pz(),MyTau->energy());
-      nGenTau++;
-    }
+	bool leptonDecayMode=false;
+	MyTau = &(*pruned)[i];
+	//	std::cout << "Tau found. nTauDaughter = "  <<  MyTau->numberOfDaughters() << std::endl;
+	int ndaughter=MyTau->numberOfDaughters();
+	for (int n=0; n<ndaughter; n++) {
+	  const Candidate *MyTauDaughter=MyTau->daughter(n);
+	  // std::cout << "Tau Daughter pdgID = " << MyTauDaughter->pdgId() << " and status = " << MyTauDaughter->status()  << std::endl;
+	  if (  (fabs(MyTauDaughter->pdgId())==11) ||  (fabs(MyTauDaughter->pdgId())==13) ) {
+	    leptonDecayMode=true ; 
+	    //std::cout << "Lepton decaymode detected" << std::endl;
+	  }
+	  /*
+	  if (  fabs(MyTauDaughter->pdgId())==24 ) {
+	    std::cout << "Tau decayed to W " ;
+	    std::cout << " nWDaughter = "  <<  MyTauDaughter->numberOfDaughters() << std::endl;
+	    int nWdaughter = MyTauDaughter->numberOfDaughters() ; //<< std::endl;
+	    for (int n2=0; n2<nWdaughter; n2++) {
+	      const Candidate *MyWDaughter=MyTauDaughter->daughter(n2);
+	      std::cout << "W daughter PDG ID = " << MyWDaughter->pdgId() << " and status = " << MyWDaughter->status() << std::endl;
+	    }
+	  }
+	  */
+	}
+	if ( (MyTau->pt()>20.0)  &&  (fabs(MyTau->eta())<2.3)  )  {
+	  // MyTauSel=MyTau;
+	  TauPt_Gen=MyTau->pt();
+	  //// h1_TauPt_Gen->Fill(TauPt_Gen);
+	  tauGen_p4[nGenTau].SetPxPyPzE(MyTau->px(),MyTau->py(),MyTau->pz(),MyTau->energy());
+	  nGenTau++;
+	  if (leptonDecayMode==false) nGenTauJet++;
+	}
       }
     }
     //if(   (abs((*pruned)[i].pdgId())==16) && ( ((*pruned)[i].status()==2)) && (sel_tau==true)) {
@@ -994,7 +1020,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     //MyNu->px(); // to get rid of not use warning
     //}
   }
-
+  //  std::cout << "nGenTau= " << nGenTau << "  nGenTauJet=" << nGenTauJet << std::endl;
   h1_nGenTau->Fill(nGenTau);
 
 
@@ -1445,8 +1471,14 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      " tauID_SF_up=" << tauID_SF_syst_up <<
      " tauID_SF_down=" << tauID_SF_syst_down << std::endl;
    */
+
+
+   if (nGenTauJet==1) h1_TauPt_Gen_den->Fill(TauPt_Gen);
+   if (nGenTauJet==1 && nGoodTau>0) h1_TauPt_Gen_num_tot->Fill(TauPt_Gen);
+   //if (nGenTauJet==1 && nGoodTau_decay_iso>0) h1_TauPt_Gen_decay_iso_num->Fill(TauPt_Gen);
+
    h1_nGoodTau_Reco->Fill(nGoodTau,final_weight);
-   if (nGenTau==1) FindTauIDEfficiency(iEvent,tauGen_p4[0]);
+   //   if (nGenTau==1) FindTauIDEfficiency(iEvent,tauGen_p4[0]);
    
    if (RunOnData) {
      //     std::cout << "passMuonTrig_ForEff=" << passMuonTrig_ForEff << " nGoodTauTrig=" << nGoodTauTrig 
@@ -1854,6 +1886,7 @@ bool MiniAODAnalyzer::FindTauTrigEfficiency(bool passRefTrigger, bool passAnaTri
   return true;
 }
 
+/*
 bool MiniAODAnalyzer::FindTauIDEfficiency(const edm::Event& iEvent, TLorentzVector gen_p4) {
   edm::Handle<pat::TauCollection> taus;
   iEvent.getByToken(tauToken_, taus);
@@ -1876,6 +1909,8 @@ bool MiniAODAnalyzer::FindTauIDEfficiency(const edm::Event& iEvent, TLorentzVect
   }
   return true;
 }
+*/
+
 
 bool MiniAODAnalyzer::PassTauID(const pat::Tau &tau)
 {
