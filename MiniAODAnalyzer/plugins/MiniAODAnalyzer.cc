@@ -368,6 +368,11 @@ private:
   // TH1F *h1_TauPt_goodreco;
   //  TH1F *h1_TauEta_goodreco;
   TH1F *h1_TauPt_Stage1;
+  TH1F *h1_TauCharge_Stage1;
+  TH1F *h1_TauDxy_Stage1;
+  TH1F *h1_TauChIso_Stage1;
+  TH1F *h1_TauNeuIso_Stage1;
+  TH1F *h1_TauNTrack_Stage1;
   TH1F *h1_TauEta_Stage1;
   TH1F *h1_TauPhi_Stage1;
   TH1F *h1_pToverEtMiss_Stage1;
@@ -541,6 +546,11 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   // h1_TauEta_reco = histoDir.make<TH1F>("tauEta_reco", "TauEta_reco", 48, -2.4, 2.4);
   // h1_TauEta_goodreco = histoDir.make<TH1F>("tauEta_goodreco", "TauEta_goodreco", 48, -2.4, 2.4);
   h1_TauPt_Stage1 = histoDir.make<TH1F>("tauPt_Stage1", "TauPt_Stage1", 1000, 0, 4000);
+  h1_TauCharge_Stage1 = histoDir.make<TH1F>("tauCharge_Stage1", "TauCharge_Stage1", 5, -2.5, 2.5);
+  h1_TauDxy_Stage1 = histoDir.make<TH1F>("tauDxy_Stage1", "TauDxy_Stage1", 1000, 0, 1);
+  h1_TauChIso_Stage1 = histoDir.make<TH1F>("tauChIso_Stage1", "TauChIso_Stage1", 200, 0, 20);
+  h1_TauNeuIso_Stage1 = histoDir.make<TH1F>("tauNeuIso_Stage1", "TauNeuIso_Stage1", 500, 0, 50);
+  h1_TauNTrack_Stage1 = histoDir.make<TH1F>("tauNTrack_Stage1", "TauNTrack_Stage1", 50, -0.5, 49.5);
   h1_TauEta_Stage1 = histoDir.make<TH1F>("tauEta_Stage1", "TauEta_Stage1", 480, -2.4, 2.4);
   h1_TauPhi_Stage1 = histoDir.make<TH1F>("tauPhi_Stage1", "TauPhi_Stage1", 800, -4.0, 4.0);
   /// N-1
@@ -898,7 +908,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  // std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
+  std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
@@ -1252,7 +1262,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    //Pass All MET Filters? //
    passAllMETFilters =  passHBHENoiseFilter * passHBHENoiseIsoFilter * passEcalDeadCellTriggerPrimitiveFilter * passgoodVertices * passeeBadScFilter * passglobalTightHalo2016Filter * filterbadChCandidate * filterbadPFMuon ;
-
+   //   passAllMETFilters=1.0;
    //   std::cout << "passAllMETFilters=" << passAllMETFilters << std::endl;
 
    ///-- VERTEX --///
@@ -1381,9 +1391,12 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    double tau_eta[10]={0};
    double tau_pt_trig[10]={0};
    double tau_eta_trig[10]={0};
-   // int nGoodNonIsoTau=0;
-   //   double tau_pt_nonIso[10]={0};
-   // double tau_phi_nonIso[10]={0};
+   int tau_charge[10]={0};
+   double tau_dxy[10]={0};
+   int tau_nTrack[10]={0};
+   double tau_chIso[10]={0};
+   double tau_neuIso[10]={0};
+
    int nGoodTau_ScaleUp=0;
    double tau_pt_ScaleUp[10]={0};
    double tau_phi_ScaleUp[10]={0};
@@ -1404,24 +1417,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    iEvent.getByToken(tauToken_, taus);
 
    for (const pat::Tau &tau : *taus) {
-     /*     
-     float val_decayModeFindingNewDMs = tau.tauID("decayModeFindingNewDMs");
-     float val_byMediumIsolationMVArun2v1DBnewDMwLT = tau.tauID("byMediumIsolationMVArun2v1DBnewDMwLT");
-     float val_againstElectronLooseMVA6 = tau.tauID("againstElectronLooseMVA6");
-     float val_againstMuonLoose3 = tau.tauID("againstMuonLoose3");
-     */
-     /*
-       if (PassTauID_NonIsolated(tau)==true) {
-       tau_nonIso.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
-       if (PassTauAcceptance(tau_nonIso)==true) {
-       tau_pt_nonIso[nGoodNonIsoTau]=tau_nonIso.Pt();
-       tau_phi_nonIso[nGoodNonIsoTau]=tau_nonIso.Phi();
-       nGoodNonIsoTau++;
-       }
-       }
-     */
-
- 
+  
      tau_NoShift_acc.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
      if (PassTauAcceptance(tau_NoShift_acc)==true) {
        nGoodTau_acc++;
@@ -1434,10 +1430,18 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        tau_ScaleDown.SetPxPyPzE((1-tauScaleShift)*(tau.px()),(1-tauScaleShift)*(tau.py()),(1-tauScaleShift)*(tau.pz()),(1-tauScaleShift)*(tau.energy()));
        
        if (PassTauAcceptance(tau_NoShift)==true) {
-	 // std::cout << "Tau selected" << std::endl;
+	 std::cout << "\nTau selected" << std::endl;
 	 tau_pt[nGoodTau]=tau_NoShift.Pt();
 	 tau_phi[nGoodTau]=tau_NoShift.Phi();
 	 tau_eta[nGoodTau]=tau_NoShift.Eta();
+	 tau_charge[nGoodTau]=tau.charge();
+	 tau_dxy[nGoodTau]=fabs(tau.dxy());
+	 tau_nTrack[nGoodTau]=tau.signalCands().size();
+	 tau_chIso[nGoodTau]=tau.tauID("chargedIsoPtSum");
+	 tau_neuIso[nGoodTau]=tau.tauID("neutralIsoPtSum");
+
+	 std::cout << "charge=" << tau.charge() << " |dxy|=" << fabs(tau.dxy()) << " nTrack=" << tau.signalCands().size() << std::endl;
+	 std::cout << "chIso=" << tau.tauID("chargedIsoPtSum") << " NeutralIso=" <<tau.tauID("neutralIsoPtSum") << std::endl;
 	 nGoodTau++;
        }
 
@@ -1595,6 +1599,11 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 h1_recoVtx_NoPUWt->Fill(recoVtx,final_wt_NOPU);
 	 h1_recoVtx_WithPUWt->Fill(recoVtx,final_weight);
 	 h1_TauPt_Stage1->Fill(tau_pt[0],final_weight);
+	 h1_TauCharge_Stage1->Fill(tau_charge[0],final_weight);
+	 h1_TauDxy_Stage1->Fill(tau_dxy[0],final_weight);
+	 h1_TauChIso_Stage1->Fill(tau_chIso[0],final_weight);
+	 h1_TauNeuIso_Stage1->Fill(tau_neuIso[0],final_weight);
+	 h1_TauNTrack_Stage1->Fill(tau_nTrack[0],final_weight);
 	 h1_TauEta_Stage1->Fill(tau_eta[0],final_weight);
 	 h1_TauPhi_Stage1->Fill(tau_phi[0],final_weight);
 	 h1_dPhi_tau_MET_Stage1->Fill(dphi_tau_met,final_weight);
