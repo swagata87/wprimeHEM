@@ -1418,7 +1418,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //       printf("muon with pt %4.1f, dz(PV) %+5.3f, POG loose id %d, tight id %d\n",
      //     mu.pt(), mu.muonBestTrack()->dz(PV.position()), mu.isLooseMuon(), mu.isTightMuon(PV));
    }
-   std::cout << "nTightMu=" << nTightMu << std::endl;
+   //   std::cout << "nTightMu=" << nTightMu << std::endl;
 
    edm::Handle<edm::ValueMap<bool> > ele_id_decisions;
    iEvent.getByToken(eleIdMapToken_ ,ele_id_decisions);
@@ -1438,7 +1438,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        EleIDPassed->push_back(1);}
      else {EleIDPassed->push_back(0);}
    }
-   std::cout << "nLooseEle=" << nLooseEle << std::endl;
+   //   std::cout << "nLooseEle=" << nLooseEle << std::endl;
 
    //
    /*
@@ -1500,7 +1500,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        tau_ScaleDown.SetPxPyPzE((1-tauScaleShift)*(tau.px()),(1-tauScaleShift)*(tau.py()),(1-tauScaleShift)*(tau.pz()),(1-tauScaleShift)*(tau.energy()));
        
        if (PassTauAcceptance(tau_NoShift)==true) {
-	 std::cout << "\nTau selected" << std::endl;
+	 //std::cout << "\nTau selected" << std::endl;
 	 tau_pt[nGoodTau]=tau_NoShift.Pt();
 	 tau_phi[nGoodTau]=tau_NoShift.Phi();
 	 tau_eta[nGoodTau]=tau_NoShift.Eta();
@@ -1510,7 +1510,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 tau_chIso[nGoodTau]=tau.tauID("chargedIsoPtSum");
 	 tau_neuIso[nGoodTau]=tau.tauID("neutralIsoPtSum");
 
-	 std::cout << "Tau decaymode = " << tau.decayMode() << std::endl;
+	 //	 std::cout << "Tau decaymode = " << tau.decayMode() << std::endl;
 	 int tauDM=tau.decayMode();
 	 tau_DM[nGoodTau] = tauDM;
 	 
@@ -3405,10 +3405,10 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
     int numVetoMuo=vetoNumberMuon(m_leptonVetoPt,vetoConeSize);
     int numVetoTau=vetoNumberTau(ptTauTreshold);
     int numVetoEle=vetoNumberEle(m_leptonVetoPt,vetoConeSize);
-    // std::cout << "In QCDAnalyseTau" << std::endl;
-    // std::cout << "nEle " << numVetoEle << "  nMu " << numVetoMuo << " taus size "<<taus->size()<< std::endl;
+    std::cout << "In QCDAnalyseTau" << std::endl;
+    std::cout << "nEle " << numVetoEle << "  nMu " << numVetoMuo << " taus size "<<taus->size()<< std::endl;
     if( ( (numVetoEle==1) xor (numVetoMuo==1 )) && taus->size()>=1){
-      // std::cout << "tau size > 0 and  Ele Muo cut fulfilled " << std::endl;
+      //std::cout << "tau size > 0 and  Ele Muo cut fulfilled " << std::endl;
       pat::Electron eleCandi;
       pat::Muon muoCandi;
       int i=0;
@@ -3459,9 +3459,9 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
         FakeCandLeptonPhi->clear();
         FakeCandLeptonTrigger->clear();
         for( auto tau: *taus ) {
-	  //std::cout << "\n Inside Tau Loop. Take this tau" << std::endl; 
+	  std::cout << "\n Inside Tau Loop. Take this tau" << std::endl; 
             if(muonBool && DeltaR(muoCandi,tau)<vetoConeSize){
-	      //std::cout << "Muon too close to tau" << std::endl;
+	      //    std::cout << "Muon too close to tau" << std::endl;
                 continue;
             }
             if(eleBool &&  DeltaR(eleCandi,tau)<vetoConeSize){
@@ -3470,7 +3470,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
             }
 
             if( not PassTauID_NonIsolated(tau)  and not PassTauID(tau)){
-	      //std::cout << "tau do not pass ID (iso and noniso) " << std::endl; 
+	      // std::cout << "tau do not pass ID (iso and noniso) " << std::endl; 
                 continue;
             }
             if(!m_do_complicated_tau_stuff){
@@ -3550,7 +3550,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
 	      
 	      if (doTrees) helper->Tree_Filler("fakeTree");
 	      if(PassTauID_NonIsolated(tau)){
-		//	std::cout << "Non-isolated tau, fill tau_fake_pt 0" << std::endl;
+	       	std::cout << "Non-isolated tau, fill tau_fake_pt 0" << std::endl;
 		if (doFakeHist) helper->Fill(0,"Tau_fake_pt",tau.pt(),weight);
 		if(muonBool) {
 		  // std::cout << "muonBool True, fill tau_fake_pt 1" << std::endl;
@@ -3609,7 +3609,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
 		  }
 		}
 	      }else if(PassTauID(tau)){
-		//	std::cout << "passTauID" << std::endl;
+	       	std::cout << "passTauID, fill Tau_nofake_pt" << std::endl;
 		if (doFakeHist)   helper->Fill(0,"Tau_nofake_pt",tau.pt(),weight);
 		if(muonBool) {
 		  if (doFakeHist)  helper->Fill(1,"Tau_nofake_pt",muoCandi.pt(),weight);
