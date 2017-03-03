@@ -2994,9 +2994,9 @@ bool MiniAODAnalyzer::Overlap(edm::Handle<edm::View<reco::GenParticle>> p1, doub
   if ( (sourceFileString.find("WToTauNu_M-4000_") != std::string::npos) && ( (getWmass(p1)<4000) || (getWmass(p1)>5000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-5000_") != std::string::npos) && ( (getWmass(p1)<5000) || (getWmass(p1)>6000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-6000_") != std::string::npos) && ( (getWmass(p1)<6000)) ) return true;
-  //  if ( (sourceFileString.find("TT_Tune") != std::string::npos) && (genMTT>700) ) return true;
-  //  if ( (sourceFileString.find("TT_Mtt-700to1000_Tune") != std::string::npos) && ( (genMTT<700) || (genMTT>1000) ) ) return true;
-  //  if ( (sourceFileString.find("TT_Mtt-1000toInf_Tune") != std::string::npos) && (genMTT<1000) ) return true;
+  if ( (sourceFileString.find("TT_Tune") != std::string::npos) && (genMTT>700) ) return true;
+  if ( (sourceFileString.find("TT_Mtt-700to1000_Tune") != std::string::npos) && ( (genMTT<700) || (genMTT>1000) ) ) return true;
+  if ( (sourceFileString.find("TT_Mtt-1000toInf_Tune") != std::string::npos) && (genMTT<1000) ) return true;
   
   return false;
 }
