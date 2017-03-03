@@ -2,18 +2,20 @@
 
 export SCRAM_ARCH=slc6_amd64_gcc530
 
-cmsrel CMSSW_8_0_11
+cmsrel CMSSW_8_0_25
 
-cd CMSSW_8_0_11/src/
+cd CMSSW_8_0_25/src/
 
 cmsenv
 
 git cms-init
 
-git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate  (Needed for Bad Charged Hadron and Bad Muon Filters)
+git cms-merge-topic -u cms-met:fromCMSSW_8_0_20_postICHEPfilter (Needed for Bad Charged Hadron and Bad Muon Filters)
+Previously it was : git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate  (Now outdated)
 
 To use the electron ID egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose, one needs to merge a code from a private CMSSW branch :
-git cms-merge-topic ikrav:egm_id_80X_v1
+git cms-merge-topic ikrav:egm_id_80X_v2
+Previously it was -> git cms-merge-topic ikrav:egm_id_80X_v1 (Now outdated)
 
 
 
