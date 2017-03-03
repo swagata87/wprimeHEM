@@ -1989,7 +1989,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    tauGenMatchMap.clear();
    tauGenMatchMapAllFlav.clear();
    //std::cout << "Call QCDAnalyseTau" << std::endl;
-   QCDAnalyseTau(met,final_weight,pruned);
+   if (passEleTrig || passMuonTrig)  QCDAnalyseTau(met,final_weight,pruned);
    //if(tau_NoShift.Pt()>80 && calcMT(tau_NoShift,met)>50){
    iEvent.getByToken(jetToken_, jets);
 
@@ -3162,25 +3162,17 @@ int MiniAODAnalyzer::vetoNumberEle(double ptTreshold,double vetoConeSize){
     int posi=0;
     for( auto part: *electrons) {
       if( part.pt()>ptTreshold && (EleIDPassed->at(posi)==1) ){
-            bool veto_tau=false; //if particle is used as tau
-            int i=0;
-            for( auto tau : *taus ){
-                if( PassTauID(tau) && DeltaR(part,tau)>vetoConeSize){
-                    veto_tau=true;
-                }
-                i++;
-            }
-            if(not veto_tau){
-                numVeto++;
-            }
-        }else if(part.pt()<ptTreshold) {
+	numVeto++;
+      }
+      else if(part.pt()<ptTreshold) {
         ///    Lists are Pt sorted
-            break;
-        }
-        posi++;
+	break;
+      }
+      posi++;
     }
     return numVeto;
 }
+
 int MiniAODAnalyzer::vetoNumberMuon(double ptTreshold,double vetoConeSize){
     //make veto numbers
     //we don't need std::vectors, do we?
@@ -3188,25 +3180,16 @@ int MiniAODAnalyzer::vetoNumberMuon(double ptTreshold,double vetoConeSize){
     int posi=0;
     for( auto part: *muons) {
       if( part.pt()>ptTreshold && (MuonIDPassed->at(posi)==1) ){
-            bool veto_tau=false; //if particle is used as tau
-            int i=0;
-            for( auto tau : *taus ){
-                if( PassTauID(tau) && DeltaR(part,tau)>vetoConeSize){
-                    veto_tau=true;
-                }
-                i++;
-            }
-            if(not veto_tau){
-                numVeto++;
-            }
-        }else if(part.pt()<ptTreshold) {
+	numVeto++;
+      }
+      else if(part.pt()<ptTreshold) {
         ///    Lists are Pt sorted
-            break;
-        }
-        posi++;
+	break;
+      }
+      posi++;
     }
     return numVeto;
-
+    
 }
 
 
@@ -3399,7 +3382,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
 //void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met) {
 
     double ptTauTreshold=80;
-    double m_leptonVetoPt=20;
+    double m_leptonVetoPt=30;
     double vetoConeSize=0.3;
     //int numVetoMuo=vetoNumberMuon(MuonList, m_leptonVetoPt,TauList,vetoConeSize);
     int numVetoMuo=vetoNumberMuon(m_leptonVetoPt,vetoConeSize);
@@ -3620,7 +3603,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
 		  }
 		  if (doFakeHist)  helper->Fill(4,"Tau_nofake_pt",tau.pt(),weight);
 		  if (doFakeHist)  helper->Fill( "Tau_nofake_pt_eta",tau.pt(),tau.eta(), weight );
-		  if (doFakeHist)  helper->Fill( "Tau_fake_pt_met",tau.pt(),sel_met.pt(),weight );
+		  if (doFakeHist)  helper->Fill( "Tau_nofake_pt_met",tau.pt(),sel_met.pt(),weight );
 		  if(tau.decayMode()){
 		    if (doFakeHist) helper->Fill( "Tau_nofake_pt_decay",tau.pt(),tau.decayMode(), weight );
 		  }
@@ -3628,7 +3611,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
                     //if(not RunOnData  ){
 		    if (doFakeHist)  helper->Fill(0,"Tau_nofake_pt_true",tau.pt(),weight);
 		    if (doFakeHist)  helper->Fill( "Tau_nofake_pt_eta_true",tau.pt(),tau.eta(), weight );
-		    if (doFakeHist)  helper->Fill( "Tau_fake_pt_met_true",tau.pt(),sel_met.pt(),weight );
+		    if (doFakeHist)  helper->Fill( "Tau_nofake_pt_met_true",tau.pt(),sel_met.pt(),weight );
 		    if(tau.decayMode()){
 		      if (doFakeHist) helper->Fill( "Tau_nofake_pt_decay_true",tau.pt(),tau.decayMode(), weight );
 		    }
