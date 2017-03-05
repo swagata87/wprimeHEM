@@ -23,13 +23,13 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #80X_mcRun2_asymptotic_2016_TrancheIV_v6
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')     # MC
 
-#process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_TrancheIV_v6', '')     # MC
+process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_TrancheIV_v6', '')     # MC
 
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')  # OBSOLETE?? DATA
 
 #process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_2016SeptRepro_v7', '')  # reminiaod DATA B-G
 
-process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_Prompt_v16', '')  # reminiaod DATA H
+#process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_Prompt_v16', '')  # reminiaod DATA H
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
@@ -81,8 +81,8 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        doFakeHist_ = cms.bool(True),
        doTrees_ = cms.bool(True),
        useReweighting = cms.bool(True),
-#       RunOnData_ = cms.bool(False),
-       RunOnData_ = cms.bool(True),
+       RunOnData_ = cms.bool(False),
+#       RunOnData_ = cms.bool(True),
 ### generatorName required only for madgraph and powheg. For other cases one can just write "default"
 #       generatorName = cms.string("madgraphMLM"),
        generatorName = cms.string("default"),

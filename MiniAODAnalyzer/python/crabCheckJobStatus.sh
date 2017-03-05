@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd crab_projects_SSMsigOnly_Jan7/
+cd crab_projects_March3
 echo " "
 echo $(pwd)
 

@@ -31,10 +31,10 @@
 int Plot_mT_Stage1_WithSyst() {
 
   double totalMC =0.0;
-  double lumi=13.496 ;  // B->5.882  // C->2.646   D->4.353 ;  // E->4.049 ; F->3.16 ;  G->7.554;  H->5.942  //--inv fb--//
-  // lumi error 6.2 %
-  double wt_lumi_up = 1.062; 
-  double wt_lumi_down = 0.938;
+  double lumi=35.865; //36.813;  //13.496 ;  // B->5.882  // C->2.646   D->4.353 ;  // E->4.049 ; F->3.16 ;  G->7.554;  H->5.942  //--inv fb--//
+  // lumi error 2.6%  (OLD value 6.2 %)
+  double wt_lumi_up = 1.026; 
+  double wt_lumi_down = 0.974;
   //
   unsigned long long evt_DYJetsToLL_M50=1;
   unsigned long long evt_DYJetsToLL_M5to50=1;
@@ -45,183 +45,203 @@ int Plot_mT_Stage1_WithSyst() {
   //  TFile *file_DYJetsToLL_M50  = new TFile("../python/crab_projects/crab_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/results/hist.root");
   //double xs_DYJetsToLL_M50=6104000; //--fb--//
 
-  TFile *file_DYJetsToLL_M50  = new TFile("../python/crab_projects_Nov9/crab_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");             
+  TFile *file_DYJetsToLL_M50  = new TFile("../python/crab_projects_March3/crab_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");             
   double xs_DYJetsToLL_M50=4895000;  //--fb--//                                                                                                                    
 
-  TFile *file_DYJetsToLL_M5to50  = new TFile("../python/crab_projects_Nov9/crab_DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");    
+  TFile *file_DYJetsToLL_M5to50  = new TFile("../python/crab_projects_March3/crab_DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");    
   double xs_DYJetsToLL_M5to50=7160000;  //--fb--//                                                                                                                    
 
-  TFile *file_TT              = new TFile("../python/crab_projects_Nov9/crab_TT_TuneCUETP8M1_13TeV-powheg-pythia8/results/hist.root");
+  TFile *file_TT              = new TFile("../python/crab_projects_March3/crab_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/results/hist.root");
   double xs_TT=730000; //--fb--//
   double kfact_TT= 1.139;
 
-  TFile *file_TT_Mtt_700to1000      = new TFile("../python/crab_projects_Nov9/crab_TT_Mtt-700to1000_TuneCUETP8M1_13TeV-powheg-pythia8/results/hist.root");
+  TFile *file_TT_Mtt_700to1000      = new TFile("../python/crab_projects_March3/crab_TT_Mtt-700to1000_TuneCUETP8M1_13TeV-powheg-pythia8/results/hist.root");
   double xs_TT_Mtt_700to1000=730000; //--fb--//
-  double kfact_TT_Mtt_700to1000= 1.0;
+  double kfact_TT_Mtt_700to1000= 0.0921;
 
-  TFile *file_TT_Mtt_1000toInf              = new TFile("../python/crab_projects_Nov9/crab_TT_Mtt-1000toInf_TuneCUETP8M1_13TeV-powheg-pythia8/results/hist.root");
+  TFile *file_TT_Mtt_1000toInf              = new TFile("../python/crab_projects_March3/crab_TT_Mtt-1000toInf_TuneCUETP8M1_13TeV-powheg-pythia8/results/hist.root");
   double xs_TT_Mtt_1000toInf=730000; //--fb--//
-  double kfact_TT_Mtt_1000toInf= 1.0;
+  double kfact_TT_Mtt_1000toInf= 0.02474;
 
 
-  //TFile *file_WJetsToLNu      = new TFile("../python/crab_projects_Nov9/crab_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/results/hist.root");
+  //TFile *file_WJetsToLNu      = new TFile("../python/crab_projects_March3/crab_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/results/hist.root");
   //double xs_WJetsToLNu=60290000; //--fb--//
 
-  TFile *file_WJetsToLNu      = new TFile("../python/crab_projects_Nov9/crab_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu      = new TFile("../python/crab_projects_March3/crab_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu= 50690000; //--fb--//
   //
-  TFile *file_WToTauNu_M100  = new TFile("../python/crab_projects_Nov9/crab_WToTauNu_M-100_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_WToTauNu_M100  = new TFile("../python/crab_projects_March3/crab_WToTauNu_M-100_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_WToTauNu_M100 = 165000; //--fb--//
   double kfact_WToTauNu_M100 = 1.0 ; 
   //
-  TFile *file_WToTauNu_M200  = new TFile("../python/crab_projects_Nov9/crab_WToTauNu_M-200_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_WToTauNu_M200  = new TFile("../python/crab_projects_March3/crab_WToTauNu_M-200_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_WToTauNu_M200 = 6370; //--fb--//
   double kfact_WToTauNu_M200 = 1.0 ; 
   //
-  TFile *file_WToTauNu_M500  = new TFile("../python/crab_projects_Nov9/crab_WToTauNu_M-500_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_WToTauNu_M500  = new TFile("../python/crab_projects_March3/crab_WToTauNu_M-500_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_WToTauNu_M500 = 224.0; //--fb--//
   double kfact_WToTauNu_M500 = 1.0 ; 
   //
-  TFile *file_WToTauNu_M1000  = new TFile("../python/crab_projects_Nov9/crab_WToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_WToTauNu_M1000  = new TFile("../python/crab_projects_March3/crab_WToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_WToTauNu_M1000 = 13.7; //--fb--//
   double kfact_WToTauNu_M1000 = 1.0 ; 
   //
-  TFile *file_WToTauNu_M2000  = new TFile("../python/crab_projects_Nov9/crab_WToTauNu_M-2000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_WToTauNu_M2000  = new TFile("../python/crab_projects_March3/crab_WToTauNu_M-2000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_WToTauNu_M2000 = 0.437; //--fb--//
   double kfact_WToTauNu_M2000 = 1.0 ; 
   //
-  TFile *file_WToTauNu_M3000  = new TFile("../python/crab_projects_Nov9/crab_WToTauNu_M-3000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_WToTauNu_M3000  = new TFile("../python/crab_projects_March3/crab_WToTauNu_M-3000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_WToTauNu_M3000 = 0.0342; //--fb--//
   double kfact_WToTauNu_M3000 = 1.0 ; 
   //
-  TFile *file_WToTauNu_M4000  = new TFile("../python/crab_projects_Nov9/crab_WToTauNu_M-4000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_WToTauNu_M4000  = new TFile("../python/crab_projects_March3/crab_WToTauNu_M-4000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_WToTauNu_M4000 = 0.00292; //--fb--//
   double kfact_WToTauNu_M4000 = 1.0 ; 
   //
-  TFile *file_WToTauNu_M5000  = new TFile("../python/crab_projects_Nov9/crab_WToTauNu_M-5000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_WToTauNu_M5000  = new TFile("../python/crab_projects_March3/crab_WToTauNu_M-5000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_WToTauNu_M5000 = 0.000233; //--fb--//
   double kfact_WToTauNu_M5000 = 1.0 ; 
   //
-  TFile *file_WToTauNu_M6000  = new TFile("../python/crab_projects_Nov9/crab_WToTauNu_M-6000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_WToTauNu_M6000  = new TFile("../python/crab_projects_March3/crab_WToTauNu_M-6000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_WToTauNu_M6000 = 0.000015; //--fb--//
   double kfact_WToTauNu_M6000 = 1.0 ; 
   //
-  TFile *file_WJetsToLNu_HT100To200  = new TFile("../python/crab_projects_Nov9/crab_WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT100To200  = new TFile("../python/crab_projects_March3/crab_WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT100To200 = 1345000 ; //--fb--//
   double kfact_WJetsToLNu_HT100To200 = 1.0 ; 
 
-  TFile *file_WJetsToLNu_HT200To400  = new TFile("../python/crab_projects_Nov9/crab_WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT200To400  = new TFile("../python/crab_projects_March3/crab_WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT200To400 = 359700 ; //--fb--//
   double kfact_WJetsToLNu_HT200To400 = 1.0 ;
 
-  TFile *file_WJetsToLNu_HT400To600  = new TFile("../python/crab_projects_Nov9/crab_WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT400To600  = new TFile("../python/crab_projects_March3/crab_WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT400To600 = 48910 ; //--fb--//
   double kfact_WJetsToLNu_HT400To600 = 1.0 ;
 
-  TFile *file_WJetsToLNu_HT600To800  = new TFile("../python/crab_projects_Nov9/crab_WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT600To800  = new TFile("../python/crab_projects_March3/crab_WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT600To800 = 12050 ; //--fb--//
   double kfact_WJetsToLNu_HT600To800 = 1.0 ;
 
-  TFile *file_WJetsToLNu_HT800To1200  = new TFile("../python/crab_projects_Nov9/crab_WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT800To1200  = new TFile("../python/crab_projects_March3/crab_WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT800To1200 = 5501 ; //--fb--//
   double kfact_WJetsToLNu_HT800To1200 = 1.0 ;
 
-  TFile *file_WJetsToLNu_HT1200To2500  = new TFile("../python/crab_projects_Nov9/crab_WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT1200To2500  = new TFile("../python/crab_projects_March3/crab_WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT1200To2500 = 1329 ; //--fb--//
   double kfact_WJetsToLNu_HT1200To2500 = 1.0 ;
 
-  TFile *file_WJetsToLNu_HT2500ToInf  = new TFile("../python/crab_projects_Nov9/crab_WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_WJetsToLNu_HT2500ToInf  = new TFile("../python/crab_projects_March3/crab_WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_WJetsToLNu_HT2500ToInf = 32.16  ; //--fb--//
   double kfact_WJetsToLNu_HT2500ToInf = 1.0 ;
 
-  TFile *file_ST_tchannel_antitop=new TFile("../python/crab_projects_Nov9/crab_ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
+  //crab_ST_t-channel_antitop_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin
+  //crab_ST_t-channel_top_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin
+  //crab_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4
+  //crab_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4
+
+  TFile *file_ST_tchannel_antitop=new TFile("../python/crab_projects_March3/crab_ST_t-channel_antitop_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin/results/hist.root");
   double xs_ST_tchannel_antitop = 80950; //--fb--//
-  double kfact_ST_tchannel_antitop = 0.326;
+  double kfact_ST_tchannel_antitop = 1.0; // 0.326;
   //
-  TFile *file_ST_tchannel_top=new TFile("../python/crab_projects_Nov9/crab_ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
-  double xs_ST_tchannel_top = 103200; //--fb--//
-  double kfact_ST_tchannel_top = 0.43;
+  TFile *file_ST_tchannel_top=new TFile("../python/crab_projects_March3/crab_ST_t-channel_top_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin/results/hist.root");
+  double xs_ST_tchannel_top = 136020; //  103200; //--fb--//
+  double kfact_ST_tchannel_top =1.0; // 0.43;
   //
-  TFile *file_ST_tW_antitop=new TFile("../python/crab_projects_Nov9/crab_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
+  TFile *file_ST_tW_antitop=new TFile("../python/crab_projects_March3/crab_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/results/hist.root");
   double xs_ST_tW_antitop = 38090; //--fb--//
-  double kfact_ST_tW_antitop = 0.94;
+  double kfact_ST_tW_antitop = 1.0; // 0.94;
   //
-  TFile *file_ST_tW_top=new TFile("../python/crab_projects_Nov9/crab_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/results/hist.root");
+  TFile *file_ST_tW_top=new TFile("../python/crab_projects_March3/crab_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/results/hist.root");
   double xs_ST_tW_top = 38090; //--fb--//
-  double kfact_ST_tW_top = 0.94;
+  double kfact_ST_tW_top = 1.0; //0.94;
   //
-  TFile *file_WW=new TFile("../python/crab_projects_Nov9/crab_WW_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
+  TFile *file_WW=new TFile("../python/crab_projects_March3/crab_WW_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
   double xs_WW = 63210; //--fb--//
   //
-  TFile *file_WZ=new TFile("../python/crab_projects_Nov9/crab_WZ_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
+  TFile *file_WZ=new TFile("../python/crab_projects_March3/crab_WZ_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
   double xs_WZ = 22820; //--fb--//
   double kfact_WZ = 2.06; // 47.13/22.82
   //
-  TFile *file_ZZ=new TFile("../python/crab_projects_Nov9/crab_ZZ_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
+  TFile *file_ZZ=new TFile("../python/crab_projects_March3/crab_ZZ_TuneCUETP8M1_13TeV-pythia8/results/hist.root");
   double xs_ZZ = 10320; //--fb--//
   double kfact_ZZ = 1.60 ; //16523/10320
   //
-  TFile *file_QCD_HT200to300=new TFile("../python/crab_projects_Nov9/crab_QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT200to300=new TFile("../python/crab_projects_March3/crab_QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT200to300 = 1717000000; //--fb--//
   //
-  TFile *file_QCD_HT300to500=new TFile("../python/crab_projects_Nov9/crab_QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT300to500=new TFile("../python/crab_projects_March3/crab_QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT300to500 = 351300000; //--fb--//
   //
-  TFile *file_QCD_HT500to700=new TFile("../python/crab_projects_Nov9/crab_QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT500to700=new TFile("../python/crab_projects_March3/crab_QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT500to700 = 31630000 ; //--fb--//
   //
-  TFile *file_QCD_HT700to1000=new TFile("../python/crab_projects_Nov9/crab_QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT700to1000=new TFile("../python/crab_projects_March3/crab_QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT700to1000 = 6802000 ; //--fb--//
   //
-  TFile *file_QCD_HT1000to1500=new TFile("../python/crab_projects_Nov9/crab_QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT1000to1500=new TFile("../python/crab_projects_March3/crab_QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT1000to1500 = 1206000 ; //--fb--//
   //
-  TFile *file_QCD_HT1500to2000=new TFile("../python/crab_projects_Nov9/crab_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT1500to2000=new TFile("../python/crab_projects_March3/crab_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT1500to2000 = 120400 ; //--fb--//
   //
-  TFile *file_QCD_HT2000toInf=new TFile("../python/crab_projects_Nov9/crab_QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
+  TFile *file_QCD_HT2000toInf=new TFile("../python/crab_projects_March3/crab_QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
   double xs_QCD_HT2000toInf = 25250 ; //--fb--//
   //
-  TFile *file_ZJetsToNuNu_HT100To200 =new TFile("../python/crab_projects_Nov9/crab_ZJetsToNuNu_HT-100To200_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT100To200 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-100To200_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT100To200 =  280350; //--fb--//
   double kfact_ZJetsToNuNu_HT100To200 =  1.23 ;
   //
-  TFile *file_ZJetsToNuNu_HT200To400 =new TFile("../python/crab_projects_Nov9/crab_ZJetsToNuNu_HT-200To400_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT200To400 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-200To400_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT200To400 = 77670 ; //--fb--//
   double kfact_ZJetsToNuNu_HT200To400 = 1.23 ;
   //
-  TFile *file_ZJetsToNuNu_HT400To600 =new TFile("../python/crab_projects_Nov9/crab_ZJetsToNuNu_HT-400To600_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT400To600 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-400To600_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT400To600 = 10730 ; //--fb--//
   double kfact_ZJetsToNuNu_HT400To600 =  1.23 ;
   //
-  TFile *file_ZJetsToNuNu_HT600To800 =new TFile("../python/crab_projects_Nov9/crab_ZJetsToNuNu_HT-600To800_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT600To800 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-600To800_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT600To800 = 853 ; //--fb--//
  double kfact_ZJetsToNuNu_HT600To800 =  1.23 ;
   //
-  TFile *file_ZJetsToNuNu_HT800To1200 =new TFile("../python/crab_projects_Nov9/crab_ZJetsToNuNu_HT-800To1200_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT800To1200 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-800To1200_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT800To1200 = 394.2 ; //--fb--//
   double kfact_ZJetsToNuNu_HT800To1200 =  1.23 ;
   //
-  TFile *file_ZJetsToNuNu_HT1200To2500 =new TFile("../python/crab_projects_Nov9/crab_ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT1200To2500 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT1200To2500 = 97.4 ; //--fb--//
   double kfact_ZJetsToNuNu_HT1200To2500 =  1.23 ;
   //
-  TFile *file_ZJetsToNuNu_HT2500ToInf =new TFile("../python/crab_projects_Nov9/crab_ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph/results/hist.root");
+  TFile *file_ZJetsToNuNu_HT2500ToInf =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph/results/hist.root");
   double xs_ZJetsToNuNu_HT2500ToInf = 2.308 ; //--fb--//
   double kfact_ZJetsToNuNu_HT2500ToInf =  1.23 ;
 
   /// DATA ///
-  //  TFile *file_Tau_Run2016B = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016B_23Sep2016_v3_2/results/hist.root");
-  //  TFile *file_Tau_Run2016C = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016C_23Sep2016_v1/results/hist.root");
-  //  TFile *file_Tau_Run2016D = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016D_23Sep2016_v1/results/hist.root");
-  //  TFile *file_Tau_Run2016E = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016E_23Sep2016_v1_2/results/hist.root");
-  // TFile *file_Tau_Run2016F = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016F_23Sep2016_v1_2/results/hist.root");
+  /*
+  TFile *file_Tau_Run2016B = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016B_23Sep2016_v3_2/results/hist.root");
+  TFile *file_Tau_Run2016C = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016C_23Sep2016_v1/results/hist.root");
+  TFile *file_Tau_Run2016D = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016D_23Sep2016_v1/results/hist.root");
+  TFile *file_Tau_Run2016E = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016E_23Sep2016_v1_2/results/hist.root");
+  TFile *file_Tau_Run2016F = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016F_23Sep2016_v1_2/results/hist.root");
   TFile *file_Tau_Run2016G = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016G_PromptReco_v1/results/hist.root");
   TFile *file_Tau_Run2016H = new TFile("../python/crab_projects_Oct31/crab_Tau_Run2016H_PromptReco_v2/results/hist.root");
+  */
+
+  TFile *file_Tau_Run2016B = new TFile("../python/crab_projects_March3/crab_Tau_Run2016B/results/hist.root");
+  TFile *file_Tau_Run2016C = new TFile("../python/crab_projects_March3/crab_Tau_Run2016C/results/hist.root");
+  TFile *file_Tau_Run2016D = new TFile("../python/crab_projects_March3/crab_Tau_Run2016D/results/hist.root");
+  TFile *file_Tau_Run2016E = new TFile("../python/crab_projects_March3/crab_Tau_Run2016E/results/hist.root");
+  TFile *file_Tau_Run2016F = new TFile("../python/crab_projects_March3/crab_Tau_Run2016F/results/hist.root");
+  TFile *file_Tau_Run2016G = new TFile("../python/crab_projects_March3/crab_Tau_Run2016G/results/hist.root");
+  TFile *file_Tau_Run2016H_v2 = new TFile("../python/crab_projects_March3/crab_Tau_Run2016H_1/results/hist.root");
+  TFile *file_Tau_Run2016H_v3 = new TFile("../python/crab_projects_March3/crab_Tau_Run2016H_2/results/hist.root");
+
 
   /// Signal ///
-  TFile *file_Wprime_M1000 = new TFile("../python/crab_projects_Nov9/crab_WprimeToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
-  double xs_Wprime_M1000= 3060; // --fb-- //
+  //  TFile *file_Wprime_M1000 = new TFile("../python/crab_projects_March3/crab_WprimeToTauNu_M-4000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  // double xs_Wprime_M1000= 3060; // --fb-- //
+
+  TFile *file_Wprime_M4000 = new TFile("../python/crab_projects_March3/crab_WprimeToTauNu_M-4000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  double xs_Wprime_M4000= 2.04; // --fb-- //
 
   //--//
   TH1D* h1_evt_DYJetsToLL_M50 = (TH1D*)file_DYJetsToLL_M50->Get("demo/histoDir/eventCount");
@@ -298,11 +318,12 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_DYJetsToLL_M50_TauIDSFDown = (TH1D*)file_DYJetsToLL_M50->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_DYJetsToLL_M50_TauIDSFDown->Scale(wt_DYJetsToLL_M50);
   //
+  /*
   TH1D* mT_Stage1_DYJetsToLL_M50_pdfUncertUp = (TH1D*)file_DYJetsToLL_M50->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_DYJetsToLL_M50_pdfUncertUp->Scale(wt_DYJetsToLL_M50);
   //
   TH1D* mT_Stage1_DYJetsToLL_M50_pdfUncertDown = (TH1D*)file_DYJetsToLL_M50->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_DYJetsToLL_M50_pdfUncertDown->Scale(wt_DYJetsToLL_M50);
+  mT_Stage1_DYJetsToLL_M50_pdfUncertDown->Scale(wt_DYJetsToLL_M50); */
   //
   TH1D* h1_evt_DYJetsToLL_M5to50 = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/eventCount");
   evt_DYJetsToLL_M5to50 = h1_evt_DYJetsToLL_M5to50->GetEntries(); // Integral();
@@ -378,18 +399,19 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_DYJetsToLL_M5to50_TauIDSFDown = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_DYJetsToLL_M5to50_TauIDSFDown->Scale(wt_DYJetsToLL_M5to50);
   //
+  /*
   TH1D* mT_Stage1_DYJetsToLL_M5to50_pdfUncertUp = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_DYJetsToLL_M5to50_pdfUncertUp->Scale(wt_DYJetsToLL_M5to50);
   //                                                                                                                                                                            
   TH1D* mT_Stage1_DYJetsToLL_M5to50_pdfUncertDown = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_DYJetsToLL_M5to50_pdfUncertDown->Scale(wt_DYJetsToLL_M5to50);
-  //
+  // */
   
   TH1D* total_DY = (TH1D*)mT_Stage1_DYJetsToLL_M50->Clone(); 
   total_DY->Add(mT_Stage1_DYJetsToLL_M5to50);
   total_DY->SetFillColorAlpha(kRed,0.5);
   total_DY->SetLineColor(kBlack);
-  total_DY->Rebin(80);
+  total_DY->Rebin(100);
   //
 
   TH1D* h1_evt_TT = (TH1D*)file_TT->Get("demo/histoDir/eventCount");
@@ -488,7 +510,8 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_TT_TauIDSFDown  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_TT_TauIDSFDown->Scale(wt_TT);
   mT_Stage1_TT_TauIDSFDown->Scale(kfact_TT);
-  //
+  // 
+/*
   TH1D* mT_Stage1_TT_pdfUncertUp  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_TT_pdfUncertUp->Scale(wt_TT);
   mT_Stage1_TT_pdfUncertUp->Scale(kfact_TT);
@@ -496,7 +519,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_TT_pdfUncertDown  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_TT_pdfUncertDown->Scale(wt_TT);
   mT_Stage1_TT_pdfUncertDown->Scale(kfact_TT);
-  //
+  // */
   /*
   TH1D* mT_Stage1_TT_lumiUp  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_TT_lumiUp->Scale(wt_TT);
@@ -607,6 +630,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_TT_Mtt_700to1000_TauIDSFDown->Scale(wt_TT_Mtt_700to1000);
   mT_Stage1_TT_Mtt_700to1000_TauIDSFDown->Scale(kfact_TT_Mtt_700to1000);
   //
+  /*
   TH1D* mT_Stage1_TT_Mtt_700to1000_pdfUncertUp  = (TH1D*)file_TT_Mtt_700to1000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_TT_Mtt_700to1000_pdfUncertUp->Scale(wt_TT_Mtt_700to1000);
   mT_Stage1_TT_Mtt_700to1000_pdfUncertUp->Scale(kfact_TT_Mtt_700to1000);
@@ -614,7 +638,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_TT_Mtt_700to1000_pdfUncertDown  = (TH1D*)file_TT_Mtt_700to1000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_TT_Mtt_700to1000_pdfUncertDown->Scale(wt_TT_Mtt_700to1000);
   mT_Stage1_TT_Mtt_700to1000_pdfUncertDown->Scale(kfact_TT_Mtt_700to1000);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_TT_Mtt_700to1000_lumiUp  = (TH1D*)file_TT_Mtt_700to1000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_TT_Mtt_700to1000_lumiUp->Scale(wt_TT_Mtt_700to1000);
@@ -725,6 +749,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_TT_Mtt_1000toInf_TauIDSFDown->Scale(wt_TT_Mtt_1000toInf);
   mT_Stage1_TT_Mtt_1000toInf_TauIDSFDown->Scale(kfact_TT_Mtt_1000toInf);
   //
+  /*
   TH1D* mT_Stage1_TT_Mtt_1000toInf_pdfUncertUp  = (TH1D*)file_TT_Mtt_1000toInf->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_TT_Mtt_1000toInf_pdfUncertUp->Scale(wt_TT_Mtt_1000toInf);
   mT_Stage1_TT_Mtt_1000toInf_pdfUncertUp->Scale(kfact_TT_Mtt_1000toInf);
@@ -732,7 +757,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_TT_Mtt_1000toInf_pdfUncertDown  = (TH1D*)file_TT_Mtt_1000toInf->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_TT_Mtt_1000toInf_pdfUncertDown->Scale(wt_TT_Mtt_1000toInf);
   mT_Stage1_TT_Mtt_1000toInf_pdfUncertDown->Scale(kfact_TT_Mtt_1000toInf);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_TT_Mtt_1000toInf_lumiUp  = (TH1D*)file_TT_Mtt_1000toInf->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_TT_Mtt_1000toInf_lumiUp->Scale(wt_TT_Mtt_1000toInf);
@@ -750,7 +775,7 @@ int Plot_mT_Stage1_WithSyst() {
   total_TT->Add(mT_Stage1_TT_Mtt_1000toInf);
   total_TT->SetFillColor(kBlue-7);
   total_TT->SetLineColor(kBlack);
-  total_TT->Rebin(80);
+  total_TT->Rebin(100);
 
 
   /*
@@ -767,7 +792,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_WJetsToLNu->Scale(wt_WJetsToLNu);
   mT_Stage1_WJetsToLNu->SetFillColorAlpha(kGreen-7,0.5);
   mT_Stage1_WJetsToLNu->SetLineColor(kGreen-7);
-  mT_Stage1_WJetsToLNu->Rebin(80);
+  mT_Stage1_WJetsToLNu->Rebin(100);
   std::cout << "**WJets** weighted nevt=" << mT_Stage1_WJetsToLNu->Integral() << std::endl;
   */
 
@@ -869,6 +894,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ST_tchannel_antitop_TauIDSFDown->Scale(wt_ST_tchannel_antitop);
   mT_Stage1_ST_tchannel_antitop_TauIDSFDown->Scale(kfact_ST_tchannel_antitop);
   //
+  /*
   TH1D* mT_Stage1_ST_tchannel_antitop_pdfUncertUp  = (TH1D*)file_ST_tchannel_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ST_tchannel_antitop_pdfUncertUp->Scale(wt_ST_tchannel_antitop);
   mT_Stage1_ST_tchannel_antitop_pdfUncertUp->Scale(kfact_ST_tchannel_antitop);
@@ -876,7 +902,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ST_tchannel_antitop_pdfUncertDown  = (TH1D*)file_ST_tchannel_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ST_tchannel_antitop_pdfUncertDown->Scale(wt_ST_tchannel_antitop);
   mT_Stage1_ST_tchannel_antitop_pdfUncertDown->Scale(kfact_ST_tchannel_antitop);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_ST_tchannel_antitop_lumiUp  = (TH1D*)file_ST_tchannel_antitop->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ST_tchannel_antitop_lumiUp->Scale(wt_ST_tchannel_antitop);
@@ -987,6 +1013,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ST_tchannel_top_TauIDSFDown->Scale(wt_ST_tchannel_top);
   mT_Stage1_ST_tchannel_top_TauIDSFDown->Scale(kfact_ST_tchannel_top);
   //
+  /*
   TH1D* mT_Stage1_ST_tchannel_top_pdfUncertUp  = (TH1D*)file_ST_tchannel_top->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ST_tchannel_top_pdfUncertUp->Scale(wt_ST_tchannel_top);
   mT_Stage1_ST_tchannel_top_pdfUncertUp->Scale(kfact_ST_tchannel_top);
@@ -994,7 +1021,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ST_tchannel_top_pdfUncertDown  = (TH1D*)file_ST_tchannel_top->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ST_tchannel_top_pdfUncertDown->Scale(wt_ST_tchannel_top);
   mT_Stage1_ST_tchannel_top_pdfUncertDown->Scale(kfact_ST_tchannel_top);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_ST_tchannel_top_lumiUp  = (TH1D*)file_ST_tchannel_top->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ST_tchannel_top_lumiUp->Scale(wt_ST_tchannel_top);
@@ -1106,6 +1133,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ST_tW_antitop_TauIDSFDown->Scale(wt_ST_tW_antitop);
   mT_Stage1_ST_tW_antitop_TauIDSFDown->Scale(kfact_ST_tW_antitop);
   //
+  /*
   TH1D* mT_Stage1_ST_tW_antitop_pdfUncertUp  = (TH1D*)file_ST_tW_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ST_tW_antitop_pdfUncertUp->Scale(wt_ST_tW_antitop);
   mT_Stage1_ST_tW_antitop_pdfUncertUp->Scale(kfact_ST_tW_antitop);
@@ -1113,7 +1141,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ST_tW_antitop_pdfUncertDown  = (TH1D*)file_ST_tW_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ST_tW_antitop_pdfUncertDown->Scale(wt_ST_tW_antitop);
   mT_Stage1_ST_tW_antitop_pdfUncertDown->Scale(kfact_ST_tW_antitop);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_ST_tW_antitop_lumiUp  = (TH1D*)file_ST_tW_antitop->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ST_tW_antitop_lumiUp->Scale(wt_ST_tW_antitop);
@@ -1224,6 +1252,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ST_tW_top_TauIDSFDown->Scale(wt_ST_tW_top);
   mT_Stage1_ST_tW_top_TauIDSFDown->Scale(kfact_ST_tW_top);
   //
+  /*
   TH1D* mT_Stage1_ST_tW_top_pdfUncertUp  = (TH1D*)file_ST_tW_top->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ST_tW_top_pdfUncertUp->Scale(wt_ST_tW_top);
   mT_Stage1_ST_tW_top_pdfUncertUp->Scale(kfact_ST_tW_top);
@@ -1231,7 +1260,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ST_tW_top_pdfUncertDown  = (TH1D*)file_ST_tW_top->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ST_tW_top_pdfUncertDown->Scale(wt_ST_tW_top);
   mT_Stage1_ST_tW_top_pdfUncertDown->Scale(kfact_ST_tW_top);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_ST_tW_top_lumiUp  = (TH1D*)file_ST_tW_top->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ST_tW_top_lumiUp->Scale(wt_ST_tW_top);
@@ -1250,7 +1279,7 @@ int Plot_mT_Stage1_WithSyst() {
   total_ST->Add(mT_Stage1_ST_tW_top);
   total_ST->SetFillColorAlpha(kCyan,0.5);
   total_ST->SetLineColor(kBlack);
-  total_ST->Rebin(80);
+  total_ST->Rebin(100);
 
   //file_WJetsToLNu_HT100To200
   TH1D* h1_evt_WJetsToLNu_HT100To200 = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/eventCount");
@@ -1327,12 +1356,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT100To200_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT100To200_TauIDSFDown->Scale(wt_WJetsToLNu_HT100To200);
   //
+  /*
   TH1D* mT_Stage1_WJetsToLNu_HT100To200_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WJetsToLNu_HT100To200_pdfUncertUp->Scale(wt_WJetsToLNu_HT100To200);
 
   TH1D* mT_Stage1_WJetsToLNu_HT100To200_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WJetsToLNu_HT100To200_pdfUncertDown->Scale(wt_WJetsToLNu_HT100To200);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT100To200_lumiUp  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT100To200_lumiUp->Scale(wt_WJetsToLNu_HT100To200);
@@ -1419,12 +1449,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT200To400_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT200To400_TauIDSFDown->Scale(wt_WJetsToLNu_HT200To400);
   //
+  /*
   TH1D* mT_Stage1_WJetsToLNu_HT200To400_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WJetsToLNu_HT200To400_pdfUncertUp->Scale(wt_WJetsToLNu_HT200To400);
 
   TH1D* mT_Stage1_WJetsToLNu_HT200To400_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WJetsToLNu_HT200To400_pdfUncertDown->Scale(wt_WJetsToLNu_HT200To400);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT200To400_lumiUp  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT200To400_lumiUp->Scale(wt_WJetsToLNu_HT200To400);
@@ -1510,12 +1541,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT400To600_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT400To600_TauIDSFDown->Scale(wt_WJetsToLNu_HT400To600);
   //
+  /*
   TH1D* mT_Stage1_WJetsToLNu_HT400To600_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WJetsToLNu_HT400To600_pdfUncertUp->Scale(wt_WJetsToLNu_HT400To600);
 
   TH1D* mT_Stage1_WJetsToLNu_HT400To600_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WJetsToLNu_HT400To600_pdfUncertDown->Scale(wt_WJetsToLNu_HT400To600);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT400To600_lumiUp  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT400To600_lumiUp->Scale(wt_WJetsToLNu_HT400To600);
@@ -1601,12 +1633,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT600To800_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT600To800_TauIDSFDown->Scale(wt_WJetsToLNu_HT600To800);
   //
+  /*
   TH1D* mT_Stage1_WJetsToLNu_HT600To800_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WJetsToLNu_HT600To800_pdfUncertUp->Scale(wt_WJetsToLNu_HT600To800);
 
   TH1D* mT_Stage1_WJetsToLNu_HT600To800_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WJetsToLNu_HT600To800_pdfUncertDown->Scale(wt_WJetsToLNu_HT600To800);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT600To800_lumiUp  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT600To800_lumiUp->Scale(wt_WJetsToLNu_HT600To800);
@@ -1692,12 +1725,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT800To1200_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT800To1200_TauIDSFDown->Scale(wt_WJetsToLNu_HT800To1200);
   //
+  /*
   TH1D* mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertUp->Scale(wt_WJetsToLNu_HT800To1200);
 
   TH1D* mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertDown->Scale(wt_WJetsToLNu_HT800To1200);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT800To1200_lumiUp  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT800To1200_lumiUp->Scale(wt_WJetsToLNu_HT800To1200);
@@ -1784,12 +1818,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT1200To2500_TauIDSFDown->Scale(wt_WJetsToLNu_HT1200To2500);
   //
+  /*
   TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertUp->Scale(wt_WJetsToLNu_HT1200To2500);
 
   TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertDown->Scale(wt_WJetsToLNu_HT1200To2500);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_lumiUp  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT1200To2500_lumiUp->Scale(wt_WJetsToLNu_HT1200To2500);
@@ -1875,12 +1910,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT2500ToInf_TauIDSFDown->Scale(wt_WJetsToLNu_HT2500ToInf);
   //
+  /*
   TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertUp->Scale(wt_WJetsToLNu_HT2500ToInf);
 
   TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertDown->Scale(wt_WJetsToLNu_HT2500ToInf);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_lumiUp  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT2500ToInf_lumiUp->Scale(wt_WJetsToLNu_HT2500ToInf);
@@ -1966,12 +2002,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M100_TauIDSFDown  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M100_TauIDSFDown->Scale(wt_WToTauNu_M100);
   //
+  /*
   TH1D* mT_Stage1_WToTauNu_M100_pdfUncertUp  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WToTauNu_M100_pdfUncertUp->Scale(wt_WToTauNu_M100);
 
   TH1D* mT_Stage1_WToTauNu_M100_pdfUncertDown  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WToTauNu_M100_pdfUncertDown->Scale(wt_WToTauNu_M100);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WToTauNu_M100_lumiUp  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M100_lumiUp->Scale(wt_WToTauNu_M100);
@@ -2057,12 +2094,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M200_TauIDSFDown  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M200_TauIDSFDown->Scale(wt_WToTauNu_M200);
   //
+  /*
   TH1D* mT_Stage1_WToTauNu_M200_pdfUncertUp  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WToTauNu_M200_pdfUncertUp->Scale(wt_WToTauNu_M200);
 
   TH1D* mT_Stage1_WToTauNu_M200_pdfUncertDown  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WToTauNu_M200_pdfUncertDown->Scale(wt_WToTauNu_M200);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_WToTauNu_M200_lumiUp  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M200_lumiUp->Scale(wt_WToTauNu_M200);
@@ -2148,12 +2186,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M500_TauIDSFDown  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M500_TauIDSFDown->Scale(wt_WToTauNu_M500);
   //
+  /*
   TH1D* mT_Stage1_WToTauNu_M500_pdfUncertUp  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WToTauNu_M500_pdfUncertUp->Scale(wt_WToTauNu_M500);
 
   TH1D* mT_Stage1_WToTauNu_M500_pdfUncertDown  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WToTauNu_M500_pdfUncertDown->Scale(wt_WToTauNu_M500);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_WToTauNu_M500_lumiUp  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M500_lumiUp->Scale(wt_WToTauNu_M500);
@@ -2239,12 +2278,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M1000_TauIDSFDown  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M1000_TauIDSFDown->Scale(wt_WToTauNu_M1000);
   //
+  /*
   TH1D* mT_Stage1_WToTauNu_M1000_pdfUncertUp  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WToTauNu_M1000_pdfUncertUp->Scale(wt_WToTauNu_M1000);
 
   TH1D* mT_Stage1_WToTauNu_M1000_pdfUncertDown  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WToTauNu_M1000_pdfUncertDown->Scale(wt_WToTauNu_M1000);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WToTauNu_M1000_lumiUp  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M1000_lumiUp->Scale(wt_WToTauNu_M1000);
@@ -2330,12 +2370,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M2000_TauIDSFDown  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M2000_TauIDSFDown->Scale(wt_WToTauNu_M2000);
   //
+  /*
   TH1D* mT_Stage1_WToTauNu_M2000_pdfUncertUp  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WToTauNu_M2000_pdfUncertUp->Scale(wt_WToTauNu_M2000);
 
   TH1D* mT_Stage1_WToTauNu_M2000_pdfUncertDown  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WToTauNu_M2000_pdfUncertDown->Scale(wt_WToTauNu_M2000);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WToTauNu_M2000_lumiUp  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M2000_lumiUp->Scale(wt_WToTauNu_M2000);
@@ -2421,12 +2462,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M3000_TauIDSFDown  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M3000_TauIDSFDown->Scale(wt_WToTauNu_M3000);
   //
+  /*
   TH1D* mT_Stage1_WToTauNu_M3000_pdfUncertUp  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WToTauNu_M3000_pdfUncertUp->Scale(wt_WToTauNu_M3000);
 
   TH1D* mT_Stage1_WToTauNu_M3000_pdfUncertDown  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WToTauNu_M3000_pdfUncertDown->Scale(wt_WToTauNu_M3000);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WToTauNu_M3000_lumiUp  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M3000_lumiUp->Scale(wt_WToTauNu_M3000);
@@ -2513,12 +2555,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M4000_TauIDSFDown  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M4000_TauIDSFDown->Scale(wt_WToTauNu_M4000);
   //
+  /*
   TH1D* mT_Stage1_WToTauNu_M4000_pdfUncertUp  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WToTauNu_M4000_pdfUncertUp->Scale(wt_WToTauNu_M4000);
 
   TH1D* mT_Stage1_WToTauNu_M4000_pdfUncertDown  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WToTauNu_M4000_pdfUncertDown->Scale(wt_WToTauNu_M4000);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WToTauNu_M4000_lumiUp  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M4000_lumiUp->Scale(wt_WToTauNu_M4000);
@@ -2604,12 +2647,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M5000_TauIDSFDown  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M5000_TauIDSFDown->Scale(wt_WToTauNu_M5000);
   //
+  /*
   TH1D* mT_Stage1_WToTauNu_M5000_pdfUncertUp  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WToTauNu_M5000_pdfUncertUp->Scale(wt_WToTauNu_M5000);
 
   TH1D* mT_Stage1_WToTauNu_M5000_pdfUncertDown  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WToTauNu_M5000_pdfUncertDown->Scale(wt_WToTauNu_M5000);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WToTauNu_M5000_lumiUp  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M5000_lumiUp->Scale(wt_WToTauNu_M5000);
@@ -2697,12 +2741,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M6000_TauIDSFDown  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M6000_TauIDSFDown->Scale(wt_WToTauNu_M6000);
   //
+  /*
   TH1D* mT_Stage1_WToTauNu_M6000_pdfUncertUp  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WToTauNu_M6000_pdfUncertUp->Scale(wt_WToTauNu_M6000);
 
   TH1D* mT_Stage1_WToTauNu_M6000_pdfUncertDown  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WToTauNu_M6000_pdfUncertDown->Scale(wt_WToTauNu_M6000);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_WToTauNu_M6000_lumiUp  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M6000_lumiUp->Scale(wt_WToTauNu_M6000);
@@ -2789,12 +2834,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_TauIDSFDown  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_TauIDSFDown->Scale(wt_WJetsToLNu);
   //
+  /*
   TH1D* mT_Stage1_WJetsToLNu_pdfUncertUp  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WJetsToLNu_pdfUncertUp->Scale(wt_WJetsToLNu);
 
   TH1D* mT_Stage1_WJetsToLNu_pdfUncertDown  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WJetsToLNu_pdfUncertDown->Scale(wt_WJetsToLNu);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WJetsToLNu_lumiUp  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_lumiUp->Scale(wt_WJetsToLNu);
@@ -2827,7 +2873,7 @@ int Plot_mT_Stage1_WithSyst() {
   total_WJets->SetLineColor(kBlack);
   //std::cout << "Wjets " << total_WJets->GetBinError(300) << std::endl;
 
-  total_WJets->Rebin(80);
+  total_WJets->Rebin(100);
 
 
   //file_WW
@@ -2905,12 +2951,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WW_TauIDSFDown  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WW_TauIDSFDown->Scale(wt_WW);
   //
+  /*
   TH1D* mT_Stage1_WW_pdfUncertUp  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WW_pdfUncertUp->Scale(wt_WW);
 
   TH1D* mT_Stage1_WW_pdfUncertDown  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WW_pdfUncertDown->Scale(wt_WW);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WW_lumiUp  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WW_lumiUp->Scale(wt_WW);
@@ -3020,6 +3067,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_WZ_TauIDSFDown->Scale(wt_WZ);
   mT_Stage1_WZ_TauIDSFDown->Scale(kfact_WZ);
   //
+  /*
   TH1D* mT_Stage1_WZ_pdfUncertUp  = (TH1D*)file_WZ->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_WZ_pdfUncertUp->Scale(wt_WZ);
   mT_Stage1_WZ_pdfUncertUp->Scale(kfact_WZ);
@@ -3027,7 +3075,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WZ_pdfUncertDown  = (TH1D*)file_WZ->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_WZ_pdfUncertDown->Scale(wt_WZ);
   mT_Stage1_WZ_pdfUncertDown->Scale(kfact_WZ);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_WZ_lumiUp  = (TH1D*)file_WZ->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WZ_lumiUp->Scale(wt_WZ);
@@ -3138,6 +3186,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ZZ_TauIDSFDown->Scale(wt_ZZ);
   mT_Stage1_ZZ_TauIDSFDown->Scale(kfact_ZZ);
   //
+  /*
   TH1D* mT_Stage1_ZZ_pdfUncertUp  = (TH1D*)file_ZZ->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ZZ_pdfUncertUp->Scale(wt_ZZ);
   mT_Stage1_ZZ_pdfUncertUp->Scale(kfact_ZZ);
@@ -3145,7 +3194,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ZZ_pdfUncertDown  = (TH1D*)file_ZZ->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ZZ_pdfUncertDown->Scale(wt_ZZ);
   mT_Stage1_ZZ_pdfUncertDown->Scale(kfact_ZZ);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_ZZ_lumiUp  = (TH1D*)file_ZZ->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ZZ_lumiUp->Scale(wt_ZZ);
@@ -3163,7 +3212,7 @@ int Plot_mT_Stage1_WithSyst() {
   total_diboson->Add(mT_Stage1_ZZ);
   total_diboson->SetFillColorAlpha(kOrange+2,0.5);
   total_diboson->SetLineColor(kBlack);
-  total_diboson->Rebin(80);
+  total_diboson->Rebin(100);
 
   //file_QCD_HT200to300
   TH1D* h1_evt_QCD_HT200to300 = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/eventCount");
@@ -3240,12 +3289,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_QCD_HT200to300_TauIDSFDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_QCD_HT200to300_TauIDSFDown->Scale(wt_QCD_HT200to300);
   //
+  /*
   TH1D* mT_Stage1_QCD_HT200to300_pdfUncertUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_QCD_HT200to300_pdfUncertUp->Scale(wt_QCD_HT200to300);
 
   TH1D* mT_Stage1_QCD_HT200to300_pdfUncertDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_QCD_HT200to300_pdfUncertDown->Scale(wt_QCD_HT200to300);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_QCD_HT200to300_lumiUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_QCD_HT200to300_lumiUp->Scale(wt_QCD_HT200to300);
@@ -3331,12 +3381,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_QCD_HT300to500_TauIDSFDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_QCD_HT300to500_TauIDSFDown->Scale(wt_QCD_HT300to500);
   //
+  /*
   TH1D* mT_Stage1_QCD_HT300to500_pdfUncertUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_QCD_HT300to500_pdfUncertUp->Scale(wt_QCD_HT300to500);
 
   TH1D* mT_Stage1_QCD_HT300to500_pdfUncertDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_QCD_HT300to500_pdfUncertDown->Scale(wt_QCD_HT300to500);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_QCD_HT300to500_lumiUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_QCD_HT300to500_lumiUp->Scale(wt_QCD_HT300to500);
@@ -3424,12 +3475,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_QCD_HT500to700_TauIDSFDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_QCD_HT500to700_TauIDSFDown->Scale(wt_QCD_HT500to700);
   //
+  /*
   TH1D* mT_Stage1_QCD_HT500to700_pdfUncertUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_QCD_HT500to700_pdfUncertUp->Scale(wt_QCD_HT500to700);
 
   TH1D* mT_Stage1_QCD_HT500to700_pdfUncertDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_QCD_HT500to700_pdfUncertDown->Scale(wt_QCD_HT500to700);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_QCD_HT500to700_lumiUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_QCD_HT500to700_lumiUp->Scale(wt_QCD_HT500to700);
@@ -3515,12 +3567,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_QCD_HT700to1000_TauIDSFDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_QCD_HT700to1000_TauIDSFDown->Scale(wt_QCD_HT700to1000);
   //
+  /*
   TH1D* mT_Stage1_QCD_HT700to1000_pdfUncertUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_QCD_HT700to1000_pdfUncertUp->Scale(wt_QCD_HT700to1000);
 
   TH1D* mT_Stage1_QCD_HT700to1000_pdfUncertDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_QCD_HT700to1000_pdfUncertDown->Scale(wt_QCD_HT700to1000);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_QCD_HT700to1000_lumiUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_QCD_HT700to1000_lumiUp->Scale(wt_QCD_HT700to1000);
@@ -3606,12 +3659,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_QCD_HT1000to1500_TauIDSFDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_QCD_HT1000to1500_TauIDSFDown->Scale(wt_QCD_HT1000to1500);
   //
+  /*
   TH1D* mT_Stage1_QCD_HT1000to1500_pdfUncertUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_QCD_HT1000to1500_pdfUncertUp->Scale(wt_QCD_HT1000to1500);
 
   TH1D* mT_Stage1_QCD_HT1000to1500_pdfUncertDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_QCD_HT1000to1500_pdfUncertDown->Scale(wt_QCD_HT1000to1500);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_QCD_HT1000to1500_lumiUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_QCD_HT1000to1500_lumiUp->Scale(wt_QCD_HT1000to1500);
@@ -3697,12 +3751,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_QCD_HT1500to2000_TauIDSFDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_QCD_HT1500to2000_TauIDSFDown->Scale(wt_QCD_HT1500to2000);
   //
+  /*
   TH1D* mT_Stage1_QCD_HT1500to2000_pdfUncertUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_QCD_HT1500to2000_pdfUncertUp->Scale(wt_QCD_HT1500to2000);
 
   TH1D* mT_Stage1_QCD_HT1500to2000_pdfUncertDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_QCD_HT1500to2000_pdfUncertDown->Scale(wt_QCD_HT1500to2000);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_QCD_HT1500to2000_lumiUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_QCD_HT1500to2000_lumiUp->Scale(wt_QCD_HT1500to2000);
@@ -3788,12 +3843,13 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_QCD_HT2000toInf_TauIDSFDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_QCD_HT2000toInf_TauIDSFDown->Scale(wt_QCD_HT2000toInf);
   //
+  /*
   TH1D* mT_Stage1_QCD_HT2000toInf_pdfUncertUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_QCD_HT2000toInf_pdfUncertUp->Scale(wt_QCD_HT2000toInf);
 
   TH1D* mT_Stage1_QCD_HT2000toInf_pdfUncertDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_QCD_HT2000toInf_pdfUncertDown->Scale(wt_QCD_HT2000toInf);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_QCD_HT2000toInf_lumiUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_QCD_HT2000toInf_lumiUp->Scale(wt_QCD_HT2000toInf);
@@ -3813,7 +3869,7 @@ int Plot_mT_Stage1_WithSyst() {
   total_QCD->Add(mT_Stage1_QCD_HT2000toInf);
   total_QCD->SetFillColorAlpha(kPink+1,0.5);
   total_QCD->SetLineColor(kBlack);
-  total_QCD->Rebin(80);
+  total_QCD->Rebin(100);
 
   //file_ZJetsToNuNu_HT100To200
   TH1D* h1_evt_ZJetsToNuNu_HT100To200 = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/eventCount");
@@ -3914,6 +3970,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ZJetsToNuNu_HT100To200_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT100To200);
   mT_Stage1_ZJetsToNuNu_HT100To200_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT100To200);
   //
+  /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT100To200);
   mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT100To200);
@@ -3921,7 +3978,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT100To200);
   mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ZJetsToNuNu_HT100To200_lumiUp->Scale(wt_ZJetsToNuNu_HT100To200);
@@ -4035,6 +4092,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ZJetsToNuNu_HT200To400_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT200To400);
   mT_Stage1_ZJetsToNuNu_HT200To400_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT200To400);
   //
+  /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT200To400);
   mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT200To400);
@@ -4042,7 +4100,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT200To400);
   mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ZJetsToNuNu_HT200To400_lumiUp->Scale(wt_ZJetsToNuNu_HT200To400);
@@ -4154,6 +4212,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ZJetsToNuNu_HT400To600_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT400To600);
   mT_Stage1_ZJetsToNuNu_HT400To600_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT400To600);
   //
+  /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT400To600);
   mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT400To600);
@@ -4161,7 +4220,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT400To600);
   mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ZJetsToNuNu_HT400To600_lumiUp->Scale(wt_ZJetsToNuNu_HT400To600);
@@ -4274,6 +4333,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ZJetsToNuNu_HT600To800_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT600To800);
   mT_Stage1_ZJetsToNuNu_HT600To800_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT600To800);
   //
+  /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT600To800);
   mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT600To800);
@@ -4281,7 +4341,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT600To800);
   mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ZJetsToNuNu_HT600To800_lumiUp->Scale(wt_ZJetsToNuNu_HT600To800);
@@ -4393,6 +4453,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ZJetsToNuNu_HT800To1200_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT800To1200);
   mT_Stage1_ZJetsToNuNu_HT800To1200_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
   //
+  /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT800To1200);
   mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
@@ -4400,7 +4461,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT800To1200);
   mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ZJetsToNuNu_HT800To1200_lumiUp->Scale(wt_ZJetsToNuNu_HT800To1200);
@@ -4513,6 +4574,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ZJetsToNuNu_HT1200To2500_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
   mT_Stage1_ZJetsToNuNu_HT1200To2500_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
   //
+  /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
   mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
@@ -4520,7 +4582,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
   mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  //
+  */ //
   /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
@@ -4633,6 +4695,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
   mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
   //
+  /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
   mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
@@ -4640,7 +4703,7 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
   mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
+  */  //
   /*
   TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
@@ -4665,94 +4728,51 @@ int Plot_mT_Stage1_WithSyst() {
   total_ZJets->SetLineColor(kBlack);
   //std::cout << "total=" <<  total_ZJets->GetBinError(600) << std::endl;
 
-  total_ZJets->Rebin(80);
+  total_ZJets->Rebin(100);
 
   std::cout << "totalMC =" << totalMC << std::endl;
 
    std::cout << "will do data" << std::endl;
   
   //--Data--//
-   //    TH1D* mT_Stage1_Run2016F  = (TH1D*)file_Tau_Run2016F->Get("demo/histoDir/mT_Stage1");
-   //  std::cout << "RunF nevt=" << mT_Stage1_Run2016F->Integral() << std::endl;
-
-   //  TH1D* mT_Stage1_Run2016E  = (TH1D*)file_Tau_Run2016E->Get("demo/histoDir/mT_Stage1");
-   //  std::cout << "RunE nevt=" << mT_Stage1_Run2016E->Integral() << std::endl;
-
-  // mT_Stage1_Run2016E->SetMarkerStyle(20);
-  // mT_Stage1_Run2016E->SetMarkerColor(kBlack);
-  // mT_Stage1_Run2016E->SetLineColor(kBlack);
-  // mT_Stage1_Run2016E->Rebin(80);
-  //
- 
-   //  TH1D* mT_Stage1_Run2016D  = (TH1D*)file_Tau_Run2016D->Get("demo/histoDir/mT_Stage1");
-   //   std::cout << "RunD nevt=" << mT_Stage1_Run2016D->Integral() << std::endl;
-
-   // mT_Stage1_Run2016D->SetMarkerStyle(20);
-   // mT_Stage1_Run2016D->SetMarkerColor(kBlack);
-   // mT_Stage1_Run2016D->SetLineColor(kBlack);
-   // mT_Stage1_Run2016D->Rebin(80);
-  //
-   
-   //  TH1D* mT_Stage1_Run2016C  = (TH1D*)file_Tau_Run2016C->Get("demo/histoDir/mT_Stage1");
-   // std::cout << "RunC nevt=" << mT_Stage1_Run2016C->Integral() << std::endl;
-
-   //  mT_Stage1_Run2016C->SetMarkerStyle(20);
-   //  mT_Stage1_Run2016C->SetMarkerColor(kBlack);
-   //  mT_Stage1_Run2016C->SetLineColor(kBlack);
-   //  mT_Stage1_Run2016C->Rebin(80);
-
-   //  TH1D* mT_Stage1_Run2016B  = (TH1D*)file_Tau_Run2016B->Get("demo/histoDir/mT_Stage1");
-   //  std::cout << "RunB nevt=" << mT_Stage1_Run2016B->Integral() << std::endl;  
- // mT_Stage1_Run2016B->SetMarkerStyle(20);
-   // mT_Stage1_Run2016B->SetMarkerColor(kBlack);
-   //  mT_Stage1_Run2016B->SetLineColor(kBlack);
-   //  mT_Stage1_Run2016B->Rebin(80);
-
+   TH1D* mT_Stage1_Run2016F  = (TH1D*)file_Tau_Run2016F->Get("demo/histoDir/mT_Stage1");
+   TH1D* mT_Stage1_Run2016E  = (TH1D*)file_Tau_Run2016E->Get("demo/histoDir/mT_Stage1");
+   TH1D* mT_Stage1_Run2016D  = (TH1D*)file_Tau_Run2016D->Get("demo/histoDir/mT_Stage1");
+   TH1D* mT_Stage1_Run2016C  = (TH1D*)file_Tau_Run2016C->Get("demo/histoDir/mT_Stage1");
+   TH1D* mT_Stage1_Run2016B  = (TH1D*)file_Tau_Run2016B->Get("demo/histoDir/mT_Stage1");
    TH1D* mT_Stage1_Run2016G  = (TH1D*)file_Tau_Run2016G->Get("demo/histoDir/mT_Stage1");
-   TH1D* mT_Stage1_Run2016H  = (TH1D*)file_Tau_Run2016H->Get("demo/histoDir/mT_Stage1");
+   TH1D* mT_Stage1_Run2016H_v2  = (TH1D*)file_Tau_Run2016H_v2->Get("demo/histoDir/mT_Stage1");
+   TH1D* mT_Stage1_Run2016H_v3  = (TH1D*)file_Tau_Run2016H_v3->Get("demo/histoDir/mT_Stage1");
 
-   /*
-  std::cout << "Will Clone B" << std::endl;
-  TH1D* mT_Stage1_Run2016BCD = (TH1D*)mT_Stage1_Run2016B->Clone();
- 
-  std::cout << "Will add C" << std::endl;
-  mT_Stage1_Run2016BCD->Add(mT_Stage1_Run2016C);
+   TH1D* mT_Stage1_Run2016all = (TH1D*)mT_Stage1_Run2016B->Clone();
+   mT_Stage1_Run2016all->Add(mT_Stage1_Run2016C);
+   mT_Stage1_Run2016all->Add(mT_Stage1_Run2016D);
+   mT_Stage1_Run2016all->Add(mT_Stage1_Run2016E);
+   mT_Stage1_Run2016all->Add(mT_Stage1_Run2016F);
+   mT_Stage1_Run2016all->Add(mT_Stage1_Run2016G);
+   mT_Stage1_Run2016all->Add(mT_Stage1_Run2016H_v2);
+   mT_Stage1_Run2016all->Add(mT_Stage1_Run2016H_v3);
 
-  std::cout << "Will add D" << std::endl;
-  mT_Stage1_Run2016BCD->Add(mT_Stage1_Run2016D);
+   mT_Stage1_Run2016all->SetMarkerStyle(20);
+   mT_Stage1_Run2016all->SetMarkerColor(kBlack);
+   mT_Stage1_Run2016all->SetLineColor(kBlack);
+   mT_Stage1_Run2016all->Rebin(100);
 
-  //  std::cout << "Will add E" << std::endl;
-  // mT_Stage1_Run2016BCDEF->Add(mT_Stage1_Run2016E);
-
-  // std::cout << "Will add F" << std::endl;
-  //  mT_Stage1_Run2016BCDEF->Add(mT_Stage1_Run2016F);
-  */
-
-  TH1D* mT_Stage1_Run2016GH = (TH1D*)mT_Stage1_Run2016G->Clone();
-  mT_Stage1_Run2016GH->Add(mT_Stage1_Run2016H);
-  //  mT_Stage1_Run2016GH->Add(mT_Stage1_Run2016D);
-  // mT_Stage1_Run2016GH->Add(mT_Stage1_Run2016E);
-  // mT_Stage1_Run2016GH->Add(mT_Stage1_Run2016F);
-                                                                                                                                    
-  mT_Stage1_Run2016GH->SetMarkerStyle(20);
-  mT_Stage1_Run2016GH->SetMarkerColor(kBlack);
-  mT_Stage1_Run2016GH->SetLineColor(kBlack);
-  mT_Stage1_Run2016GH->Rebin(80);
   
   std::cout << "will do signal " << std::endl;
   //--Signal--//
-  TH1D* h1_evt_Wprime_M1000 = (TH1D*)file_Wprime_M1000->Get("demo/histoDir/eventCount");
-  unsigned long long evt_Wprime_M1000 = h1_evt_Wprime_M1000->GetEntries(); //Integral();                                                                          
+  TH1D* h1_evt_Wprime_M4000 = (TH1D*)file_Wprime_M4000->Get("demo/histoDir/eventCount");
+  unsigned long long evt_Wprime_M4000 = h1_evt_Wprime_M4000->GetEntries(); //Integral();                                                                          
   // std::cout << "evt_Wprime_M1000 = " << evt_Wprime_M1000 << std::endl;
-  double wt_Wprime_M1000 = (xs_Wprime_M1000*lumi)/evt_Wprime_M1000 ;
-  TH1D* mT_Stage1_Wprime_M1000  = (TH1D*)file_Wprime_M1000->Get("demo/histoDir/mT_Stage1");
-  std::cout << "Sig Eff W' M1000 : " << ( mT_Stage1_Wprime_M1000->GetEntries() / evt_Wprime_M1000 ) << std::endl;
-  mT_Stage1_Wprime_M1000->Scale(wt_Wprime_M1000);
+  double wt_Wprime_M4000 = (xs_Wprime_M4000*lumi)/evt_Wprime_M4000 ;
+  TH1D* mT_Stage1_Wprime_M4000  = (TH1D*)file_Wprime_M4000->Get("demo/histoDir/mT_Stage1");
+  std::cout << "Sig Eff W' M4000 : " << ( mT_Stage1_Wprime_M4000->GetEntries() / evt_Wprime_M4000 ) << std::endl;
+  mT_Stage1_Wprime_M4000->Scale(wt_Wprime_M4000);
   //  mT_Stage1_Wprime_M1000->SetFillColorAlpha(kGreen-7,0.5);
-  mT_Stage1_Wprime_M1000->SetLineColor(kMagenta);
-  mT_Stage1_Wprime_M1000->SetLineWidth(2);
-  mT_Stage1_Wprime_M1000->SetLineStyle(5);
-  mT_Stage1_Wprime_M1000->Rebin(80);
+  mT_Stage1_Wprime_M4000->SetLineColor(kMagenta);
+  mT_Stage1_Wprime_M4000->SetLineWidth(2);
+  mT_Stage1_Wprime_M4000->SetLineStyle(5);
+  mT_Stage1_Wprime_M4000->Rebin(100);
  
   //--Plotting Styles//
   gStyle->SetPadLeftMargin(0.15);
@@ -5616,15 +5636,15 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_kFactorUp->Add(mT_Stage1_WJetsToLNu_HT1200To2500_kFactorUp);
   totalBkg_kFactorUp->Add(mT_Stage1_WJetsToLNu_HT2500ToInf_kFactorUp);
   totalBkg_kFactorUp->Add(mT_Stage1_WJetsToLNu_kFactorUp);
-  //  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M100_kFactorUp);
-  //  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M200_kFactorUp);
-  //  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M500_kFactorUp);
-  //  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M1000_kFactorUp);
-  //  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M2000_kFactorUp);
-  //  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M3000_kFactorUp);
-  //  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M4000_kFactorUp);
-  //  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M5000_kFactorUp);
-  //  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M6000_kFactorUp);
+  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M100_kFactorUp);
+  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M200_kFactorUp);
+  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M500_kFactorUp);
+  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M1000_kFactorUp);
+  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M2000_kFactorUp);
+  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M3000_kFactorUp);
+  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M4000_kFactorUp);
+  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M5000_kFactorUp);
+  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M6000_kFactorUp);
 
   TH1D* totalBkg_kFactorDown = (TH1D*)mT_Stage1_WJetsToLNu_HT100To200_kFactorDown->Clone();
   totalBkg_kFactorDown->Add(mT_Stage1_WJetsToLNu_HT200To400_kFactorDown);
@@ -5634,15 +5654,15 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_kFactorDown->Add(mT_Stage1_WJetsToLNu_HT1200To2500_kFactorDown);
   totalBkg_kFactorDown->Add(mT_Stage1_WJetsToLNu_HT2500ToInf_kFactorDown);
   totalBkg_kFactorDown->Add(mT_Stage1_WJetsToLNu_kFactorDown);
-  // totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M100_kFactorDown);
-  // totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M200_kFactorDown);
-  // totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M500_kFactorDown);
-  // totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M1000_kFactorDown);
-  // totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M2000_kFactorDown);
-  // totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M3000_kFactorDown);
-  // totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M4000_kFactorDown);
-  // totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M5000_kFactorDown);
-  // totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M6000_kFactorDown);
+  totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M100_kFactorDown);
+  totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M200_kFactorDown);
+  totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M500_kFactorDown);
+  totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M1000_kFactorDown);
+  totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M2000_kFactorDown);
+  totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M3000_kFactorDown);
+  totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M4000_kFactorDown);
+  totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M5000_kFactorDown);
+  totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M6000_kFactorDown);
   
 
   TH1D* totalBkg_TauIDSFUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_TauIDSFUp->Clone();
@@ -5733,7 +5753,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauIDSFDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_TauIDSFDown);
   totalBkg_TauIDSFDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauIDSFDown);
   //
-
+  /*
   TH1D* totalBkg_pdfUncertUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_pdfUncertUp->Clone();
   totalBkg_pdfUncertUp->Add(mT_Stage1_DYJetsToLL_M5to50_pdfUncertUp);
   totalBkg_pdfUncertUp->Add(mT_Stage1_TT_pdfUncertUp);
@@ -5822,6 +5842,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_pdfUncertDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertDown);
   totalBkg_pdfUncertDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertDown);
   //
+  */
  //
   /*
   TH1D* totalBkg_lumiUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_lumiUp->Clone();
@@ -5914,46 +5935,46 @@ int Plot_mT_Stage1_WithSyst() {
  //
  */
 
-  totalBkg->Rebin(80);
+  totalBkg->Rebin(100);
 
-  totalBkg_JetEnUp->Rebin(80);
-  totalBkg_JetEnDown->Rebin(80);
+  totalBkg_JetEnUp->Rebin(100);
+  totalBkg_JetEnDown->Rebin(100);
 
-  totalBkg_JetResUp->Rebin(80);
-  totalBkg_JetResDown->Rebin(80);
+  totalBkg_JetResUp->Rebin(100);
+  totalBkg_JetResDown->Rebin(100);
 
-  totalBkg_MuonEnUp->Rebin(80);
-  totalBkg_MuonEnDown->Rebin(80);
+  totalBkg_MuonEnUp->Rebin(100);
+  totalBkg_MuonEnDown->Rebin(100);
 
-  totalBkg_ElectronEnUp->Rebin(80);
-  totalBkg_ElectronEnDown->Rebin(80);
+  totalBkg_ElectronEnUp->Rebin(100);
+  totalBkg_ElectronEnDown->Rebin(100);
 
-  totalBkg_TauEnUp->Rebin(80);
-  totalBkg_TauEnDown->Rebin(80);
+  totalBkg_TauEnUp->Rebin(100);
+  totalBkg_TauEnDown->Rebin(100);
 
-  totalBkg_PhotonEnUp->Rebin(80);
-  totalBkg_PhotonEnDown->Rebin(80);
+  totalBkg_PhotonEnUp->Rebin(100);
+  totalBkg_PhotonEnDown->Rebin(100);
 
-  totalBkg_UnclusteredEnUp->Rebin(80);
-  totalBkg_UnclusteredEnDown->Rebin(80);
+  totalBkg_UnclusteredEnUp->Rebin(100);
+  totalBkg_UnclusteredEnDown->Rebin(100);
 
-  totalBkg_TauScaleUp->Rebin(80);
-  totalBkg_TauScaleDown->Rebin(80);
+  totalBkg_TauScaleUp->Rebin(100);
+  totalBkg_TauScaleDown->Rebin(100);
 
-  totalBkg_pileupUncertUp->Rebin(80);
-  totalBkg_pileupUncertDown->Rebin(80);
+  totalBkg_pileupUncertUp->Rebin(100);
+  totalBkg_pileupUncertDown->Rebin(100);
 
-  totalBkg_kFactorUp->Rebin(80);
-  totalBkg_kFactorDown->Rebin(80);
+  totalBkg_kFactorUp->Rebin(100);
+  totalBkg_kFactorDown->Rebin(100);
 
-  totalBkg_TauIDSFUp->Rebin(80);
-  totalBkg_TauIDSFDown->Rebin(80);
+  totalBkg_TauIDSFUp->Rebin(100);
+  totalBkg_TauIDSFDown->Rebin(100);
 
-  totalBkg_pdfUncertUp->Rebin(80);
-  totalBkg_pdfUncertDown->Rebin(80);
+  //  totalBkg_pdfUncertUp->Rebin(100);
+  //  totalBkg_pdfUncertDown->Rebin(100);
 
-  // totalBkg_lumiUp->Rebin(80);
-  // totalBkg_lumiDown->Rebin(80);
+  // totalBkg_lumiUp->Rebin(100);
+  // totalBkg_lumiDown->Rebin(100)  ;
 
   TH1D* bkg_lumi_up = (TH1D*)totalBkg->Clone();
   bkg_lumi_up->Scale(wt_lumi_up);
@@ -5963,31 +5984,32 @@ int Plot_mT_Stage1_WithSyst() {
 
   int nbin1 = totalBkg->GetNbinsX();
   std::cout << "Nbin=" << nbin1 << std::endl;
-  Double_t x[200] = {0} ;
-  Double_t y_JetEn[200] = {0} ;
+  Double_t  x[200] = {0} ;
+  Double_t  y_JetEn[200] = {0} ;
+  Double_t  y_JetRes[200] = {0} ;
+  Double_t  y_MuonEn[200] = {0} ;
 
   for (int n=0; n<nbin1; n++) {
     std::cout << "n=" << n << std::endl;
-    x[n] = totalBkg->GetBinContent(n) ;
+    x[n] = totalBkg->GetXaxis()->GetBinCenter(n) ;
 
     double delta_JetEnUp   = fabs(totalBkg_JetEnUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_JetEnDown = fabs(totalBkg_JetEnDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
     double delta_syst_JetEn = min(delta_JetEnUp,delta_JetEnDown);
     if (totalBkg->GetBinContent(n) > 0)  y_JetEn[n] = delta_syst_JetEn/(totalBkg->GetBinContent(n)) ;
-    std::cout << "totalBkg->GetBinContent(n)=" << totalBkg->GetBinContent(n) << std::endl;
-    std::cout << "delta_syst_JetEn = " << delta_syst_JetEn  << std::endl;
-
+    std::cout << "JES " << delta_syst_JetEn << std::endl;
+  
     double delta_JetResUp   = fabs(totalBkg_JetResUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_JetResDown = fabs(totalBkg_JetResDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
     double delta_syst_JetRes = min(delta_JetResUp,delta_JetResDown);
-    Double_t  y_JetRes[200] ;
-    y_JetRes[n] = delta_syst_JetRes ;
+    if (totalBkg->GetBinContent(n) > 0)  y_JetRes[n] = delta_syst_JetRes/(totalBkg->GetBinContent(n)) ;
+    std::cout << "JER " << delta_syst_JetRes << std::endl;
 
     double delta_MuonEnUp   = fabs(totalBkg_MuonEnUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_MuonEnDown = fabs(totalBkg_MuonEnDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
     double delta_syst_MuonEn = min(delta_MuonEnUp,delta_MuonEnDown);
-    Double_t  y_MuonEn[200] ;
-    y_MuonEn[n] = delta_syst_MuonEn ;
+    if (totalBkg->GetBinContent(n) > 0)  y_MuonEn[n] = delta_syst_MuonEn/(totalBkg->GetBinContent(n)) ;
+    std::cout << "MuonEn " << delta_syst_MuonEn << std::endl;
 
     double delta_ElectronEnUp   = fabs(totalBkg_ElectronEnUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_ElectronEnDown = fabs(totalBkg_ElectronEnDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
@@ -6023,7 +6045,6 @@ int Plot_mT_Stage1_WithSyst() {
     double delta_pileupUncertUp   = fabs(totalBkg_pileupUncertUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_pileupUncertDown = fabs(totalBkg_pileupUncertDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
     double delta_syst_pileupUncert = min(delta_pileupUncertUp,delta_pileupUncertDown);
-    std::cout << "delta_syst_pileupUncert = " << delta_syst_pileupUncert << std::endl;
     Double_t  y_pileupUncert[200] ;
     y_pileupUncert[n] = delta_syst_pileupUncert ;
 
@@ -6038,12 +6059,12 @@ int Plot_mT_Stage1_WithSyst() {
     Double_t  y_TauIDSF[200] ;
     y_TauIDSF[n] = delta_syst_TauIDSF ;
 
-    double delta_pdfUncertUp   = fabs(totalBkg_pdfUncertUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
-    double delta_pdfUncertDown = fabs(totalBkg_pdfUncertDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_pdfUncert = min(delta_pdfUncertUp,delta_pdfUncertDown);
+    //    double delta_pdfUncertUp   = fabs(totalBkg_pdfUncertUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
+    // double delta_pdfUncertDown = fabs(totalBkg_pdfUncertDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
+    // double delta_syst_pdfUncert = min(delta_pdfUncertUp,delta_pdfUncertDown);
     // std::cout << "delta_syst_pdfUncert = " << delta_syst_pdfUncert << std::endl;
-    Double_t  y_pdfUncert[200] ;
-    y_pdfUncert[n] = delta_syst_pdfUncert ;
+    //  Double_t  y_pdfUncert[200] ;
+    // y_pdfUncert[n] = delta_syst_pdfUncert ;
     
     double delta_lumiUp   = fabs(bkg_lumi_up->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_lumiDown = fabs(bkg_lumi_down->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
@@ -6052,17 +6073,88 @@ int Plot_mT_Stage1_WithSyst() {
     Double_t  y_lumi[200] ;
     y_lumi[n] = delta_syst_lumi ;
 
-    double delta_syst_tot = sqrt( (delta_syst_JetEn*delta_syst_JetEn) + (delta_syst_JetRes*delta_syst_JetRes) + (delta_syst_MuonEn*delta_syst_MuonEn) + (delta_syst_ElectronEn*delta_syst_ElectronEn) + (delta_syst_TauEn*delta_syst_TauEn) + (delta_syst_PhotonEn*delta_syst_PhotonEn) + (delta_syst_UnclusteredEn*delta_syst_UnclusteredEn) + (delta_syst_TauScale*delta_syst_TauScale) + (delta_syst_pileupUncert*delta_syst_pileupUncert) + (delta_syst_TauIDSF*delta_syst_TauIDSF) + (delta_syst_pdfUncert*delta_syst_pdfUncert) + (delta_syst_lumi*delta_syst_lumi)) ; //+ (delta_syst_kFactor*delta_syst_kFactor) );
+    double delta_syst_tot = sqrt( (delta_syst_JetEn*delta_syst_JetEn) + (delta_syst_JetRes*delta_syst_JetRes) + (delta_syst_MuonEn*delta_syst_MuonEn) + (delta_syst_ElectronEn*delta_syst_ElectronEn) + (delta_syst_TauEn*delta_syst_TauEn) + (delta_syst_PhotonEn*delta_syst_PhotonEn) + (delta_syst_UnclusteredEn*delta_syst_UnclusteredEn) + (delta_syst_TauScale*delta_syst_TauScale) + (delta_syst_pileupUncert*delta_syst_pileupUncert) + (delta_syst_TauIDSF*delta_syst_TauIDSF) + 
+				  //(delta_syst_pdfUncert*delta_syst_pdfUncert) + 
+(delta_syst_lumi*delta_syst_lumi) + (delta_syst_kFactor*delta_syst_kFactor) );
 
     totalBkg->SetBinError(n,delta_syst_tot);
   }
 
+
   TCanvas *syst_canv = new TCanvas("systematic","Systematics");
+
   TGraph *gr_JetEn = new TGraph(nbin1,x,y_JetEn);
-  gr_JetEn->GetXaxis()->SetRangeUser(0,3200);
-  gr_JetEn->Draw("AC*");
+  gr_JetEn->SetLineColor(4);                             
+  gr_JetEn->SetLineWidth(4);
+  gr_JetEn->SetMarkerColor(4);
+  gr_JetEn->SetMarkerStyle(21);
+  gr_JetEn->SetMaximum(0.8);
+  gr_JetEn->SetTitle(" ");
+  gr_JetEn->GetXaxis()->SetTitle("M_{T} in GeV");   
+  gr_JetEn->GetYaxis()->SetTitle("Systematic uncertainty");   
+  gr_JetEn->GetXaxis()->SetLimits(200,4000);
+
+  TGraph *gr_JetRes = new TGraph(nbin1,x,y_JetRes);
+  gr_JetRes->SetLineColor(8);                             
+  gr_JetRes->SetLineWidth(4);
+  gr_JetRes->SetMarkerColor(8);
+  gr_JetRes->SetMarkerStyle(22);
+  gr_JetRes->SetMaximum(0.8);
+  gr_JetRes->SetTitle(" ");
+  gr_JetRes->GetXaxis()->SetTitle("M_{T} in GeV");   
+  gr_JetRes->GetYaxis()->SetTitle("Systematic uncertainty");   
+  gr_JetRes->GetXaxis()->SetLimits(200,4000);
+
+  TGraph *gr_MuonEn = new TGraph(nbin1,x,y_MuonEn);
+  gr_MuonEn->SetLineColor(8);                             
+  gr_MuonEn->SetLineWidth(4);
+  gr_MuonEn->SetMarkerColor(8);
+  gr_MuonEn->SetMarkerStyle(22);
+  gr_MuonEn->SetMaximum(0.8);
+  gr_MuonEn->SetTitle(" ");
+  gr_MuonEn->GetXaxis()->SetTitle("M_{T} in GeV");   
+  gr_MuonEn->GetYaxis()->SetTitle("Systematic uncertainty");   
+  gr_MuonEn->GetXaxis()->SetLimits(200,4000);
+  
+  syst_canv->cd();
+  gr_JetEn->Draw("APL");
+  gr_JetRes->Draw("PL SAME");
+  gr_MuonEn->Draw("PL SAME");
+
+  TLegend *leg_example5 = new TLegend(0.75,0.60,0.94,0.94);
+  leg_example5->SetFillColor(0);
+  leg_example5->SetTextFont(42);
+  leg_example5->SetHeader("Systematics");
+  leg_example5->SetBorderSize(0);
+  leg_example5->AddEntry(gr_JetEn, "JES","PL");
+  leg_example5->AddEntry(gr_MuonEn, "JER","PL");
+ 
+  leg_example5->Draw("same");
+
+  TLatex* CMS_text1 = new TLatex(0.20,0.90,"CMS");
+  CMS_text1->SetNDC();
+  CMS_text1->SetTextSize(0.05);
+  CMS_text1->SetTextAngle(0);
+  CMS_text1->Draw("same");
+  TLatex* CMS_text_21 = new TLatex(0.20,0.85,"Preliminary");
+  CMS_text_21->SetNDC();
+  CMS_text_21->SetTextFont(42);
+  CMS_text_21->SetTextSize(0.05);
+  CMS_text_21->SetTextAngle(0);
+  CMS_text_21->Draw("same");
+
+  TLatex* lumiText1 = new TLatex(0.92,0.975,"36.8 fb^{-1} (13 TeV)");
+  lumiText1->SetNDC();
+  lumiText1->SetTextFont(42);
+  lumiText1->SetTextSize(0.04);
+  lumiText1->SetTextAlign(32);
+  lumiText1->Draw("same");
+
+  syst_canv->Update();
+
+
   syst_canv->Write();
-  syst_canv->Print("mT_Stage1_Syst.pdf");
+  syst_canv->Print("SystematicUncertPlot.pdf");
  
   //--//
   THStack *hs = new THStack("hs","");
@@ -6107,13 +6199,13 @@ int Plot_mT_Stage1_WithSyst() {
   // hs->Draw("SAME HIST");
 
   //  mT_Stage1_Run2016E->Draw("SAME E0");
-  mT_Stage1_Run2016GH->Draw("SAME E0");
-  TH1F* mydata =  (TH1F*)mT_Stage1_Run2016GH->Clone();
+  mT_Stage1_Run2016all->Draw("SAME E0");
+  TH1F* mydata =  (TH1F*)mT_Stage1_Run2016all->Clone();
 
   //mT_Stage1_Run2016C->Draw("SAME E0");
   //mT_Stage1_Run2016CDE->Draw("SAME E0");
   //
-  mT_Stage1_Wprime_M1000->Draw("SAME HIST");
+  mT_Stage1_Wprime_M4000->Draw("SAME HIST");
   //  hs->SetOption("HIST L");
   
   TLatex* CMS_text = new TLatex(0.20,0.90,"CMS");
@@ -6128,15 +6220,16 @@ int Plot_mT_Stage1_WithSyst() {
   CMS_text_2->SetTextAngle(0);
   CMS_text_2->Draw("same");    
 
-  TLatex* lumiText = new TLatex(0.92,0.975,"13.5 fb^{-1} (Run G+H 2016 13 TeV)");
+  TLatex* lumiText = new TLatex(0.92,0.975,"36.8 fb^{-1} (13 TeV)");
   lumiText->SetNDC();
   lumiText->SetTextFont(42);
   lumiText->SetTextSize(0.04);
   lumiText->SetTextAlign(32);
   lumiText->Draw("same");     
 
-  TLegend *leg_example = new TLegend(0.75,0.50,0.94,0.94);
+  TLegend *leg_example = new TLegend(0.50,0.65,0.94,0.94);
   leg_example->SetFillColor(0);
+  leg_example->SetNColumns(2);
   leg_example->SetTextFont(42);
   leg_example->SetBorderSize(0);
   leg_example->AddEntry(total_WJets, "Wjets","f");
@@ -6147,8 +6240,8 @@ int Plot_mT_Stage1_WithSyst() {
   leg_example->AddEntry(total_ST, "Single Top", "f");
   leg_example->AddEntry(total_DY, "DY","f");
   leg_example->AddEntry(total_diboson, "Diboson", "f");
-  leg_example->AddEntry(mT_Stage1_Wprime_M1000, "SSM W' 1 TeV", "l");
-  leg_example->AddEntry(mT_Stage1_Run2016GH, "Data", "pl" );
+  leg_example->AddEntry(mT_Stage1_Wprime_M4000, "SSM W' 4 TeV", "l");
+  leg_example->AddEntry(mT_Stage1_Run2016all, "Data", "pl" );
   // leg_example->AddEntry(mT_Stage1_Run2016E, "Data", "pl" );
   // leg_example->AddEntry(mT_Stage1_Run2016D, "Data", "pl" );
   leg_example->Draw("same");
@@ -6168,6 +6261,7 @@ int Plot_mT_Stage1_WithSyst() {
   total->Draw("E");
   my_canvas2->Write();
   */
+
   TCanvas* ratio_c = new TCanvas("ratio","ratio_canvas",600,800);
   ratio_c->SetTopMargin(0.); 
   ratio_c->SetBottomMargin(0.); 
@@ -6195,7 +6289,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg->GetXaxis()->SetRangeUser(0,3200);
 
   mydata->Draw("SAME E1");
-  mT_Stage1_Wprime_M1000->Draw("SAME HIST");
+  mT_Stage1_Wprime_M4000->Draw("SAME HIST");
   CMS_text->Draw("same");
   CMS_text_2->Draw("same");
   lumiText->Draw("same");
@@ -6234,6 +6328,7 @@ int Plot_mT_Stage1_WithSyst() {
     data_by_MC_syst->SetBinContent(i,1.0);
     //   float ratio_syst_err = (data/(MC*MC))*syst_err  ;  // abs error : sigma_f , where f = data/mc
     float ratio_syst_err = (syst_err/MC) ;  // relative error : sigma_f / f , where f = data/mc
+    if (data==0 && MC==0) ratio_syst_err=0;
     data_by_MC_syst->SetBinError(i,ratio_syst_err);
     
     // data_by_MC->SetBinWidth(i,width);  
@@ -6268,8 +6363,114 @@ int Plot_mT_Stage1_WithSyst() {
   ratio_c->Write();
   ratio_c->Print("mT_Stage1_ratio_syst.pdf");
   ratio_c->Print("mT_Stage1_ratio_syst.png");
+  /////
+
+
+  TCanvas* ratio_noband = new TCanvas("ratio1","ratio_nobandanvas",600,800);
+  ratio_noband->SetTopMargin(0.); 
+  ratio_noband->SetBottomMargin(0.); 
+  ratio_noband->Update();
+  ratio_noband->Divide(1, 2);
+  ratio_noband->cd(1);
+
+  gPad->SetPad(.005, .30, .995, .995);
+  TPad* pad12 = (TPad*)ratio_noband->GetPad(1); 
+  pad12->SetTopMargin(0.05);
+  pad12->SetBottomMargin(0.05); 
+  
+  ratio_noband->Update();
+  gPad->SetLogy();
+  
+  hs->Draw("HIST");                                                                                                                                        
+  hs->SetMaximum(100000);
+  hs->SetMinimum(0.01);
+  hs->GetXaxis()->SetLimits(0, 3200);
+  hs->GetXaxis()->SetTitle("");
+  // total->Draw("SAME E2");
+  totalBkg->SetFillColor(kGray+1);
+  totalBkg->SetFillStyle(3001);
+  // totalBkg->Draw("same e2");
+  totalBkg->GetXaxis()->SetRangeUser(0,3200);
+
+  mydata->Draw("SAME E1");
+  mT_Stage1_Wprime_M4000->Draw("SAME HIST");
+  CMS_text->Draw("same");
+  CMS_text_2->Draw("same");
+  lumiText->Draw("same");
+  leg_example->Draw("same");
+  ratio_noband->cd(2);
+
+  gPad->SetPad(.005, .08, .995, .24); 
+  gStyle->SetOptStat(false);
+  ratio_noband->Update();
+  TPad* pad22 = (TPad*)ratio_noband->GetPad(2);
+  pad22->SetTopMargin(0.04); 
+  pad22->SetBottomMargin(0.30); 
+  pad22->SetGridx();
+  pad22->SetGridy();
+
+  std::cout << "data bins = " << mydata->GetNbinsX() << " width=" << mydata->GetBinWidth(2);
+  std::cout << " MC bins = " << total->GetNbinsX() << " width=" << total->GetBinWidth(2) << std::endl;
+
+  int nbin5=mydata->GetNbinsX() ;
+  float width5=mydata->GetBinWidth(2);
+  TH1F *data_by_MC5 = new TH1F("h1", "ratio5", nbin5, 0, 8000);
+  //TH1F *data_by_MC_syst = new TH1F("h2", "ratio_syst5", nbin5, 0, 8000);
+  // std::cout << "before D/MC bins=" << data_by_MC->GetNbinsX() << " width=" << data_by_MC->GetBinWidth(2) << std::endl;
+
+  for (int i=0; i<nbin5; i++) {
+    float data5 = mydata->GetBinContent(i);
+    float MC5 = total->GetBinContent(i);
+    // float syst_err = totalBkg->GetBinError(i);
+    float ratio5=0;
+    if (MC5>0) ratio5=data5/MC5 ;
+    data_by_MC5->SetBinContent(i,ratio5);
+    if (data5>0) {
+      float stat_err5 = sqrt(data5)/data5 ;  
+      data_by_MC5->SetBinError(i,stat_err5);
+    }
+    //   data_by_MC_syst->SetBinContent(i,1.0);
+    //   float ratio_syst_err = (data/(MC*MC))*syst_err  ;  // abs error : sigma_f , where f = data/mc
+    //  float ratio_syst_err = (syst_err/MC) ;  // relative error : sigma_f / f , where f = data/mc
+    //  if (data==0 && MC==0) ratio_syst_err=0;
+    // data_by_MC_syst->SetBinError(i,ratio_syst_err);
+    
+    // data_by_MC->SetBinWidth(i,width);  
+  }
+
+  //  TH1F* data_by_MC = (TH1F*)mydata->Clone();
+  // data_by_MC->Divide(total);
+  data_by_MC5->SetMarkerStyle(20);
+  data_by_MC5->SetFillColor(kGray);
+  data_by_MC5->SetFillStyle(3001);
+  /// data_by_MC5->Draw("e2");
+  data_by_MC5->Draw("same E");
+  data_by_MC5->GetXaxis()->SetTitle("M_{T} [GeV]");
+  data_by_MC5->GetYaxis()->SetTitle("#frac{DATA}{MC}");
+  data_by_MC5->GetYaxis()->SetLabelSize(0.12);
+  data_by_MC5->GetXaxis()->SetLabelSize(0.12);
+  data_by_MC5->GetYaxis()->SetTitleSize(0.18);
+  data_by_MC5->GetXaxis()->SetTitleSize(0.18);
+  data_by_MC5->GetYaxis()->SetTitleOffset(0.20);
+  data_by_MC5->GetXaxis()->SetTitleOffset(0.75);
+  data_by_MC5->SetTitle("");
+  data_by_MC5->GetXaxis()->SetRangeUser(0, 3200);
+  data_by_MC5->SetMaximum(3);
+  data_by_MC5->SetMinimum(0);
+  data_by_MC5->GetYaxis()->SetNdivisions(3);
+
+  TLine *l5=new TLine(0,1,3200,1);
+  l5->SetLineColor(kRed);
+  l5->Draw("same");
+
+  //  std::cout << "D/MC bins=" << data_by_MC->GetNbinsX() << " width=" << data_by_MC->GetBinWidth(2) << std::endl;
+  ratio_noband->Write();
+  ratio_noband->Print("mT_Stage1_ratio_noBAND.pdf");
+  ratio_noband->Print("mT_Stage1_ratio_noBAND.png");
 
  
   return 0;
 
 }
+
+//  LocalWords:  SetLineColor
