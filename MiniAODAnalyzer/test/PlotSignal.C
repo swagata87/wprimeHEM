@@ -30,22 +30,22 @@
 
 int PlotSignal() {
 
-  double lumi=20.0 ;  // B->5.882  // C->2.646   D->4.353 ;  // E->4.049 ; F->3.16 ;  G->7.554;  H->5.942  //--inv fb--//
+  double lumi=35.865 ;  // B->5.882  // C->2.646   D->4.353 ;  // E->4.049 ; F->3.16 ;  G->7.554;  H->5.942  //--inv fb--//
 
   /// Signal ///
-  TFile *file_Wprime_M1000 = new TFile("../python/crab_projects_SSMsigOnly_Jan7/crab_WprimeToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_Wprime_M1000 = new TFile("../python/crab_projects_March3/crab_WprimeToTauNu_M-1000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_Wprime_M1000= 3060; // --fb-- //
 
-  TFile *file_Wprime_M2000 = new TFile("../python/crab_projects_SSMsigOnly_Jan7/crab_WprimeToTauNu_M-2000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
-  double xs_Wprime_M2000= 122.0; // --fb-- //
+  //  TFile *file_Wprime_M2000 = new TFile("../python/crab_projects_March3/crab_WprimeToTauNu_M-2000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  //  double xs_Wprime_M2000= 122.0; // --fb-- //
 
-  TFile *file_Wprime_M3000 = new TFile("../python/crab_projects_SSMsigOnly_Jan7/crab_WprimeToTauNu_M-3000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_Wprime_M3000 = new TFile("../python/crab_projects_March3/crab_WprimeToTauNu_M-3000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_Wprime_M3000= 11.6; // --fb-- //
 
-  TFile *file_Wprime_M4000 = new TFile("../python/crab_projects_SSMsigOnly_Jan7/crab_WprimeToTauNu_M-4000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_Wprime_M4000 = new TFile("../python/crab_projects_March3/crab_WprimeToTauNu_M-4000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_Wprime_M4000= 2.04; // --fb-- //
 
-  TFile *file_Wprime_M5000 = new TFile("../python/crab_projects_SSMsigOnly_Jan7/crab_WprimeToTauNu_M-5000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
+  TFile *file_Wprime_M5000 = new TFile("../python/crab_projects_March3/crab_WprimeToTauNu_M-5000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_Wprime_M5000=0.408; // --fb-- //
 
   std::cout << "will do signal " << std::endl;
@@ -61,6 +61,7 @@ int PlotSignal() {
   mT_Stage1_Wprime_M1000->SetLineWidth(3);
   mT_Stage1_Wprime_M1000->Rebin(80);
 
+  /*
   TH1D* h1_evt_Wprime_M2000 = (TH1D*)file_Wprime_M2000->Get("demo/histoDir/eventCount");
   unsigned long long evt_Wprime_M2000 = h1_evt_Wprime_M2000->GetEntries(); //Integral();                                                                          
   double wt_Wprime_M2000 = (xs_Wprime_M2000*lumi)/evt_Wprime_M2000 ;
@@ -70,6 +71,7 @@ int PlotSignal() {
   mT_Stage1_Wprime_M2000->SetLineColor(kGreen);
   mT_Stage1_Wprime_M2000->SetLineWidth(3);
   mT_Stage1_Wprime_M2000->Rebin(80);
+  */
 
   TH1D* h1_evt_Wprime_M3000 = (TH1D*)file_Wprime_M3000->Get("demo/histoDir/eventCount");
   unsigned long long evt_Wprime_M3000 = h1_evt_Wprime_M3000->GetEntries(); //Integral();                                                                          
@@ -131,7 +133,7 @@ int PlotSignal() {
   
 
   mT_Stage1_Wprime_M1000->Draw("HIST");
-  mT_Stage1_Wprime_M2000->Draw("SAME HIST");
+  //  mT_Stage1_Wprime_M2000->Draw("SAME HIST");
   mT_Stage1_Wprime_M3000->Draw("SAME HIST");
   mT_Stage1_Wprime_M4000->Draw("SAME HIST");
   mT_Stage1_Wprime_M5000->Draw("SAME HIST");
@@ -148,7 +150,7 @@ int PlotSignal() {
   CMS_text_2->SetTextAngle(0);
   CMS_text_2->Draw("same");    
 
-  TLatex* lumiText = new TLatex(0.92,0.975,"20 fb^{-1}");
+  TLatex* lumiText = new TLatex(0.92,0.975,"35.9 fb^{-1}");
   lumiText->SetNDC();
   lumiText->SetTextFont(42);
   lumiText->SetTextSize(0.04);
@@ -160,7 +162,7 @@ int PlotSignal() {
   leg_example->SetTextFont(42);
   leg_example->SetBorderSize(0);
   leg_example->AddEntry(mT_Stage1_Wprime_M1000, "SSM W' 1 TeV", "l");
-  leg_example->AddEntry(mT_Stage1_Wprime_M2000, "SSM W' 2 TeV", "l");
+  //  leg_example->AddEntry(mT_Stage1_Wprime_M2000, "SSM W' 2 TeV", "l");
   leg_example->AddEntry(mT_Stage1_Wprime_M3000, "SSM W' 3 TeV", "l");
   leg_example->AddEntry(mT_Stage1_Wprime_M4000, "SSM W' 4 TeV", "l");
   leg_example->AddEntry(mT_Stage1_Wprime_M5000, "SSM W' 5 TeV", "l");

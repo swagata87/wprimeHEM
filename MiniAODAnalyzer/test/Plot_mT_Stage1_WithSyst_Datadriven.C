@@ -28,13 +28,17 @@
 
 // kfactor source : https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns
 
-int Plot_mT_Stage1_WithSyst() {
+int Plot_mT_Stage1_WithSyst_Datadriven() {
 
   double totalMC =0.0;
-  double lumi=35.865; //36.813;  //13.496 ;  // B->5.882  // C->2.646   D->4.353 ;  // E->4.049 ; F->3.16 ;  G->7.554;  H->5.942  //--inv fb--//
-  // lumi error 2.6%  (OLD value 6.2 %)
-  double wt_lumi_up = 1.026; 
-  double wt_lumi_down = 0.974;
+  double lumi= 35.865;  //36.813;  //13.496 ;  // B->5.882  // C->2.646   D->4.353 ;  // E->4.049 ; F->3.16 ;  G->7.554;  H->5.942  //--inv fb--//
+  // lumi error 
+  double wt_lumi_up = 1.026; // 1.062; 
+  double wt_lumi_down = 0.974; //0.938;
+  // 
+  // DD error 50 %
+  double wt_DD_up = 1.5; 
+  double wt_DD_down = 0.5;
   //
   unsigned long long evt_DYJetsToLL_M50=1;
   unsigned long long evt_DYJetsToLL_M5to50=1;
@@ -45,7 +49,13 @@ int Plot_mT_Stage1_WithSyst() {
   //  TFile *file_DYJetsToLL_M50  = new TFile("../python/crab_projects/crab_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/results/hist.root");
   //double xs_DYJetsToLL_M50=6104000; //--fb--//
 
-  TFile *file_DYJetsToLL_M50  = new TFile("../python/crab_projects_March3/crab_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");             
+  //
+  std::cout << "get datadriven root file" << std::endl;
+  TFile *file_Datadriven  = new TFile("/net/scratch_cms3a/materok/wprime/qcd/dataDrivenTree15_pt_base_Mar7_fromData.root");        
+  //
+
+  std::cout << "get DY M50 root file" << std::endl;
+  TFile *file_DYJetsToLL_M50  = new TFile("../python/crab_projects_March3/crab_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");        
   double xs_DYJetsToLL_M50=4895000;  //--fb--//                                                                                                                    
 
   TFile *file_DYJetsToLL_M5to50  = new TFile("../python/crab_projects_March3/crab_DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");    
@@ -54,7 +64,7 @@ int Plot_mT_Stage1_WithSyst() {
   TFile *file_TT              = new TFile("../python/crab_projects_March3/crab_TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/results/hist.root");
   double xs_TT=730000; //--fb--//
   double kfact_TT= 1.139;
-
+  
   TFile *file_TT_Mtt_700to1000      = new TFile("../python/crab_projects_March3/crab_TT_Mtt-700to1000_TuneCUETP8M1_13TeV-powheg-pythia8/results/hist.root");
   double xs_TT_Mtt_700to1000=730000; //--fb--//
   double kfact_TT_Mtt_700to1000= 0.0921;
@@ -62,7 +72,7 @@ int Plot_mT_Stage1_WithSyst() {
   TFile *file_TT_Mtt_1000toInf              = new TFile("../python/crab_projects_March3/crab_TT_Mtt-1000toInf_TuneCUETP8M1_13TeV-powheg-pythia8/results/hist.root");
   double xs_TT_Mtt_1000toInf=730000; //--fb--//
   double kfact_TT_Mtt_1000toInf= 0.02474;
-
+  
 
   //TFile *file_WJetsToLNu      = new TFile("../python/crab_projects_March3/crab_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/results/hist.root");
   //double xs_WJetsToLNu=60290000; //--fb--//
@@ -134,22 +144,17 @@ int Plot_mT_Stage1_WithSyst() {
   double xs_WJetsToLNu_HT2500ToInf = 32.16  ; //--fb--//
   double kfact_WJetsToLNu_HT2500ToInf = 1.0 ;
 
-  //crab_ST_t-channel_antitop_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin
-  //crab_ST_t-channel_top_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin
-  //crab_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4
-  //crab_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4
-
   TFile *file_ST_tchannel_antitop=new TFile("../python/crab_projects_March3/crab_ST_t-channel_antitop_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin/results/hist.root");
   double xs_ST_tchannel_antitop = 80950; //--fb--//
-  double kfact_ST_tchannel_antitop = 1.0; // 0.326;
+  double kfact_ST_tchannel_antitop = 1.0;//0.326;
   //
   TFile *file_ST_tchannel_top=new TFile("../python/crab_projects_March3/crab_ST_t-channel_top_4f_inclusiveDecays_TuneCUETP8M2T4_13TeV-powhegV2-madspin/results/hist.root");
-  double xs_ST_tchannel_top = 136020; //  103200; //--fb--//
-  double kfact_ST_tchannel_top =1.0; // 0.43;
+  double xs_ST_tchannel_top = 136020; //103200; //--fb--//
+  double kfact_ST_tchannel_top = 1.0;//0.43;
   //
   TFile *file_ST_tW_antitop=new TFile("../python/crab_projects_March3/crab_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/results/hist.root");
   double xs_ST_tW_antitop = 38090; //--fb--//
-  double kfact_ST_tW_antitop = 1.0; // 0.94;
+  double kfact_ST_tW_antitop = 1.0;//0.94;
   //
   TFile *file_ST_tW_top=new TFile("../python/crab_projects_March3/crab_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/results/hist.root");
   double xs_ST_tW_top = 38090; //--fb--//
@@ -166,54 +171,6 @@ int Plot_mT_Stage1_WithSyst() {
   double xs_ZZ = 10320; //--fb--//
   double kfact_ZZ = 1.60 ; //16523/10320
   //
-  TFile *file_QCD_HT200to300=new TFile("../python/crab_projects_March3/crab_QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
-  double xs_QCD_HT200to300 = 1717000000; //--fb--//
-  //
-  TFile *file_QCD_HT300to500=new TFile("../python/crab_projects_March3/crab_QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
-  double xs_QCD_HT300to500 = 351300000; //--fb--//
-  //
-  TFile *file_QCD_HT500to700=new TFile("../python/crab_projects_March3/crab_QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
-  double xs_QCD_HT500to700 = 31630000 ; //--fb--//
-  //
-  TFile *file_QCD_HT700to1000=new TFile("../python/crab_projects_March3/crab_QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
-  double xs_QCD_HT700to1000 = 6802000 ; //--fb--//
-  //
-  TFile *file_QCD_HT1000to1500=new TFile("../python/crab_projects_March3/crab_QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
-  double xs_QCD_HT1000to1500 = 1206000 ; //--fb--//
-  //
-  TFile *file_QCD_HT1500to2000=new TFile("../python/crab_projects_March3/crab_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
-  double xs_QCD_HT1500to2000 = 120400 ; //--fb--//
-  //
-  TFile *file_QCD_HT2000toInf=new TFile("../python/crab_projects_March3/crab_QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/results/hist.root");
-  double xs_QCD_HT2000toInf = 25250 ; //--fb--//
-  //
-  TFile *file_ZJetsToNuNu_HT100To200 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-100To200_13TeV-madgraph/results/hist.root");
-  double xs_ZJetsToNuNu_HT100To200 =  280350; //--fb--//
-  double kfact_ZJetsToNuNu_HT100To200 =  1.23 ;
-  //
-  TFile *file_ZJetsToNuNu_HT200To400 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-200To400_13TeV-madgraph/results/hist.root");
-  double xs_ZJetsToNuNu_HT200To400 = 77670 ; //--fb--//
-  double kfact_ZJetsToNuNu_HT200To400 = 1.23 ;
-  //
-  TFile *file_ZJetsToNuNu_HT400To600 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-400To600_13TeV-madgraph/results/hist.root");
-  double xs_ZJetsToNuNu_HT400To600 = 10730 ; //--fb--//
-  double kfact_ZJetsToNuNu_HT400To600 =  1.23 ;
-  //
-  TFile *file_ZJetsToNuNu_HT600To800 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-600To800_13TeV-madgraph/results/hist.root");
-  double xs_ZJetsToNuNu_HT600To800 = 853 ; //--fb--//
- double kfact_ZJetsToNuNu_HT600To800 =  1.23 ;
-  //
-  TFile *file_ZJetsToNuNu_HT800To1200 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-800To1200_13TeV-madgraph/results/hist.root");
-  double xs_ZJetsToNuNu_HT800To1200 = 394.2 ; //--fb--//
-  double kfact_ZJetsToNuNu_HT800To1200 =  1.23 ;
-  //
-  TFile *file_ZJetsToNuNu_HT1200To2500 =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/results/hist.root");
-  double xs_ZJetsToNuNu_HT1200To2500 = 97.4 ; //--fb--//
-  double kfact_ZJetsToNuNu_HT1200To2500 =  1.23 ;
-  //
-  TFile *file_ZJetsToNuNu_HT2500ToInf =new TFile("../python/crab_projects_March3/crab_ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph/results/hist.root");
-  double xs_ZJetsToNuNu_HT2500ToInf = 2.308 ; //--fb--//
-  double kfact_ZJetsToNuNu_HT2500ToInf =  1.23 ;
 
   /// DATA ///
   /*
@@ -237,14 +194,27 @@ int Plot_mT_Stage1_WithSyst() {
 
 
   /// Signal ///
-  //  TFile *file_Wprime_M1000 = new TFile("../python/crab_projects_March3/crab_WprimeToTauNu_M-4000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
-  // double xs_Wprime_M1000= 3060; // --fb-- //
-
   TFile *file_Wprime_M4000 = new TFile("../python/crab_projects_March3/crab_WprimeToTauNu_M-4000_TuneCUETP8M1_13TeV-pythia8-tauola/results/hist.root");
   double xs_Wprime_M4000= 2.04; // --fb-- //
 
-  //  TFile *file_WprimeNUGIM_M3000_1p5 = new TFile("../python/crab_projects_March3/crab_WprimeToTauNUGIM_M3000_gL1p5-madgraph/results/hist.root");
-  //double xs_WprimeNUGIM_M3000_1p5= 2.04; // --fb-- //
+  //datadriven
+  //  double wt_Datadriven = (lumi/33.507) ;
+  TH1D* mT_Stage1_Datadriven = (TH1D*)file_Datadriven->Get("demo/histoDir/mT_Stage1");
+  // mT_Stage1_Datadriven->Scale(lumi);
+  std::cout << "Datadriven weighted nevt=" << mT_Stage1_Datadriven->Integral() << std::endl;
+
+  mT_Stage1_Datadriven->SetFillStyle(3001);
+  mT_Stage1_Datadriven->SetFillColor(kPink+1);
+  mT_Stage1_Datadriven->SetLineColor(kBlack);
+  mT_Stage1_Datadriven->Rebin(100);
+
+  TH1D* mT_Stage1_Datadriven_up = (TH1D*)mT_Stage1_Datadriven->Clone();
+  mT_Stage1_Datadriven_up->Scale(wt_DD_up);
+  TH1D* mT_Stage1_Datadriven_down = (TH1D*)mT_Stage1_Datadriven->Clone();
+  mT_Stage1_Datadriven_down->Scale(wt_DD_down);
+
+  totalMC += mT_Stage1_Datadriven->Integral();
+
 
   //--//
   TH1D* h1_evt_DYJetsToLL_M50 = (TH1D*)file_DYJetsToLL_M50->Get("demo/histoDir/eventCount");
@@ -326,7 +296,13 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_DYJetsToLL_M50_pdfUncertUp->Scale(wt_DYJetsToLL_M50);
   //
   TH1D* mT_Stage1_DYJetsToLL_M50_pdfUncertDown = (TH1D*)file_DYJetsToLL_M50->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_DYJetsToLL_M50_pdfUncertDown->Scale(wt_DYJetsToLL_M50); */
+  mT_Stage1_DYJetsToLL_M50_pdfUncertDown->Scale(wt_DYJetsToLL_M50);
+  */  //
+  TH1D* mT_Stage1_DYJetsToLL_M50_trigSFUp = (TH1D*)file_DYJetsToLL_M50->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_DYJetsToLL_M50_trigSFUp->Scale(wt_DYJetsToLL_M50);
+  //
+  TH1D* mT_Stage1_DYJetsToLL_M50_trigSFDown = (TH1D*)file_DYJetsToLL_M50->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_DYJetsToLL_M50_trigSFDown->Scale(wt_DYJetsToLL_M50);
   //
   TH1D* h1_evt_DYJetsToLL_M5to50 = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/eventCount");
   evt_DYJetsToLL_M5to50 = h1_evt_DYJetsToLL_M5to50->GetEntries(); // Integral();
@@ -402,13 +378,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_DYJetsToLL_M5to50_TauIDSFDown = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_DYJetsToLL_M5to50_TauIDSFDown->Scale(wt_DYJetsToLL_M5to50);
   //
-  /*
-  TH1D* mT_Stage1_DYJetsToLL_M5to50_pdfUncertUp = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_DYJetsToLL_M5to50_pdfUncertUp->Scale(wt_DYJetsToLL_M5to50);
+  //  TH1D* mT_Stage1_DYJetsToLL_M5to50_pdfUncertUp = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_DYJetsToLL_M5to50_pdfUncertUp->Scale(wt_DYJetsToLL_M5to50);
   //                                                                                                                                                                            
-  TH1D* mT_Stage1_DYJetsToLL_M5to50_pdfUncertDown = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_DYJetsToLL_M5to50_pdfUncertDown->Scale(wt_DYJetsToLL_M5to50);
-  // */
+  // TH1D* mT_Stage1_DYJetsToLL_M5to50_pdfUncertDown = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  //  mT_Stage1_DYJetsToLL_M5to50_pdfUncertDown->Scale(wt_DYJetsToLL_M5to50);
+  //
+  TH1D* mT_Stage1_DYJetsToLL_M5to50_trigSFUp = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_DYJetsToLL_M5to50_trigSFUp->Scale(wt_DYJetsToLL_M5to50);
+  //                                                                                                                                                                            
+  TH1D* mT_Stage1_DYJetsToLL_M5to50_trigSFDown = (TH1D*)file_DYJetsToLL_M5to50->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_DYJetsToLL_M5to50_trigSFDown->Scale(wt_DYJetsToLL_M5to50);
+  //
   
   TH1D* total_DY = (TH1D*)mT_Stage1_DYJetsToLL_M50->Clone(); 
   total_DY->Add(mT_Stage1_DYJetsToLL_M5to50);
@@ -426,14 +407,17 @@ int Plot_mT_Stage1_WithSyst() {
   std::cout << "TTbar weighted nevt=" << mT_Stage1_TT->Integral() << std::endl;
   totalMC += mT_Stage1_TT->Integral();
   //
+  std::cout << "Will do ttbar jet En up" << std::endl;
   TH1D* mT_Stage1_TT_JetEnUp  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
   mT_Stage1_TT_JetEnUp->Scale(wt_TT);
   mT_Stage1_TT_JetEnUp->Scale(kfact_TT);
   //
+  std::cout << "Will do ttbar jet En down" << std::endl;
   TH1D* mT_Stage1_TT_JetEnDown  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
   mT_Stage1_TT_JetEnDown->Scale(wt_TT);
   mT_Stage1_TT_JetEnDown->Scale(kfact_TT);
   //
+  std::cout << "Will do ttbar jet res up" << std::endl;
   TH1D* mT_Stage1_TT_JetResUp  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
   mT_Stage1_TT_JetResUp->Scale(wt_TT);
   mT_Stage1_TT_JetResUp->Scale(kfact_TT);
@@ -513,8 +497,8 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_TT_TauIDSFDown  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_TT_TauIDSFDown->Scale(wt_TT);
   mT_Stage1_TT_TauIDSFDown->Scale(kfact_TT);
-  // 
-/*
+  //
+  /*
   TH1D* mT_Stage1_TT_pdfUncertUp  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
   mT_Stage1_TT_pdfUncertUp->Scale(wt_TT);
   mT_Stage1_TT_pdfUncertUp->Scale(kfact_TT);
@@ -522,7 +506,21 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_TT_pdfUncertDown  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
   mT_Stage1_TT_pdfUncertDown->Scale(wt_TT);
   mT_Stage1_TT_pdfUncertDown->Scale(kfact_TT);
-  // */
+  //
+  */
+  TH1D* mT_Stage1_TT_trigSFUp  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_TT_trigSFUp->Scale(wt_TT);
+  mT_Stage1_TT_trigSFUp->Scale(kfact_TT);
+  //
+  std::cout << "Will do ttbar trig SF down" << std::endl;
+  TH1D* mT_Stage1_TT_trigSFDown  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_TT_trigSFDown->Scale(wt_TT);
+  mT_Stage1_TT_trigSFDown->Scale(kfact_TT);
+
+  std::cout << "Finished with ttbar bulk" << std::endl;
+
+
+  //
   /*
   TH1D* mT_Stage1_TT_lumiUp  = (TH1D*)file_TT->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_TT_lumiUp->Scale(wt_TT);
@@ -535,7 +533,9 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_TT_lumiDown->Scale(kfact_TT);
   //
   */
+
   //file_TT_Mtt_700to1000
+  
   TH1D* h1_evt_TT_Mtt_700to1000 = (TH1D*)file_TT_Mtt_700to1000->Get("demo/histoDir/eventCount");
   evt_TT_Mtt_700to1000 = h1_evt_TT_Mtt_700to1000->GetEntries(); // Integral();
   double wt_TT_Mtt_700to1000 = (xs_TT_Mtt_700to1000*lumi)/evt_TT_Mtt_700to1000 ;
@@ -633,15 +633,22 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_TT_Mtt_700to1000_TauIDSFDown->Scale(wt_TT_Mtt_700to1000);
   mT_Stage1_TT_Mtt_700to1000_TauIDSFDown->Scale(kfact_TT_Mtt_700to1000);
   //
-  /*
-  TH1D* mT_Stage1_TT_Mtt_700to1000_pdfUncertUp  = (TH1D*)file_TT_Mtt_700to1000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_TT_Mtt_700to1000_pdfUncertUp->Scale(wt_TT_Mtt_700to1000);
-  mT_Stage1_TT_Mtt_700to1000_pdfUncertUp->Scale(kfact_TT_Mtt_700to1000);
+  // TH1D* mT_Stage1_TT_Mtt_700to1000_pdfUncertUp  = (TH1D*)file_TT_Mtt_700to1000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_TT_Mtt_700to1000_pdfUncertUp->Scale(wt_TT_Mtt_700to1000);
+  //  mT_Stage1_TT_Mtt_700to1000_pdfUncertUp->Scale(kfact_TT_Mtt_700to1000);
 
-  TH1D* mT_Stage1_TT_Mtt_700to1000_pdfUncertDown  = (TH1D*)file_TT_Mtt_700to1000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_TT_Mtt_700to1000_pdfUncertDown->Scale(wt_TT_Mtt_700to1000);
-  mT_Stage1_TT_Mtt_700to1000_pdfUncertDown->Scale(kfact_TT_Mtt_700to1000);
-  */ //
+  //  TH1D* mT_Stage1_TT_Mtt_700to1000_pdfUncertDown  = (TH1D*)file_TT_Mtt_700to1000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  //  mT_Stage1_TT_Mtt_700to1000_pdfUncertDown->Scale(wt_TT_Mtt_700to1000);
+  //  mT_Stage1_TT_Mtt_700to1000_pdfUncertDown->Scale(kfact_TT_Mtt_700to1000);
+  //
+  TH1D* mT_Stage1_TT_Mtt_700to1000_trigSFUp  = (TH1D*)file_TT_Mtt_700to1000->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_TT_Mtt_700to1000_trigSFUp->Scale(wt_TT_Mtt_700to1000);
+  mT_Stage1_TT_Mtt_700to1000_trigSFUp->Scale(kfact_TT_Mtt_700to1000);
+
+  TH1D* mT_Stage1_TT_Mtt_700to1000_trigSFDown  = (TH1D*)file_TT_Mtt_700to1000->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_TT_Mtt_700to1000_trigSFDown->Scale(wt_TT_Mtt_700to1000);
+  mT_Stage1_TT_Mtt_700to1000_trigSFDown->Scale(kfact_TT_Mtt_700to1000);
+ 
   /*
   TH1D* mT_Stage1_TT_Mtt_700to1000_lumiUp  = (TH1D*)file_TT_Mtt_700to1000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_TT_Mtt_700to1000_lumiUp->Scale(wt_TT_Mtt_700to1000);
@@ -653,6 +660,7 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_TT_Mtt_700to1000_lumiDown->Scale(wt_lumi_down);
   mT_Stage1_TT_Mtt_700to1000_lumiDown->Scale(kfact_TT_Mtt_700to1000);
   */
+
 
   //file_TT_Mtt_1000toInf
   TH1D* h1_evt_TT_Mtt_1000toInf = (TH1D*)file_TT_Mtt_1000toInf->Get("demo/histoDir/eventCount");
@@ -752,15 +760,23 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_TT_Mtt_1000toInf_TauIDSFDown->Scale(wt_TT_Mtt_1000toInf);
   mT_Stage1_TT_Mtt_1000toInf_TauIDSFDown->Scale(kfact_TT_Mtt_1000toInf);
   //
-  /*
-  TH1D* mT_Stage1_TT_Mtt_1000toInf_pdfUncertUp  = (TH1D*)file_TT_Mtt_1000toInf->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_TT_Mtt_1000toInf_pdfUncertUp->Scale(wt_TT_Mtt_1000toInf);
-  mT_Stage1_TT_Mtt_1000toInf_pdfUncertUp->Scale(kfact_TT_Mtt_1000toInf);
+  //  TH1D* mT_Stage1_TT_Mtt_1000toInf_pdfUncertUp  = (TH1D*)file_TT_Mtt_1000toInf->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_TT_Mtt_1000toInf_pdfUncertUp->Scale(wt_TT_Mtt_1000toInf);
+  //  mT_Stage1_TT_Mtt_1000toInf_pdfUncertUp->Scale(kfact_TT_Mtt_1000toInf);
 
-  TH1D* mT_Stage1_TT_Mtt_1000toInf_pdfUncertDown  = (TH1D*)file_TT_Mtt_1000toInf->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_TT_Mtt_1000toInf_pdfUncertDown->Scale(wt_TT_Mtt_1000toInf);
-  mT_Stage1_TT_Mtt_1000toInf_pdfUncertDown->Scale(kfact_TT_Mtt_1000toInf);
-  */  //
+  //  TH1D* mT_Stage1_TT_Mtt_1000toInf_pdfUncertDown  = (TH1D*)file_TT_Mtt_1000toInf->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_TT_Mtt_1000toInf_pdfUncertDown->Scale(wt_TT_Mtt_1000toInf);
+  //  mT_Stage1_TT_Mtt_1000toInf_pdfUncertDown->Scale(kfact_TT_Mtt_1000toInf);
+  //
+  TH1D* mT_Stage1_TT_Mtt_1000toInf_trigSFUp  = (TH1D*)file_TT_Mtt_1000toInf->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_TT_Mtt_1000toInf_trigSFUp->Scale(wt_TT_Mtt_1000toInf);
+  mT_Stage1_TT_Mtt_1000toInf_trigSFUp->Scale(kfact_TT_Mtt_1000toInf);
+
+  TH1D* mT_Stage1_TT_Mtt_1000toInf_trigSFDown  = (TH1D*)file_TT_Mtt_1000toInf->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_TT_Mtt_1000toInf_trigSFDown->Scale(wt_TT_Mtt_1000toInf);
+  mT_Stage1_TT_Mtt_1000toInf_trigSFDown->Scale(kfact_TT_Mtt_1000toInf);
+  //
+
   /*
   TH1D* mT_Stage1_TT_Mtt_1000toInf_lumiUp  = (TH1D*)file_TT_Mtt_1000toInf->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_TT_Mtt_1000toInf_lumiUp->Scale(wt_TT_Mtt_1000toInf);
@@ -773,6 +789,8 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_TT_Mtt_1000toInf_lumiDown->Scale(kfact_TT_Mtt_1000toInf);
   */
 
+
+  std::cout << "do total_tt" << std::endl;
   TH1D* total_TT = (TH1D*)mT_Stage1_TT->Clone(); 
   total_TT->Add(mT_Stage1_TT_Mtt_700to1000);
   total_TT->Add(mT_Stage1_TT_Mtt_1000toInf);
@@ -798,6 +816,9 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_WJetsToLNu->Rebin(100);
   std::cout << "**WJets** weighted nevt=" << mT_Stage1_WJetsToLNu->Integral() << std::endl;
   */
+
+
+  std::cout << "do ST" << std::endl;
 
   //file_ST_tchannel_antitop
   TH1D* h1_evt_ST_tchannel_antitop = (TH1D*)file_ST_tchannel_antitop->Get("demo/histoDir/eventCount");
@@ -897,15 +918,21 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ST_tchannel_antitop_TauIDSFDown->Scale(wt_ST_tchannel_antitop);
   mT_Stage1_ST_tchannel_antitop_TauIDSFDown->Scale(kfact_ST_tchannel_antitop);
   //
-  /*
-  TH1D* mT_Stage1_ST_tchannel_antitop_pdfUncertUp  = (TH1D*)file_ST_tchannel_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ST_tchannel_antitop_pdfUncertUp->Scale(wt_ST_tchannel_antitop);
-  mT_Stage1_ST_tchannel_antitop_pdfUncertUp->Scale(kfact_ST_tchannel_antitop);
+  //  TH1D* mT_Stage1_ST_tchannel_antitop_pdfUncertUp  = (TH1D*)file_ST_tchannel_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  //  mT_Stage1_ST_tchannel_antitop_pdfUncertUp->Scale(wt_ST_tchannel_antitop);
+  // mT_Stage1_ST_tchannel_antitop_pdfUncertUp->Scale(kfact_ST_tchannel_antitop);
 
-  TH1D* mT_Stage1_ST_tchannel_antitop_pdfUncertDown  = (TH1D*)file_ST_tchannel_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ST_tchannel_antitop_pdfUncertDown->Scale(wt_ST_tchannel_antitop);
-  mT_Stage1_ST_tchannel_antitop_pdfUncertDown->Scale(kfact_ST_tchannel_antitop);
-  */  //
+  //  TH1D* mT_Stage1_ST_tchannel_antitop_pdfUncertDown  = (TH1D*)file_ST_tchannel_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  //  mT_Stage1_ST_tchannel_antitop_pdfUncertDown->Scale(wt_ST_tchannel_antitop);
+  //  mT_Stage1_ST_tchannel_antitop_pdfUncertDown->Scale(kfact_ST_tchannel_antitop);
+  //
+  TH1D* mT_Stage1_ST_tchannel_antitop_trigSFUp  = (TH1D*)file_ST_tchannel_antitop->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_ST_tchannel_antitop_trigSFUp->Scale(wt_ST_tchannel_antitop);
+  mT_Stage1_ST_tchannel_antitop_trigSFUp->Scale(kfact_ST_tchannel_antitop);
+
+  TH1D* mT_Stage1_ST_tchannel_antitop_trigSFDown  = (TH1D*)file_ST_tchannel_antitop->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_ST_tchannel_antitop_trigSFDown->Scale(wt_ST_tchannel_antitop);
+  mT_Stage1_ST_tchannel_antitop_trigSFDown->Scale(kfact_ST_tchannel_antitop);
   /*
   TH1D* mT_Stage1_ST_tchannel_antitop_lumiUp  = (TH1D*)file_ST_tchannel_antitop->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ST_tchannel_antitop_lumiUp->Scale(wt_ST_tchannel_antitop);
@@ -1016,15 +1043,22 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ST_tchannel_top_TauIDSFDown->Scale(wt_ST_tchannel_top);
   mT_Stage1_ST_tchannel_top_TauIDSFDown->Scale(kfact_ST_tchannel_top);
   //
-  /*
-  TH1D* mT_Stage1_ST_tchannel_top_pdfUncertUp  = (TH1D*)file_ST_tchannel_top->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ST_tchannel_top_pdfUncertUp->Scale(wt_ST_tchannel_top);
-  mT_Stage1_ST_tchannel_top_pdfUncertUp->Scale(kfact_ST_tchannel_top);
+  //  TH1D* mT_Stage1_ST_tchannel_top_pdfUncertUp  = (TH1D*)file_ST_tchannel_top->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  //  mT_Stage1_ST_tchannel_top_pdfUncertUp->Scale(wt_ST_tchannel_top);
+  // mT_Stage1_ST_tchannel_top_pdfUncertUp->Scale(kfact_ST_tchannel_top);
 
-  TH1D* mT_Stage1_ST_tchannel_top_pdfUncertDown  = (TH1D*)file_ST_tchannel_top->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ST_tchannel_top_pdfUncertDown->Scale(wt_ST_tchannel_top);
-  mT_Stage1_ST_tchannel_top_pdfUncertDown->Scale(kfact_ST_tchannel_top);
-  */ //
+  //  TH1D* mT_Stage1_ST_tchannel_top_pdfUncertDown  = (TH1D*)file_ST_tchannel_top->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_ST_tchannel_top_pdfUncertDown->Scale(wt_ST_tchannel_top);
+  //  mT_Stage1_ST_tchannel_top_pdfUncertDown->Scale(kfact_ST_tchannel_top);
+  //
+  TH1D* mT_Stage1_ST_tchannel_top_trigSFUp  = (TH1D*)file_ST_tchannel_top->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_ST_tchannel_top_trigSFUp->Scale(wt_ST_tchannel_top);
+  mT_Stage1_ST_tchannel_top_trigSFUp->Scale(kfact_ST_tchannel_top);
+
+  TH1D* mT_Stage1_ST_tchannel_top_trigSFDown  = (TH1D*)file_ST_tchannel_top->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_ST_tchannel_top_trigSFDown->Scale(wt_ST_tchannel_top);
+  mT_Stage1_ST_tchannel_top_trigSFDown->Scale(kfact_ST_tchannel_top);
+  //
   /*
   TH1D* mT_Stage1_ST_tchannel_top_lumiUp  = (TH1D*)file_ST_tchannel_top->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ST_tchannel_top_lumiUp->Scale(wt_ST_tchannel_top);
@@ -1136,15 +1170,22 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ST_tW_antitop_TauIDSFDown->Scale(wt_ST_tW_antitop);
   mT_Stage1_ST_tW_antitop_TauIDSFDown->Scale(kfact_ST_tW_antitop);
   //
-  /*
-  TH1D* mT_Stage1_ST_tW_antitop_pdfUncertUp  = (TH1D*)file_ST_tW_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ST_tW_antitop_pdfUncertUp->Scale(wt_ST_tW_antitop);
-  mT_Stage1_ST_tW_antitop_pdfUncertUp->Scale(kfact_ST_tW_antitop);
+  //  TH1D* mT_Stage1_ST_tW_antitop_pdfUncertUp  = (TH1D*)file_ST_tW_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  //  mT_Stage1_ST_tW_antitop_pdfUncertUp->Scale(wt_ST_tW_antitop);
+  //  mT_Stage1_ST_tW_antitop_pdfUncertUp->Scale(kfact_ST_tW_antitop);
 
-  TH1D* mT_Stage1_ST_tW_antitop_pdfUncertDown  = (TH1D*)file_ST_tW_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ST_tW_antitop_pdfUncertDown->Scale(wt_ST_tW_antitop);
-  mT_Stage1_ST_tW_antitop_pdfUncertDown->Scale(kfact_ST_tW_antitop);
-  */  //
+  //  TH1D* mT_Stage1_ST_tW_antitop_pdfUncertDown  = (TH1D*)file_ST_tW_antitop->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_ST_tW_antitop_pdfUncertDown->Scale(wt_ST_tW_antitop);
+  //  mT_Stage1_ST_tW_antitop_pdfUncertDown->Scale(kfact_ST_tW_antitop);
+  //
+  TH1D* mT_Stage1_ST_tW_antitop_trigSFUp  = (TH1D*)file_ST_tW_antitop->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_ST_tW_antitop_trigSFUp->Scale(wt_ST_tW_antitop);
+  mT_Stage1_ST_tW_antitop_trigSFUp->Scale(kfact_ST_tW_antitop);
+
+  TH1D* mT_Stage1_ST_tW_antitop_trigSFDown  = (TH1D*)file_ST_tW_antitop->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_ST_tW_antitop_trigSFDown->Scale(wt_ST_tW_antitop);
+  mT_Stage1_ST_tW_antitop_trigSFDown->Scale(kfact_ST_tW_antitop);
+  //
   /*
   TH1D* mT_Stage1_ST_tW_antitop_lumiUp  = (TH1D*)file_ST_tW_antitop->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ST_tW_antitop_lumiUp->Scale(wt_ST_tW_antitop);
@@ -1255,15 +1296,22 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ST_tW_top_TauIDSFDown->Scale(wt_ST_tW_top);
   mT_Stage1_ST_tW_top_TauIDSFDown->Scale(kfact_ST_tW_top);
   //
-  /*
-  TH1D* mT_Stage1_ST_tW_top_pdfUncertUp  = (TH1D*)file_ST_tW_top->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ST_tW_top_pdfUncertUp->Scale(wt_ST_tW_top);
-  mT_Stage1_ST_tW_top_pdfUncertUp->Scale(kfact_ST_tW_top);
+  //  TH1D* mT_Stage1_ST_tW_top_pdfUncertUp  = (TH1D*)file_ST_tW_top->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_ST_tW_top_pdfUncertUp->Scale(wt_ST_tW_top);
+  // mT_Stage1_ST_tW_top_pdfUncertUp->Scale(kfact_ST_tW_top);
 
-  TH1D* mT_Stage1_ST_tW_top_pdfUncertDown  = (TH1D*)file_ST_tW_top->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ST_tW_top_pdfUncertDown->Scale(wt_ST_tW_top);
-  mT_Stage1_ST_tW_top_pdfUncertDown->Scale(kfact_ST_tW_top);
-  */ //
+  //  TH1D* mT_Stage1_ST_tW_top_pdfUncertDown  = (TH1D*)file_ST_tW_top->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_ST_tW_top_pdfUncertDown->Scale(wt_ST_tW_top);
+  // mT_Stage1_ST_tW_top_pdfUncertDown->Scale(kfact_ST_tW_top);
+  //
+  TH1D* mT_Stage1_ST_tW_top_trigSFUp  = (TH1D*)file_ST_tW_top->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_ST_tW_top_trigSFUp->Scale(wt_ST_tW_top);
+  mT_Stage1_ST_tW_top_trigSFUp->Scale(kfact_ST_tW_top);
+
+  TH1D* mT_Stage1_ST_tW_top_trigSFDown  = (TH1D*)file_ST_tW_top->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_ST_tW_top_trigSFDown->Scale(wt_ST_tW_top);
+  mT_Stage1_ST_tW_top_trigSFDown->Scale(kfact_ST_tW_top);
+  //
   /*
   TH1D* mT_Stage1_ST_tW_top_lumiUp  = (TH1D*)file_ST_tW_top->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ST_tW_top_lumiUp->Scale(wt_ST_tW_top);
@@ -1359,13 +1407,17 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT100To200_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT100To200_TauIDSFDown->Scale(wt_WJetsToLNu_HT100To200);
   //
-  /*
-  TH1D* mT_Stage1_WJetsToLNu_HT100To200_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WJetsToLNu_HT100To200_pdfUncertUp->Scale(wt_WJetsToLNu_HT100To200);
+  //  TH1D* mT_Stage1_WJetsToLNu_HT100To200_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WJetsToLNu_HT100To200_pdfUncertUp->Scale(wt_WJetsToLNu_HT100To200);
 
-  TH1D* mT_Stage1_WJetsToLNu_HT100To200_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WJetsToLNu_HT100To200_pdfUncertDown->Scale(wt_WJetsToLNu_HT100To200);
-  */  //
+  //  TH1D* mT_Stage1_WJetsToLNu_HT100To200_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  //  mT_Stage1_WJetsToLNu_HT100To200_pdfUncertDown->Scale(wt_WJetsToLNu_HT100To200);
+  //
+  TH1D* mT_Stage1_WJetsToLNu_HT100To200_trigSFUp  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WJetsToLNu_HT100To200_trigSFUp->Scale(wt_WJetsToLNu_HT100To200);
+
+  TH1D* mT_Stage1_WJetsToLNu_HT100To200_trigSFDown  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WJetsToLNu_HT100To200_trigSFDown->Scale(wt_WJetsToLNu_HT100To200);
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT100To200_lumiUp  = (TH1D*)file_WJetsToLNu_HT100To200->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT100To200_lumiUp->Scale(wt_WJetsToLNu_HT100To200);
@@ -1452,13 +1504,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT200To400_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT200To400_TauIDSFDown->Scale(wt_WJetsToLNu_HT200To400);
   //
-  /*
-  TH1D* mT_Stage1_WJetsToLNu_HT200To400_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WJetsToLNu_HT200To400_pdfUncertUp->Scale(wt_WJetsToLNu_HT200To400);
+  //  TH1D* mT_Stage1_WJetsToLNu_HT200To400_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WJetsToLNu_HT200To400_pdfUncertUp->Scale(wt_WJetsToLNu_HT200To400);
 
-  TH1D* mT_Stage1_WJetsToLNu_HT200To400_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WJetsToLNu_HT200To400_pdfUncertDown->Scale(wt_WJetsToLNu_HT200To400);
-  */  //
+  //  TH1D* mT_Stage1_WJetsToLNu_HT200To400_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  //  mT_Stage1_WJetsToLNu_HT200To400_pdfUncertDown->Scale(wt_WJetsToLNu_HT200To400);
+  //
+  TH1D* mT_Stage1_WJetsToLNu_HT200To400_trigSFUp  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WJetsToLNu_HT200To400_trigSFUp->Scale(wt_WJetsToLNu_HT200To400);
+
+  TH1D* mT_Stage1_WJetsToLNu_HT200To400_trigSFDown  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WJetsToLNu_HT200To400_trigSFDown->Scale(wt_WJetsToLNu_HT200To400);
+  //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT200To400_lumiUp  = (TH1D*)file_WJetsToLNu_HT200To400->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT200To400_lumiUp->Scale(wt_WJetsToLNu_HT200To400);
@@ -1544,13 +1601,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT400To600_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT400To600_TauIDSFDown->Scale(wt_WJetsToLNu_HT400To600);
   //
-  /*
-  TH1D* mT_Stage1_WJetsToLNu_HT400To600_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WJetsToLNu_HT400To600_pdfUncertUp->Scale(wt_WJetsToLNu_HT400To600);
+  //  TH1D* mT_Stage1_WJetsToLNu_HT400To600_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WJetsToLNu_HT400To600_pdfUncertUp->Scale(wt_WJetsToLNu_HT400To600);
 
-  TH1D* mT_Stage1_WJetsToLNu_HT400To600_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WJetsToLNu_HT400To600_pdfUncertDown->Scale(wt_WJetsToLNu_HT400To600);
-  */ //
+  //  TH1D* mT_Stage1_WJetsToLNu_HT400To600_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  //  mT_Stage1_WJetsToLNu_HT400To600_pdfUncertDown->Scale(wt_WJetsToLNu_HT400To600);
+  //
+  TH1D* mT_Stage1_WJetsToLNu_HT400To600_trigSFUp  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WJetsToLNu_HT400To600_trigSFUp->Scale(wt_WJetsToLNu_HT400To600);
+
+  TH1D* mT_Stage1_WJetsToLNu_HT400To600_trigSFDown  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WJetsToLNu_HT400To600_trigSFDown->Scale(wt_WJetsToLNu_HT400To600);
+  //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT400To600_lumiUp  = (TH1D*)file_WJetsToLNu_HT400To600->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT400To600_lumiUp->Scale(wt_WJetsToLNu_HT400To600);
@@ -1636,13 +1698,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT600To800_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT600To800_TauIDSFDown->Scale(wt_WJetsToLNu_HT600To800);
   //
-  /*
-  TH1D* mT_Stage1_WJetsToLNu_HT600To800_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WJetsToLNu_HT600To800_pdfUncertUp->Scale(wt_WJetsToLNu_HT600To800);
+  //  TH1D* mT_Stage1_WJetsToLNu_HT600To800_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  //  mT_Stage1_WJetsToLNu_HT600To800_pdfUncertUp->Scale(wt_WJetsToLNu_HT600To800);
 
-  TH1D* mT_Stage1_WJetsToLNu_HT600To800_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WJetsToLNu_HT600To800_pdfUncertDown->Scale(wt_WJetsToLNu_HT600To800);
-  */ //
+  //  TH1D* mT_Stage1_WJetsToLNu_HT600To800_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_WJetsToLNu_HT600To800_pdfUncertDown->Scale(wt_WJetsToLNu_HT600To800);
+  //
+  TH1D* mT_Stage1_WJetsToLNu_HT600To800_trigSFUp  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WJetsToLNu_HT600To800_trigSFUp->Scale(wt_WJetsToLNu_HT600To800);
+
+  TH1D* mT_Stage1_WJetsToLNu_HT600To800_trigSFDown  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WJetsToLNu_HT600To800_trigSFDown->Scale(wt_WJetsToLNu_HT600To800);
+  //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT600To800_lumiUp  = (TH1D*)file_WJetsToLNu_HT600To800->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT600To800_lumiUp->Scale(wt_WJetsToLNu_HT600To800);
@@ -1728,13 +1795,19 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT800To1200_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT800To1200_TauIDSFDown->Scale(wt_WJetsToLNu_HT800To1200);
   //
-  /*
-  TH1D* mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertUp->Scale(wt_WJetsToLNu_HT800To1200);
+  //  TH1D* mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  //  mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertUp->Scale(wt_WJetsToLNu_HT800To1200);
 
-  TH1D* mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertDown->Scale(wt_WJetsToLNu_HT800To1200);
-  */ //
+  //  TH1D* mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertDown->Scale(wt_WJetsToLNu_HT800To1200);
+  //
+  //
+  TH1D* mT_Stage1_WJetsToLNu_HT800To1200_trigSFUp  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WJetsToLNu_HT800To1200_trigSFUp->Scale(wt_WJetsToLNu_HT800To1200);
+
+  TH1D* mT_Stage1_WJetsToLNu_HT800To1200_trigSFDown  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WJetsToLNu_HT800To1200_trigSFDown->Scale(wt_WJetsToLNu_HT800To1200);
+  //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT800To1200_lumiUp  = (TH1D*)file_WJetsToLNu_HT800To1200->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT800To1200_lumiUp->Scale(wt_WJetsToLNu_HT800To1200);
@@ -1821,13 +1894,19 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT1200To2500_TauIDSFDown->Scale(wt_WJetsToLNu_HT1200To2500);
   //
-  /*
-  TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertUp->Scale(wt_WJetsToLNu_HT1200To2500);
+  //  TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  //  mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertUp->Scale(wt_WJetsToLNu_HT1200To2500);
 
-  TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertDown->Scale(wt_WJetsToLNu_HT1200To2500);
-  */ //
+  //  TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  //  mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertDown->Scale(wt_WJetsToLNu_HT1200To2500);
+  //
+  //
+  TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_trigSFUp  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WJetsToLNu_HT1200To2500_trigSFUp->Scale(wt_WJetsToLNu_HT1200To2500);
+
+  TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_trigSFDown  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WJetsToLNu_HT1200To2500_trigSFDown->Scale(wt_WJetsToLNu_HT1200To2500);
+  //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT1200To2500_lumiUp  = (TH1D*)file_WJetsToLNu_HT1200To2500->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT1200To2500_lumiUp->Scale(wt_WJetsToLNu_HT1200To2500);
@@ -1913,13 +1992,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_TauIDSFDown  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_HT2500ToInf_TauIDSFDown->Scale(wt_WJetsToLNu_HT2500ToInf);
   //
-  /*
-  TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertUp->Scale(wt_WJetsToLNu_HT2500ToInf);
+  //  TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertUp  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertUp->Scale(wt_WJetsToLNu_HT2500ToInf);
 
-  TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertDown->Scale(wt_WJetsToLNu_HT2500ToInf);
-  */  //
+  //  TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertDown  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertDown->Scale(wt_WJetsToLNu_HT2500ToInf);
+  //
+  TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_trigSFUp  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WJetsToLNu_HT2500ToInf_trigSFUp->Scale(wt_WJetsToLNu_HT2500ToInf);
+
+  TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_trigSFDown  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WJetsToLNu_HT2500ToInf_trigSFDown->Scale(wt_WJetsToLNu_HT2500ToInf);
+  //
   /*
   TH1D* mT_Stage1_WJetsToLNu_HT2500ToInf_lumiUp  = (TH1D*)file_WJetsToLNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_HT2500ToInf_lumiUp->Scale(wt_WJetsToLNu_HT2500ToInf);
@@ -2005,13 +2089,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M100_TauIDSFDown  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M100_TauIDSFDown->Scale(wt_WToTauNu_M100);
   //
-  /*
-  TH1D* mT_Stage1_WToTauNu_M100_pdfUncertUp  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WToTauNu_M100_pdfUncertUp->Scale(wt_WToTauNu_M100);
+  //  TH1D* mT_Stage1_WToTauNu_M100_pdfUncertUp  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WToTauNu_M100_pdfUncertUp->Scale(wt_WToTauNu_M100);
 
-  TH1D* mT_Stage1_WToTauNu_M100_pdfUncertDown  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WToTauNu_M100_pdfUncertDown->Scale(wt_WToTauNu_M100);
-  */ //
+  //  TH1D* mT_Stage1_WToTauNu_M100_pdfUncertDown  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_WToTauNu_M100_pdfUncertDown->Scale(wt_WToTauNu_M100);
+  //
+  TH1D* mT_Stage1_WToTauNu_M100_trigSFUp  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WToTauNu_M100_trigSFUp->Scale(wt_WToTauNu_M100);
+
+  TH1D* mT_Stage1_WToTauNu_M100_trigSFDown  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WToTauNu_M100_trigSFDown->Scale(wt_WToTauNu_M100);
+  //
   /*
   TH1D* mT_Stage1_WToTauNu_M100_lumiUp  = (TH1D*)file_WToTauNu_M100->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M100_lumiUp->Scale(wt_WToTauNu_M100);
@@ -2097,13 +2186,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M200_TauIDSFDown  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M200_TauIDSFDown->Scale(wt_WToTauNu_M200);
   //
-  /*
-  TH1D* mT_Stage1_WToTauNu_M200_pdfUncertUp  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WToTauNu_M200_pdfUncertUp->Scale(wt_WToTauNu_M200);
+  //  TH1D* mT_Stage1_WToTauNu_M200_pdfUncertUp  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WToTauNu_M200_pdfUncertUp->Scale(wt_WToTauNu_M200);
 
-  TH1D* mT_Stage1_WToTauNu_M200_pdfUncertDown  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WToTauNu_M200_pdfUncertDown->Scale(wt_WToTauNu_M200);
-  */  //
+  //  TH1D* mT_Stage1_WToTauNu_M200_pdfUncertDown  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_WToTauNu_M200_pdfUncertDown->Scale(wt_WToTauNu_M200);
+  //
+  TH1D* mT_Stage1_WToTauNu_M200_trigSFUp  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WToTauNu_M200_trigSFUp->Scale(wt_WToTauNu_M200);
+
+  TH1D* mT_Stage1_WToTauNu_M200_trigSFDown  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WToTauNu_M200_trigSFDown->Scale(wt_WToTauNu_M200);
+  //
   /*
   TH1D* mT_Stage1_WToTauNu_M200_lumiUp  = (TH1D*)file_WToTauNu_M200->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M200_lumiUp->Scale(wt_WToTauNu_M200);
@@ -2189,13 +2283,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M500_TauIDSFDown  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M500_TauIDSFDown->Scale(wt_WToTauNu_M500);
   //
-  /*
-  TH1D* mT_Stage1_WToTauNu_M500_pdfUncertUp  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WToTauNu_M500_pdfUncertUp->Scale(wt_WToTauNu_M500);
+  //  TH1D* mT_Stage1_WToTauNu_M500_pdfUncertUp  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WToTauNu_M500_pdfUncertUp->Scale(wt_WToTauNu_M500);
 
-  TH1D* mT_Stage1_WToTauNu_M500_pdfUncertDown  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WToTauNu_M500_pdfUncertDown->Scale(wt_WToTauNu_M500);
-  */  //
+  //  TH1D* mT_Stage1_WToTauNu_M500_pdfUncertDown  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_WToTauNu_M500_pdfUncertDown->Scale(wt_WToTauNu_M500);
+  //
+  TH1D* mT_Stage1_WToTauNu_M500_trigSFUp  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WToTauNu_M500_trigSFUp->Scale(wt_WToTauNu_M500);
+
+  TH1D* mT_Stage1_WToTauNu_M500_trigSFDown  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WToTauNu_M500_trigSFDown->Scale(wt_WToTauNu_M500);
+  //
   /*
   TH1D* mT_Stage1_WToTauNu_M500_lumiUp  = (TH1D*)file_WToTauNu_M500->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M500_lumiUp->Scale(wt_WToTauNu_M500);
@@ -2281,13 +2380,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M1000_TauIDSFDown  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M1000_TauIDSFDown->Scale(wt_WToTauNu_M1000);
   //
-  /*
-  TH1D* mT_Stage1_WToTauNu_M1000_pdfUncertUp  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WToTauNu_M1000_pdfUncertUp->Scale(wt_WToTauNu_M1000);
+  //  TH1D* mT_Stage1_WToTauNu_M1000_pdfUncertUp  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WToTauNu_M1000_pdfUncertUp->Scale(wt_WToTauNu_M1000);
 
-  TH1D* mT_Stage1_WToTauNu_M1000_pdfUncertDown  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WToTauNu_M1000_pdfUncertDown->Scale(wt_WToTauNu_M1000);
-  */ //
+  //  TH1D* mT_Stage1_WToTauNu_M1000_pdfUncertDown  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  //  mT_Stage1_WToTauNu_M1000_pdfUncertDown->Scale(wt_WToTauNu_M1000);
+  //
+  TH1D* mT_Stage1_WToTauNu_M1000_trigSFUp  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WToTauNu_M1000_trigSFUp->Scale(wt_WToTauNu_M1000);
+
+  TH1D* mT_Stage1_WToTauNu_M1000_trigSFDown  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WToTauNu_M1000_trigSFDown->Scale(wt_WToTauNu_M1000);
+  //
   /*
   TH1D* mT_Stage1_WToTauNu_M1000_lumiUp  = (TH1D*)file_WToTauNu_M1000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M1000_lumiUp->Scale(wt_WToTauNu_M1000);
@@ -2373,13 +2477,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M2000_TauIDSFDown  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M2000_TauIDSFDown->Scale(wt_WToTauNu_M2000);
   //
-  /*
-  TH1D* mT_Stage1_WToTauNu_M2000_pdfUncertUp  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WToTauNu_M2000_pdfUncertUp->Scale(wt_WToTauNu_M2000);
+  //  TH1D* mT_Stage1_WToTauNu_M2000_pdfUncertUp  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WToTauNu_M2000_pdfUncertUp->Scale(wt_WToTauNu_M2000);
 
-  TH1D* mT_Stage1_WToTauNu_M2000_pdfUncertDown  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WToTauNu_M2000_pdfUncertDown->Scale(wt_WToTauNu_M2000);
-  */ //
+  //  TH1D* mT_Stage1_WToTauNu_M2000_pdfUncertDown  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_WToTauNu_M2000_pdfUncertDown->Scale(wt_WToTauNu_M2000);
+  //
+  TH1D* mT_Stage1_WToTauNu_M2000_trigSFUp  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WToTauNu_M2000_trigSFUp->Scale(wt_WToTauNu_M2000);
+
+  TH1D* mT_Stage1_WToTauNu_M2000_trigSFDown  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WToTauNu_M2000_trigSFDown->Scale(wt_WToTauNu_M2000);
+  //
   /*
   TH1D* mT_Stage1_WToTauNu_M2000_lumiUp  = (TH1D*)file_WToTauNu_M2000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M2000_lumiUp->Scale(wt_WToTauNu_M2000);
@@ -2465,13 +2574,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M3000_TauIDSFDown  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M3000_TauIDSFDown->Scale(wt_WToTauNu_M3000);
   //
-  /*
-  TH1D* mT_Stage1_WToTauNu_M3000_pdfUncertUp  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WToTauNu_M3000_pdfUncertUp->Scale(wt_WToTauNu_M3000);
+  //  TH1D* mT_Stage1_WToTauNu_M3000_pdfUncertUp  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WToTauNu_M3000_pdfUncertUp->Scale(wt_WToTauNu_M3000);
 
-  TH1D* mT_Stage1_WToTauNu_M3000_pdfUncertDown  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WToTauNu_M3000_pdfUncertDown->Scale(wt_WToTauNu_M3000);
-  */ //
+  //  TH1D* mT_Stage1_WToTauNu_M3000_pdfUncertDown  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  /// mT_Stage1_WToTauNu_M3000_pdfUncertDown->Scale(wt_WToTauNu_M3000);
+  //
+  TH1D* mT_Stage1_WToTauNu_M3000_trigSFUp  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WToTauNu_M3000_trigSFUp->Scale(wt_WToTauNu_M3000);
+
+  TH1D* mT_Stage1_WToTauNu_M3000_trigSFDown  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WToTauNu_M3000_trigSFDown->Scale(wt_WToTauNu_M3000);
+  //
   /*
   TH1D* mT_Stage1_WToTauNu_M3000_lumiUp  = (TH1D*)file_WToTauNu_M3000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M3000_lumiUp->Scale(wt_WToTauNu_M3000);
@@ -2558,13 +2672,19 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M4000_TauIDSFDown  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M4000_TauIDSFDown->Scale(wt_WToTauNu_M4000);
   //
-  /*
-  TH1D* mT_Stage1_WToTauNu_M4000_pdfUncertUp  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WToTauNu_M4000_pdfUncertUp->Scale(wt_WToTauNu_M4000);
+  //  TH1D* mT_Stage1_WToTauNu_M4000_pdfUncertUp  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WToTauNu_M4000_pdfUncertUp->Scale(wt_WToTauNu_M4000);
 
-  TH1D* mT_Stage1_WToTauNu_M4000_pdfUncertDown  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WToTauNu_M4000_pdfUncertDown->Scale(wt_WToTauNu_M4000);
-  */ //
+  //  TH1D* mT_Stage1_WToTauNu_M4000_pdfUncertDown  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_WToTauNu_M4000_pdfUncertDown->Scale(wt_WToTauNu_M4000);
+  //
+  //
+  TH1D* mT_Stage1_WToTauNu_M4000_trigSFUp  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WToTauNu_M4000_trigSFUp->Scale(wt_WToTauNu_M4000);
+
+  TH1D* mT_Stage1_WToTauNu_M4000_trigSFDown  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WToTauNu_M4000_trigSFDown->Scale(wt_WToTauNu_M4000);
+  //
   /*
   TH1D* mT_Stage1_WToTauNu_M4000_lumiUp  = (TH1D*)file_WToTauNu_M4000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M4000_lumiUp->Scale(wt_WToTauNu_M4000);
@@ -2650,13 +2770,19 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M5000_TauIDSFDown  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M5000_TauIDSFDown->Scale(wt_WToTauNu_M5000);
   //
-  /*
-  TH1D* mT_Stage1_WToTauNu_M5000_pdfUncertUp  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WToTauNu_M5000_pdfUncertUp->Scale(wt_WToTauNu_M5000);
+  //  TH1D* mT_Stage1_WToTauNu_M5000_pdfUncertUp  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WToTauNu_M5000_pdfUncertUp->Scale(wt_WToTauNu_M5000);
 
-  TH1D* mT_Stage1_WToTauNu_M5000_pdfUncertDown  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WToTauNu_M5000_pdfUncertDown->Scale(wt_WToTauNu_M5000);
-  */ //
+  //  TH1D* mT_Stage1_WToTauNu_M5000_pdfUncertDown  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_WToTauNu_M5000_pdfUncertDown->Scale(wt_WToTauNu_M5000);
+  //
+  //
+  TH1D* mT_Stage1_WToTauNu_M5000_trigSFUp  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WToTauNu_M5000_trigSFUp->Scale(wt_WToTauNu_M5000);
+
+  TH1D* mT_Stage1_WToTauNu_M5000_trigSFDown  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WToTauNu_M5000_trigSFDown->Scale(wt_WToTauNu_M5000);
+  //
   /*
   TH1D* mT_Stage1_WToTauNu_M5000_lumiUp  = (TH1D*)file_WToTauNu_M5000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M5000_lumiUp->Scale(wt_WToTauNu_M5000);
@@ -2744,13 +2870,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WToTauNu_M6000_TauIDSFDown  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WToTauNu_M6000_TauIDSFDown->Scale(wt_WToTauNu_M6000);
   //
-  /*
-  TH1D* mT_Stage1_WToTauNu_M6000_pdfUncertUp  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WToTauNu_M6000_pdfUncertUp->Scale(wt_WToTauNu_M6000);
+  //  TH1D* mT_Stage1_WToTauNu_M6000_pdfUncertUp  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  //  mT_Stage1_WToTauNu_M6000_pdfUncertUp->Scale(wt_WToTauNu_M6000);
 
-  TH1D* mT_Stage1_WToTauNu_M6000_pdfUncertDown  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WToTauNu_M6000_pdfUncertDown->Scale(wt_WToTauNu_M6000);
-  */  //
+  //  TH1D* mT_Stage1_WToTauNu_M6000_pdfUncertDown  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  //  mT_Stage1_WToTauNu_M6000_pdfUncertDown->Scale(wt_WToTauNu_M6000);
+  //
+  TH1D* mT_Stage1_WToTauNu_M6000_trigSFUp  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WToTauNu_M6000_trigSFUp->Scale(wt_WToTauNu_M6000);
+
+  TH1D* mT_Stage1_WToTauNu_M6000_trigSFDown  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WToTauNu_M6000_trigSFDown->Scale(wt_WToTauNu_M6000);
+  //
   /*
   TH1D* mT_Stage1_WToTauNu_M6000_lumiUp  = (TH1D*)file_WToTauNu_M6000->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WToTauNu_M6000_lumiUp->Scale(wt_WToTauNu_M6000);
@@ -2837,13 +2968,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WJetsToLNu_TauIDSFDown  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WJetsToLNu_TauIDSFDown->Scale(wt_WJetsToLNu);
   //
-  /*
-  TH1D* mT_Stage1_WJetsToLNu_pdfUncertUp  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WJetsToLNu_pdfUncertUp->Scale(wt_WJetsToLNu);
+  //  TH1D* mT_Stage1_WJetsToLNu_pdfUncertUp  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WJetsToLNu_pdfUncertUp->Scale(wt_WJetsToLNu);
 
-  TH1D* mT_Stage1_WJetsToLNu_pdfUncertDown  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WJetsToLNu_pdfUncertDown->Scale(wt_WJetsToLNu);
-  */ //
+  //  TH1D* mT_Stage1_WJetsToLNu_pdfUncertDown  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  //  mT_Stage1_WJetsToLNu_pdfUncertDown->Scale(wt_WJetsToLNu);
+  //
+  TH1D* mT_Stage1_WJetsToLNu_trigSFUp  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WJetsToLNu_trigSFUp->Scale(wt_WJetsToLNu);
+
+  TH1D* mT_Stage1_WJetsToLNu_trigSFDown  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WJetsToLNu_trigSFDown->Scale(wt_WJetsToLNu);
+  //
   /*
   TH1D* mT_Stage1_WJetsToLNu_lumiUp  = (TH1D*)file_WJetsToLNu->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WJetsToLNu_lumiUp->Scale(wt_WJetsToLNu);
@@ -2954,13 +3090,18 @@ int Plot_mT_Stage1_WithSyst() {
   TH1D* mT_Stage1_WW_TauIDSFDown  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
   mT_Stage1_WW_TauIDSFDown->Scale(wt_WW);
   //
-  /*
-  TH1D* mT_Stage1_WW_pdfUncertUp  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WW_pdfUncertUp->Scale(wt_WW);
+  //  TH1D* mT_Stage1_WW_pdfUncertUp  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WW_pdfUncertUp->Scale(wt_WW);
 
-  TH1D* mT_Stage1_WW_pdfUncertDown  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WW_pdfUncertDown->Scale(wt_WW);
-  */ //
+  //  TH1D* mT_Stage1_WW_pdfUncertDown  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_WW_pdfUncertDown->Scale(wt_WW);
+  //
+  TH1D* mT_Stage1_WW_trigSFUp  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WW_trigSFUp->Scale(wt_WW);
+
+  TH1D* mT_Stage1_WW_trigSFDown  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WW_trigSFDown->Scale(wt_WW);
+  //
   /*
   TH1D* mT_Stage1_WW_lumiUp  = (TH1D*)file_WW->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WW_lumiUp->Scale(wt_WW);
@@ -3070,15 +3211,22 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_WZ_TauIDSFDown->Scale(wt_WZ);
   mT_Stage1_WZ_TauIDSFDown->Scale(kfact_WZ);
   //
-  /*
-  TH1D* mT_Stage1_WZ_pdfUncertUp  = (TH1D*)file_WZ->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_WZ_pdfUncertUp->Scale(wt_WZ);
-  mT_Stage1_WZ_pdfUncertUp->Scale(kfact_WZ);
+  //  TH1D* mT_Stage1_WZ_pdfUncertUp  = (TH1D*)file_WZ->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_WZ_pdfUncertUp->Scale(wt_WZ);
+  // mT_Stage1_WZ_pdfUncertUp->Scale(kfact_WZ);
 
-  TH1D* mT_Stage1_WZ_pdfUncertDown  = (TH1D*)file_WZ->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_WZ_pdfUncertDown->Scale(wt_WZ);
-  mT_Stage1_WZ_pdfUncertDown->Scale(kfact_WZ);
-  */ //
+  //  TH1D* mT_Stage1_WZ_pdfUncertDown  = (TH1D*)file_WZ->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_WZ_pdfUncertDown->Scale(wt_WZ);
+  /// mT_Stage1_WZ_pdfUncertDown->Scale(kfact_WZ);
+  //
+  TH1D* mT_Stage1_WZ_trigSFUp  = (TH1D*)file_WZ->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_WZ_trigSFUp->Scale(wt_WZ);
+  mT_Stage1_WZ_trigSFUp->Scale(kfact_WZ);
+
+  TH1D* mT_Stage1_WZ_trigSFDown  = (TH1D*)file_WZ->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_WZ_trigSFDown->Scale(wt_WZ);
+  mT_Stage1_WZ_trigSFDown->Scale(kfact_WZ);
+  //
   /*
   TH1D* mT_Stage1_WZ_lumiUp  = (TH1D*)file_WZ->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_WZ_lumiUp->Scale(wt_WZ);
@@ -3189,15 +3337,22 @@ int Plot_mT_Stage1_WithSyst() {
   mT_Stage1_ZZ_TauIDSFDown->Scale(wt_ZZ);
   mT_Stage1_ZZ_TauIDSFDown->Scale(kfact_ZZ);
   //
-  /*
-  TH1D* mT_Stage1_ZZ_pdfUncertUp  = (TH1D*)file_ZZ->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ZZ_pdfUncertUp->Scale(wt_ZZ);
-  mT_Stage1_ZZ_pdfUncertUp->Scale(kfact_ZZ);
+  //  TH1D* mT_Stage1_ZZ_pdfUncertUp  = (TH1D*)file_ZZ->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
+  // mT_Stage1_ZZ_pdfUncertUp->Scale(wt_ZZ);
+  // mT_Stage1_ZZ_pdfUncertUp->Scale(kfact_ZZ);
 
-  TH1D* mT_Stage1_ZZ_pdfUncertDown  = (TH1D*)file_ZZ->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ZZ_pdfUncertDown->Scale(wt_ZZ);
-  mT_Stage1_ZZ_pdfUncertDown->Scale(kfact_ZZ);
-  */ //
+  //  TH1D* mT_Stage1_ZZ_pdfUncertDown  = (TH1D*)file_ZZ->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
+  // mT_Stage1_ZZ_pdfUncertDown->Scale(wt_ZZ);
+  // mT_Stage1_ZZ_pdfUncertDown->Scale(kfact_ZZ);
+  //
+  TH1D* mT_Stage1_ZZ_trigSFUp  = (TH1D*)file_ZZ->Get("demo/histoDir/mT_Stage1_trigSFUp");
+  mT_Stage1_ZZ_trigSFUp->Scale(wt_ZZ);
+  mT_Stage1_ZZ_trigSFUp->Scale(kfact_ZZ);
+
+  TH1D* mT_Stage1_ZZ_trigSFDown  = (TH1D*)file_ZZ->Get("demo/histoDir/mT_Stage1_trigSFDown");
+  mT_Stage1_ZZ_trigSFDown->Scale(wt_ZZ);
+  mT_Stage1_ZZ_trigSFDown->Scale(kfact_ZZ);
+  //
   /*
   TH1D* mT_Stage1_ZZ_lumiUp  = (TH1D*)file_ZZ->Get("demo/histoDir/mT_Stage1");
   mT_Stage1_ZZ_lumiUp->Scale(wt_ZZ);
@@ -3217,1530 +3372,15 @@ int Plot_mT_Stage1_WithSyst() {
   total_diboson->SetLineColor(kBlack);
   total_diboson->Rebin(100);
 
-  //file_QCD_HT200to300
-  TH1D* h1_evt_QCD_HT200to300 = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/eventCount");
-  unsigned long long evt_QCD_HT200to300 = h1_evt_QCD_HT200to300->GetEntries(); //Integral();                                                                 
-  double wt_QCD_HT200to300 = (xs_QCD_HT200to300*lumi)/evt_QCD_HT200to300 ;
-  TH1D* mT_Stage1_QCD_HT200to300  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT200to300->Scale(wt_QCD_HT200to300);
-  std::cout << "QCD_HT200to300 weighted nevt=" << mT_Stage1_QCD_HT200to300->Integral() << std::endl;
-  totalMC += mT_Stage1_QCD_HT200to300->Integral();
-  //
-  TH1D* mT_Stage1_QCD_HT200to300_JetEnUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_QCD_HT200to300_JetEnUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_JetEnDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_QCD_HT200to300_JetEnDown->Scale(wt_QCD_HT200to300);
-  //
-  TH1D* mT_Stage1_QCD_HT200to300_JetResUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_QCD_HT200to300_JetResUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_JetResDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_QCD_HT200to300_JetResDown->Scale(wt_QCD_HT200to300);
-  //
-  TH1D* mT_Stage1_QCD_HT200to300_MuonEnUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_QCD_HT200to300_MuonEnUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_MuonEnDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_QCD_HT200to300_MuonEnDown->Scale(wt_QCD_HT200to300);
-  //
-  TH1D* mT_Stage1_QCD_HT200to300_ElectronEnUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_QCD_HT200to300_ElectronEnUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_ElectronEnDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_QCD_HT200to300_ElectronEnDown->Scale(wt_QCD_HT200to300);
-  //
-  TH1D* mT_Stage1_QCD_HT200to300_TauEnUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_QCD_HT200to300_TauEnUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_TauEnDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_QCD_HT200to300_TauEnDown->Scale(wt_QCD_HT200to300);
-  //
-  TH1D* mT_Stage1_QCD_HT200to300_PhotonEnUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_QCD_HT200to300_PhotonEnUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_PhotonEnDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_QCD_HT200to300_PhotonEnDown->Scale(wt_QCD_HT200to300);
-  //
-  TH1D* mT_Stage1_QCD_HT200to300_UnclusteredEnUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_QCD_HT200to300_UnclusteredEnUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_UnclusteredEnDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_QCD_HT200to300_UnclusteredEnDown->Scale(wt_QCD_HT200to300);
-  //
-  TH1D* mT_Stage1_QCD_HT200to300_TauScaleUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_QCD_HT200to300_TauScaleUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_TauScaleDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_QCD_HT200to300_TauScaleDown->Scale(wt_QCD_HT200to300);
-  //
-  TH1D* mT_Stage1_QCD_HT200to300_pileupUncertUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_QCD_HT200to300_pileupUncertUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_pileupUncertDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_QCD_HT200to300_pileupUncertDown->Scale(wt_QCD_HT200to300);
-  //
-  TH1D* mT_Stage1_QCD_HT200to300_kFactorUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_QCD_HT200to300_kFactorUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_kFactorDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_QCD_HT200to300_kFactorDown->Scale(wt_QCD_HT200to300);
-  //
-  TH1D* mT_Stage1_QCD_HT200to300_TauIDSFUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_QCD_HT200to300_TauIDSFUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_TauIDSFDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_QCD_HT200to300_TauIDSFDown->Scale(wt_QCD_HT200to300);
-  //
-  /*
-  TH1D* mT_Stage1_QCD_HT200to300_pdfUncertUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_QCD_HT200to300_pdfUncertUp->Scale(wt_QCD_HT200to300);
-
-  TH1D* mT_Stage1_QCD_HT200to300_pdfUncertDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_QCD_HT200to300_pdfUncertDown->Scale(wt_QCD_HT200to300);
-  */  //
-  /*
-  TH1D* mT_Stage1_QCD_HT200to300_lumiUp  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT200to300_lumiUp->Scale(wt_QCD_HT200to300);
-  mT_Stage1_QCD_HT200to300_lumiUp->Scale(wt_lumi_up);
-
-  TH1D* mT_Stage1_QCD_HT200to300_lumiDown  = (TH1D*)file_QCD_HT200to300->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT200to300_lumiDown->Scale(wt_QCD_HT200to300);
-  mT_Stage1_QCD_HT200to300_lumiDown->Scale(wt_lumi_down);
-  */
-
-  //file_QCD_HT300to500
-  TH1D* h1_evt_QCD_HT300to500 = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/eventCount");
-  unsigned long long evt_QCD_HT300to500 = h1_evt_QCD_HT300to500->GetEntries(); //Integral();                                                                     
-  double wt_QCD_HT300to500 = (xs_QCD_HT300to500*lumi)/evt_QCD_HT300to500 ;
-  TH1D* mT_Stage1_QCD_HT300to500  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT300to500->Scale(wt_QCD_HT300to500);
-  std::cout << "QCD_HT300to500 weighted nevt=" << mT_Stage1_QCD_HT300to500->Integral() << std::endl;
-  totalMC += mT_Stage1_QCD_HT300to500->Integral();
-  //
-  TH1D* mT_Stage1_QCD_HT300to500_JetEnUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_QCD_HT300to500_JetEnUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_JetEnDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_QCD_HT300to500_JetEnDown->Scale(wt_QCD_HT300to500);
-  //
-  TH1D* mT_Stage1_QCD_HT300to500_JetResUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_QCD_HT300to500_JetResUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_JetResDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_QCD_HT300to500_JetResDown->Scale(wt_QCD_HT300to500);
-  //
-  TH1D* mT_Stage1_QCD_HT300to500_MuonEnUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_QCD_HT300to500_MuonEnUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_MuonEnDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_QCD_HT300to500_MuonEnDown->Scale(wt_QCD_HT300to500);
-  //
-  TH1D* mT_Stage1_QCD_HT300to500_ElectronEnUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_QCD_HT300to500_ElectronEnUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_ElectronEnDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_QCD_HT300to500_ElectronEnDown->Scale(wt_QCD_HT300to500);
-  //
-  TH1D* mT_Stage1_QCD_HT300to500_TauEnUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_QCD_HT300to500_TauEnUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_TauEnDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_QCD_HT300to500_TauEnDown->Scale(wt_QCD_HT300to500);
-  //
-  TH1D* mT_Stage1_QCD_HT300to500_PhotonEnUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_QCD_HT300to500_PhotonEnUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_PhotonEnDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_QCD_HT300to500_PhotonEnDown->Scale(wt_QCD_HT300to500);
-  //
-  TH1D* mT_Stage1_QCD_HT300to500_UnclusteredEnUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_QCD_HT300to500_UnclusteredEnUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_UnclusteredEnDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_QCD_HT300to500_UnclusteredEnDown->Scale(wt_QCD_HT300to500);
-  //
-  TH1D* mT_Stage1_QCD_HT300to500_TauScaleUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_QCD_HT300to500_TauScaleUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_TauScaleDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_QCD_HT300to500_TauScaleDown->Scale(wt_QCD_HT300to500);
-  //
-  TH1D* mT_Stage1_QCD_HT300to500_pileupUncertUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_QCD_HT300to500_pileupUncertUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_pileupUncertDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_QCD_HT300to500_pileupUncertDown->Scale(wt_QCD_HT300to500);
-  //
-  TH1D* mT_Stage1_QCD_HT300to500_kFactorUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_QCD_HT300to500_kFactorUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_kFactorDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_QCD_HT300to500_kFactorDown->Scale(wt_QCD_HT300to500);
-  //
-  TH1D* mT_Stage1_QCD_HT300to500_TauIDSFUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_QCD_HT300to500_TauIDSFUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_TauIDSFDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_QCD_HT300to500_TauIDSFDown->Scale(wt_QCD_HT300to500);
-  //
-  /*
-  TH1D* mT_Stage1_QCD_HT300to500_pdfUncertUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_QCD_HT300to500_pdfUncertUp->Scale(wt_QCD_HT300to500);
-
-  TH1D* mT_Stage1_QCD_HT300to500_pdfUncertDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_QCD_HT300to500_pdfUncertDown->Scale(wt_QCD_HT300to500);
-  */  //
-  /*
-  TH1D* mT_Stage1_QCD_HT300to500_lumiUp  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT300to500_lumiUp->Scale(wt_QCD_HT300to500);
-  mT_Stage1_QCD_HT300to500_lumiUp->Scale(wt_lumi_up);
-
-  TH1D* mT_Stage1_QCD_HT300to500_lumiDown  = (TH1D*)file_QCD_HT300to500->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT300to500_lumiDown->Scale(wt_QCD_HT300to500);
-  mT_Stage1_QCD_HT300to500_lumiDown->Scale(wt_lumi_down);
-
-  */
-
-  //file_QCD_HT500to700
-  TH1D* h1_evt_QCD_HT500to700 = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/eventCount");
-  unsigned long long evt_QCD_HT500to700 = h1_evt_QCD_HT500to700->GetEntries(); //Integral();                                                                
-  double wt_QCD_HT500to700 = (xs_QCD_HT500to700*lumi)/evt_QCD_HT500to700 ;
-  TH1D* mT_Stage1_QCD_HT500to700  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT500to700->Scale(wt_QCD_HT500to700);
-  std::cout << "QCD_HT500to700 weighted nevt=" << mT_Stage1_QCD_HT500to700->Integral() << std::endl;
-  totalMC += mT_Stage1_QCD_HT500to700->Integral();
-  //
-  TH1D* mT_Stage1_QCD_HT500to700_JetEnUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_QCD_HT500to700_JetEnUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_JetEnDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_QCD_HT500to700_JetEnDown->Scale(wt_QCD_HT500to700);
-  //
-  TH1D* mT_Stage1_QCD_HT500to700_JetResUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_QCD_HT500to700_JetResUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_JetResDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_QCD_HT500to700_JetResDown->Scale(wt_QCD_HT500to700);
-  //
-  TH1D* mT_Stage1_QCD_HT500to700_MuonEnUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_QCD_HT500to700_MuonEnUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_MuonEnDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_QCD_HT500to700_MuonEnDown->Scale(wt_QCD_HT500to700);
-  //
-  TH1D* mT_Stage1_QCD_HT500to700_ElectronEnUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_QCD_HT500to700_ElectronEnUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_ElectronEnDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_QCD_HT500to700_ElectronEnDown->Scale(wt_QCD_HT500to700);
-  //
-  TH1D* mT_Stage1_QCD_HT500to700_TauEnUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_QCD_HT500to700_TauEnUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_TauEnDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_QCD_HT500to700_TauEnDown->Scale(wt_QCD_HT500to700);
-
-  //
-  TH1D* mT_Stage1_QCD_HT500to700_PhotonEnUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_QCD_HT500to700_PhotonEnUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_PhotonEnDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_QCD_HT500to700_PhotonEnDown->Scale(wt_QCD_HT500to700);
-  //
-  TH1D* mT_Stage1_QCD_HT500to700_UnclusteredEnUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_QCD_HT500to700_UnclusteredEnUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_UnclusteredEnDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_QCD_HT500to700_UnclusteredEnDown->Scale(wt_QCD_HT500to700);
-  //
-  TH1D* mT_Stage1_QCD_HT500to700_TauScaleUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_QCD_HT500to700_TauScaleUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_TauScaleDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_QCD_HT500to700_TauScaleDown->Scale(wt_QCD_HT500to700);
-  //
-  TH1D* mT_Stage1_QCD_HT500to700_pileupUncertUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_QCD_HT500to700_pileupUncertUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_pileupUncertDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_QCD_HT500to700_pileupUncertDown->Scale(wt_QCD_HT500to700);
-  //
-  TH1D* mT_Stage1_QCD_HT500to700_kFactorUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_QCD_HT500to700_kFactorUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_kFactorDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_QCD_HT500to700_kFactorDown->Scale(wt_QCD_HT500to700);
-  //
-  TH1D* mT_Stage1_QCD_HT500to700_TauIDSFUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_QCD_HT500to700_TauIDSFUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_TauIDSFDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_QCD_HT500to700_TauIDSFDown->Scale(wt_QCD_HT500to700);
-  //
-  /*
-  TH1D* mT_Stage1_QCD_HT500to700_pdfUncertUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_QCD_HT500to700_pdfUncertUp->Scale(wt_QCD_HT500to700);
-
-  TH1D* mT_Stage1_QCD_HT500to700_pdfUncertDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_QCD_HT500to700_pdfUncertDown->Scale(wt_QCD_HT500to700);
-  */  //
-  /*
-  TH1D* mT_Stage1_QCD_HT500to700_lumiUp  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT500to700_lumiUp->Scale(wt_QCD_HT500to700);
-  mT_Stage1_QCD_HT500to700_lumiUp->Scale(wt_lumi_up);
-
-  TH1D* mT_Stage1_QCD_HT500to700_lumiDown  = (TH1D*)file_QCD_HT500to700->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT500to700_lumiDown->Scale(wt_QCD_HT500to700);
-  mT_Stage1_QCD_HT500to700_lumiDown->Scale(wt_lumi_down);
-  */
-
-  //file_QCD_HT700to1000
-  TH1D* h1_evt_QCD_HT700to1000 = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/eventCount");
-  unsigned long long evt_QCD_HT700to1000 = h1_evt_QCD_HT700to1000->GetEntries(); //Integral();                                                                
-  double wt_QCD_HT700to1000 = (xs_QCD_HT700to1000*lumi)/evt_QCD_HT700to1000 ;
-  TH1D* mT_Stage1_QCD_HT700to1000  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT700to1000->Scale(wt_QCD_HT700to1000);
-  std::cout << "QCD_HT700to1000 weighted nevt=" << mT_Stage1_QCD_HT700to1000->Integral() << std::endl;
-  totalMC += mT_Stage1_QCD_HT700to1000->Integral();
-  //
-  TH1D* mT_Stage1_QCD_HT700to1000_JetEnUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_QCD_HT700to1000_JetEnUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_JetEnDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_QCD_HT700to1000_JetEnDown->Scale(wt_QCD_HT700to1000);
-  //
-  TH1D* mT_Stage1_QCD_HT700to1000_JetResUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_QCD_HT700to1000_JetResUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_JetResDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_QCD_HT700to1000_JetResDown->Scale(wt_QCD_HT700to1000);
-  //
-  TH1D* mT_Stage1_QCD_HT700to1000_MuonEnUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_QCD_HT700to1000_MuonEnUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_MuonEnDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_QCD_HT700to1000_MuonEnDown->Scale(wt_QCD_HT700to1000);
-  //
-  TH1D* mT_Stage1_QCD_HT700to1000_ElectronEnUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_QCD_HT700to1000_ElectronEnUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_ElectronEnDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_QCD_HT700to1000_ElectronEnDown->Scale(wt_QCD_HT700to1000);
-  //
-  TH1D* mT_Stage1_QCD_HT700to1000_TauEnUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_QCD_HT700to1000_TauEnUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_TauEnDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_QCD_HT700to1000_TauEnDown->Scale(wt_QCD_HT700to1000);
-  //
-  TH1D* mT_Stage1_QCD_HT700to1000_PhotonEnUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_QCD_HT700to1000_PhotonEnUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_PhotonEnDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_QCD_HT700to1000_PhotonEnDown->Scale(wt_QCD_HT700to1000);
-  //
-  TH1D* mT_Stage1_QCD_HT700to1000_UnclusteredEnUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_QCD_HT700to1000_UnclusteredEnUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_UnclusteredEnDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_QCD_HT700to1000_UnclusteredEnDown->Scale(wt_QCD_HT700to1000);
-  //
-  TH1D* mT_Stage1_QCD_HT700to1000_TauScaleUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_QCD_HT700to1000_TauScaleUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_TauScaleDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_QCD_HT700to1000_TauScaleDown->Scale(wt_QCD_HT700to1000);
-  //
-  TH1D* mT_Stage1_QCD_HT700to1000_pileupUncertUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_QCD_HT700to1000_pileupUncertUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_pileupUncertDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_QCD_HT700to1000_pileupUncertDown->Scale(wt_QCD_HT700to1000);
-  //
-  TH1D* mT_Stage1_QCD_HT700to1000_kFactorUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_QCD_HT700to1000_kFactorUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_kFactorDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_QCD_HT700to1000_kFactorDown->Scale(wt_QCD_HT700to1000);
-  //
-  TH1D* mT_Stage1_QCD_HT700to1000_TauIDSFUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_QCD_HT700to1000_TauIDSFUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_TauIDSFDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_QCD_HT700to1000_TauIDSFDown->Scale(wt_QCD_HT700to1000);
-  //
-  /*
-  TH1D* mT_Stage1_QCD_HT700to1000_pdfUncertUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_QCD_HT700to1000_pdfUncertUp->Scale(wt_QCD_HT700to1000);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_pdfUncertDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_QCD_HT700to1000_pdfUncertDown->Scale(wt_QCD_HT700to1000);
-  */  //
-  /*
-  TH1D* mT_Stage1_QCD_HT700to1000_lumiUp  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT700to1000_lumiUp->Scale(wt_QCD_HT700to1000);
-  mT_Stage1_QCD_HT700to1000_lumiUp->Scale(wt_lumi_up);
-
-  TH1D* mT_Stage1_QCD_HT700to1000_lumiDown  = (TH1D*)file_QCD_HT700to1000->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT700to1000_lumiDown->Scale(wt_QCD_HT700to1000);
-  mT_Stage1_QCD_HT700to1000_lumiDown->Scale(wt_lumi_down);
-  */
-
-  //file_QCD_HT1000to1500
-  TH1D* h1_evt_QCD_HT1000to1500 = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/eventCount");
-  unsigned long long evt_QCD_HT1000to1500 = h1_evt_QCD_HT1000to1500->GetEntries(); //Integral();                                                                  
-  double wt_QCD_HT1000to1500 = (xs_QCD_HT1000to1500*lumi)/evt_QCD_HT1000to1500 ;
-  TH1D* mT_Stage1_QCD_HT1000to1500  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT1000to1500->Scale(wt_QCD_HT1000to1500);
-  std::cout << "QCD_HT1000to1500 weighted nevt=" << mT_Stage1_QCD_HT1000to1500->Integral() << std::endl;
-  totalMC += mT_Stage1_QCD_HT1000to1500->Integral();
-  //
-  TH1D* mT_Stage1_QCD_HT1000to1500_JetEnUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_QCD_HT1000to1500_JetEnUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_JetEnDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_QCD_HT1000to1500_JetEnDown->Scale(wt_QCD_HT1000to1500);
-  //
-  TH1D* mT_Stage1_QCD_HT1000to1500_JetResUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_QCD_HT1000to1500_JetResUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_JetResDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_QCD_HT1000to1500_JetResDown->Scale(wt_QCD_HT1000to1500);
-  //
-  TH1D* mT_Stage1_QCD_HT1000to1500_MuonEnUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_QCD_HT1000to1500_MuonEnUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_MuonEnDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_QCD_HT1000to1500_MuonEnDown->Scale(wt_QCD_HT1000to1500);
-  //
-  TH1D* mT_Stage1_QCD_HT1000to1500_ElectronEnUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_QCD_HT1000to1500_ElectronEnUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_ElectronEnDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_QCD_HT1000to1500_ElectronEnDown->Scale(wt_QCD_HT1000to1500);
-  //
-  TH1D* mT_Stage1_QCD_HT1000to1500_TauEnUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_QCD_HT1000to1500_TauEnUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_TauEnDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_QCD_HT1000to1500_TauEnDown->Scale(wt_QCD_HT1000to1500);
-  //
-  TH1D* mT_Stage1_QCD_HT1000to1500_PhotonEnUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_QCD_HT1000to1500_PhotonEnUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_PhotonEnDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_QCD_HT1000to1500_PhotonEnDown->Scale(wt_QCD_HT1000to1500);
-  //
-  TH1D* mT_Stage1_QCD_HT1000to1500_UnclusteredEnUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_QCD_HT1000to1500_UnclusteredEnUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_UnclusteredEnDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_QCD_HT1000to1500_UnclusteredEnDown->Scale(wt_QCD_HT1000to1500);
-  //
-  TH1D* mT_Stage1_QCD_HT1000to1500_TauScaleUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_QCD_HT1000to1500_TauScaleUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_TauScaleDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_QCD_HT1000to1500_TauScaleDown->Scale(wt_QCD_HT1000to1500);
-  //
-  TH1D* mT_Stage1_QCD_HT1000to1500_pileupUncertUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_QCD_HT1000to1500_pileupUncertUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_pileupUncertDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_QCD_HT1000to1500_pileupUncertDown->Scale(wt_QCD_HT1000to1500);
-  //
-  TH1D* mT_Stage1_QCD_HT1000to1500_kFactorUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_QCD_HT1000to1500_kFactorUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_kFactorDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_QCD_HT1000to1500_kFactorDown->Scale(wt_QCD_HT1000to1500);
-  //
-  TH1D* mT_Stage1_QCD_HT1000to1500_TauIDSFUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_QCD_HT1000to1500_TauIDSFUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_TauIDSFDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_QCD_HT1000to1500_TauIDSFDown->Scale(wt_QCD_HT1000to1500);
-  //
-  /*
-  TH1D* mT_Stage1_QCD_HT1000to1500_pdfUncertUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_QCD_HT1000to1500_pdfUncertUp->Scale(wt_QCD_HT1000to1500);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_pdfUncertDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_QCD_HT1000to1500_pdfUncertDown->Scale(wt_QCD_HT1000to1500);
-  */  //
-  /*
-  TH1D* mT_Stage1_QCD_HT1000to1500_lumiUp  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT1000to1500_lumiUp->Scale(wt_QCD_HT1000to1500);
-  mT_Stage1_QCD_HT1000to1500_lumiUp->Scale(wt_lumi_up);
-
-  TH1D* mT_Stage1_QCD_HT1000to1500_lumiDown  = (TH1D*)file_QCD_HT1000to1500->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT1000to1500_lumiDown->Scale(wt_QCD_HT1000to1500);
-  mT_Stage1_QCD_HT1000to1500_lumiDown->Scale(wt_lumi_down);
-  */
-
-  //file_QCD_HT1500to2000
-  TH1D* h1_evt_QCD_HT1500to2000 = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/eventCount");
-  unsigned long long evt_QCD_HT1500to2000 = h1_evt_QCD_HT1500to2000->GetEntries(); //Integral();                                                                  
-  double wt_QCD_HT1500to2000 = (xs_QCD_HT1500to2000*lumi)/evt_QCD_HT1500to2000 ;
-  TH1D* mT_Stage1_QCD_HT1500to2000  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT1500to2000->Scale(wt_QCD_HT1500to2000);
-  std::cout << "QCD_HT1500to2000 weighted nevt=" << mT_Stage1_QCD_HT1500to2000->Integral() << std::endl;
-  totalMC += mT_Stage1_QCD_HT1500to2000->Integral() ;
-  //
-  TH1D* mT_Stage1_QCD_HT1500to2000_JetEnUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_QCD_HT1500to2000_JetEnUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_JetEnDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_QCD_HT1500to2000_JetEnDown->Scale(wt_QCD_HT1500to2000);
-  //
-  TH1D* mT_Stage1_QCD_HT1500to2000_JetResUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_QCD_HT1500to2000_JetResUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_JetResDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_QCD_HT1500to2000_JetResDown->Scale(wt_QCD_HT1500to2000);
-  //
-  TH1D* mT_Stage1_QCD_HT1500to2000_MuonEnUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_QCD_HT1500to2000_MuonEnUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_MuonEnDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_QCD_HT1500to2000_MuonEnDown->Scale(wt_QCD_HT1500to2000);
-  //
-  TH1D* mT_Stage1_QCD_HT1500to2000_ElectronEnUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_QCD_HT1500to2000_ElectronEnUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_ElectronEnDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_QCD_HT1500to2000_ElectronEnDown->Scale(wt_QCD_HT1500to2000);
-  //
-  TH1D* mT_Stage1_QCD_HT1500to2000_TauEnUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_QCD_HT1500to2000_TauEnUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_TauEnDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_QCD_HT1500to2000_TauEnDown->Scale(wt_QCD_HT1500to2000);
-  //
-  TH1D* mT_Stage1_QCD_HT1500to2000_PhotonEnUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_QCD_HT1500to2000_PhotonEnUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_PhotonEnDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_QCD_HT1500to2000_PhotonEnDown->Scale(wt_QCD_HT1500to2000);
-  //
-  TH1D* mT_Stage1_QCD_HT1500to2000_UnclusteredEnUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_QCD_HT1500to2000_UnclusteredEnUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_UnclusteredEnDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_QCD_HT1500to2000_UnclusteredEnDown->Scale(wt_QCD_HT1500to2000);
-  //
-  TH1D* mT_Stage1_QCD_HT1500to2000_TauScaleUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_QCD_HT1500to2000_TauScaleUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_TauScaleDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_QCD_HT1500to2000_TauScaleDown->Scale(wt_QCD_HT1500to2000);
-  //
-  TH1D* mT_Stage1_QCD_HT1500to2000_pileupUncertUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_QCD_HT1500to2000_pileupUncertUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_pileupUncertDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_QCD_HT1500to2000_pileupUncertDown->Scale(wt_QCD_HT1500to2000);
-  //
-  TH1D* mT_Stage1_QCD_HT1500to2000_kFactorUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_QCD_HT1500to2000_kFactorUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_kFactorDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_QCD_HT1500to2000_kFactorDown->Scale(wt_QCD_HT1500to2000);
-  //
-  TH1D* mT_Stage1_QCD_HT1500to2000_TauIDSFUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_QCD_HT1500to2000_TauIDSFUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_TauIDSFDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_QCD_HT1500to2000_TauIDSFDown->Scale(wt_QCD_HT1500to2000);
-  //
-  /*
-  TH1D* mT_Stage1_QCD_HT1500to2000_pdfUncertUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_QCD_HT1500to2000_pdfUncertUp->Scale(wt_QCD_HT1500to2000);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_pdfUncertDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_QCD_HT1500to2000_pdfUncertDown->Scale(wt_QCD_HT1500to2000);
-  */  //
-  /*
-  TH1D* mT_Stage1_QCD_HT1500to2000_lumiUp  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT1500to2000_lumiUp->Scale(wt_QCD_HT1500to2000);
-  mT_Stage1_QCD_HT1500to2000_lumiUp->Scale(wt_lumi_up);
-
-  TH1D* mT_Stage1_QCD_HT1500to2000_lumiDown  = (TH1D*)file_QCD_HT1500to2000->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT1500to2000_lumiDown->Scale(wt_QCD_HT1500to2000);
-  mT_Stage1_QCD_HT1500to2000_lumiDown->Scale(wt_lumi_down);
-  */
-
-  //file_QCD_HT2000toInf
-  TH1D* h1_evt_QCD_HT2000toInf = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/eventCount");
-  unsigned long long evt_QCD_HT2000toInf = h1_evt_QCD_HT2000toInf->GetEntries(); //Integral();                                                                  
-  double wt_QCD_HT2000toInf = (xs_QCD_HT2000toInf*lumi)/evt_QCD_HT2000toInf ;
-  TH1D* mT_Stage1_QCD_HT2000toInf  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT2000toInf->Scale(wt_QCD_HT2000toInf);
-  std::cout << "QCD_HT2000toInf weighted nevt=" << mT_Stage1_QCD_HT2000toInf->Integral() << std::endl;
-  totalMC += mT_Stage1_QCD_HT2000toInf->Integral();
-  //
-  TH1D* mT_Stage1_QCD_HT2000toInf_JetEnUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_QCD_HT2000toInf_JetEnUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_JetEnDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_QCD_HT2000toInf_JetEnDown->Scale(wt_QCD_HT2000toInf);
-  //
-  TH1D* mT_Stage1_QCD_HT2000toInf_JetResUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_QCD_HT2000toInf_JetResUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_JetResDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_QCD_HT2000toInf_JetResDown->Scale(wt_QCD_HT2000toInf);
-  //
-  TH1D* mT_Stage1_QCD_HT2000toInf_MuonEnUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_QCD_HT2000toInf_MuonEnUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_MuonEnDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_QCD_HT2000toInf_MuonEnDown->Scale(wt_QCD_HT2000toInf);
-  //
-  TH1D* mT_Stage1_QCD_HT2000toInf_ElectronEnUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_QCD_HT2000toInf_ElectronEnUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_ElectronEnDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_QCD_HT2000toInf_ElectronEnDown->Scale(wt_QCD_HT2000toInf);
-  //
-  TH1D* mT_Stage1_QCD_HT2000toInf_TauEnUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_QCD_HT2000toInf_TauEnUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_TauEnDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_QCD_HT2000toInf_TauEnDown->Scale(wt_QCD_HT2000toInf);
-  //
-  TH1D* mT_Stage1_QCD_HT2000toInf_PhotonEnUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_QCD_HT2000toInf_PhotonEnUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_PhotonEnDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_QCD_HT2000toInf_PhotonEnDown->Scale(wt_QCD_HT2000toInf);
-  //
-  TH1D* mT_Stage1_QCD_HT2000toInf_UnclusteredEnUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_QCD_HT2000toInf_UnclusteredEnUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_UnclusteredEnDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_QCD_HT2000toInf_UnclusteredEnDown->Scale(wt_QCD_HT2000toInf);
-  //
-  TH1D* mT_Stage1_QCD_HT2000toInf_TauScaleUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_QCD_HT2000toInf_TauScaleUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_TauScaleDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_QCD_HT2000toInf_TauScaleDown->Scale(wt_QCD_HT2000toInf);
-  //
-  TH1D* mT_Stage1_QCD_HT2000toInf_pileupUncertUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_QCD_HT2000toInf_pileupUncertUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_pileupUncertDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_QCD_HT2000toInf_pileupUncertDown->Scale(wt_QCD_HT2000toInf);
-  //
-  TH1D* mT_Stage1_QCD_HT2000toInf_kFactorUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_QCD_HT2000toInf_kFactorUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_kFactorDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_QCD_HT2000toInf_kFactorDown->Scale(wt_QCD_HT2000toInf);
-  //
-  TH1D* mT_Stage1_QCD_HT2000toInf_TauIDSFUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_QCD_HT2000toInf_TauIDSFUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_TauIDSFDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_QCD_HT2000toInf_TauIDSFDown->Scale(wt_QCD_HT2000toInf);
-  //
-  /*
-  TH1D* mT_Stage1_QCD_HT2000toInf_pdfUncertUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_QCD_HT2000toInf_pdfUncertUp->Scale(wt_QCD_HT2000toInf);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_pdfUncertDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_QCD_HT2000toInf_pdfUncertDown->Scale(wt_QCD_HT2000toInf);
-  */ //
-  /*
-  TH1D* mT_Stage1_QCD_HT2000toInf_lumiUp  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT2000toInf_lumiUp->Scale(wt_QCD_HT2000toInf);
-  mT_Stage1_QCD_HT2000toInf_lumiUp->Scale(wt_lumi_up);
-
-  TH1D* mT_Stage1_QCD_HT2000toInf_lumiDown  = (TH1D*)file_QCD_HT2000toInf->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_QCD_HT2000toInf_lumiDown->Scale(wt_QCD_HT2000toInf);
-  mT_Stage1_QCD_HT2000toInf_lumiDown->Scale(wt_lumi_down);
-  */
-
-
-  //file_ZJetsToNuNu_HT100To200
-  TH1D* h1_evt_ZJetsToNuNu_HT100To200 = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/eventCount");
-  unsigned long long evt_ZJetsToNuNu_HT100To200 = h1_evt_ZJetsToNuNu_HT100To200->GetEntries(); //Integral();                                                                  
-  double wt_ZJetsToNuNu_HT100To200 = (xs_ZJetsToNuNu_HT100To200*lumi)/evt_ZJetsToNuNu_HT100To200 ;
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT100To200->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //std::cout << "\n" << mT_Stage1_ZJetsToNuNu_HT100To200->GetBinError(600) << std::endl;
-  std::cout << "ZJetsToNuNu_HT100To200 weighted nevt=" << mT_Stage1_ZJetsToNuNu_HT100To200->Integral() << std::endl;
-  totalMC += mT_Stage1_ZJetsToNuNu_HT100To200->Integral();
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_JetEnUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_JetEnUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_JetEnUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_JetEnDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_JetEnDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_JetEnDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_JetResUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_JetResUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_JetResUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_JetResDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_JetResDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_JetResDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_MuonEnUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_MuonEnUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_MuonEnUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_MuonEnDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_MuonEnDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_MuonEnDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_ElectronEnUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_ElectronEnUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_ElectronEnUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_ElectronEnDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_ElectronEnDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_ElectronEnDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_TauEnUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauEnUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauEnUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_TauEnDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauEnDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauEnDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_PhotonEnUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_PhotonEnUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_PhotonEnUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_PhotonEnDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_PhotonEnDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_PhotonEnDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_UnclusteredEnUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_UnclusteredEnUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_UnclusteredEnUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_UnclusteredEnDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_UnclusteredEnDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_UnclusteredEnDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_TauScaleUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauScaleUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauScaleUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_TauScaleDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauScaleDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauScaleDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_pileupUncertUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_pileupUncertUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_pileupUncertUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_pileupUncertDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_pileupUncertDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_pileupUncertDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_kFactorUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_kFactorUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_kFactorUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_kFactorDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_kFactorDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_kFactorDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_TauIDSFUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauIDSFUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauIDSFUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_TauIDSFDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  */  //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT100To200_lumiUp->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_lumiUp->Scale(wt_lumi_up);
-  mT_Stage1_ZJetsToNuNu_HT100To200_lumiUp->Scale(kfact_ZJetsToNuNu_HT100To200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT100To200_lumiDown  = (TH1D*)file_ZJetsToNuNu_HT100To200->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT100To200_lumiDown->Scale(wt_ZJetsToNuNu_HT100To200);
-  mT_Stage1_ZJetsToNuNu_HT100To200_lumiDown->Scale(wt_lumi_down);
-  mT_Stage1_ZJetsToNuNu_HT100To200_lumiDown->Scale(kfact_ZJetsToNuNu_HT100To200);
-  */
-
-
-
-  //file_ZJetsToNuNu_HT200To400
-  TH1D* h1_evt_ZJetsToNuNu_HT200To400 = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/eventCount");
-  unsigned long long evt_ZJetsToNuNu_HT200To400 = h1_evt_ZJetsToNuNu_HT200To400->GetEntries(); //Integral();                                                                  
-  double wt_ZJetsToNuNu_HT200To400 = (xs_ZJetsToNuNu_HT200To400*lumi)/evt_ZJetsToNuNu_HT200To400 ;
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT200To400->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //std::cout << mT_Stage1_ZJetsToNuNu_HT200To400->GetBinError(600) << std::endl;
-  std::cout << "ZJetsToNuNu_HT200To400 weighted nevt=" << mT_Stage1_ZJetsToNuNu_HT200To400->Integral() << std::endl;
-  totalMC +=  mT_Stage1_ZJetsToNuNu_HT200To400->Integral();
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_JetEnUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_JetEnUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_JetEnUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_JetEnDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_JetEnDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_JetEnDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_JetResUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_JetResUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_JetResUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_JetResDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_JetResDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_JetResDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_MuonEnUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_MuonEnUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_MuonEnUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_MuonEnDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_MuonEnDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_MuonEnDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_ElectronEnUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_ElectronEnUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_ElectronEnUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_ElectronEnDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_ElectronEnDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_ElectronEnDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_TauEnUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauEnUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauEnUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_TauEnDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauEnDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauEnDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_PhotonEnUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_PhotonEnUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_PhotonEnUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_PhotonEnDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_PhotonEnDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_PhotonEnDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_UnclusteredEnUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_UnclusteredEnUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_UnclusteredEnUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_UnclusteredEnDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_UnclusteredEnDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_UnclusteredEnDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_TauScaleUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauScaleUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauScaleUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_TauScaleDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauScaleDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauScaleDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_pileupUncertUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_pileupUncertUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_pileupUncertUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_pileupUncertDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_pileupUncertDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_pileupUncertDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_kFactorUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_kFactorUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_kFactorUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_kFactorDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_kFactorDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_kFactorDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_TauIDSFUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauIDSFUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauIDSFUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_TauIDSFDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  */  //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT200To400_lumiUp->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_lumiUp->Scale(wt_lumi_up);
-  mT_Stage1_ZJetsToNuNu_HT200To400_lumiUp->Scale(kfact_ZJetsToNuNu_HT200To400);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT200To400_lumiDown  = (TH1D*)file_ZJetsToNuNu_HT200To400->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT200To400_lumiDown->Scale(wt_ZJetsToNuNu_HT200To400);
-  mT_Stage1_ZJetsToNuNu_HT200To400_lumiDown->Scale(wt_lumi_down);
-  mT_Stage1_ZJetsToNuNu_HT200To400_lumiDown->Scale(kfact_ZJetsToNuNu_HT200To400);
-  */
-
-  //file_ZJetsToNuNu_HT400To600
-  TH1D* h1_evt_ZJetsToNuNu_HT400To600 = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/eventCount");
-  unsigned long long evt_ZJetsToNuNu_HT400To600 = h1_evt_ZJetsToNuNu_HT400To600->GetEntries(); //Integral();                                                                  
-  double wt_ZJetsToNuNu_HT400To600 = (xs_ZJetsToNuNu_HT400To600*lumi)/evt_ZJetsToNuNu_HT400To600 ;
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT400To600->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //  std::cout << mT_Stage1_ZJetsToNuNu_HT400To600->GetBinError(600) << std::endl;
-  std::cout << "ZJetsToNuNu_HT400To600 weighted nevt=" << mT_Stage1_ZJetsToNuNu_HT400To600->Integral() << std::endl;
-  totalMC += mT_Stage1_ZJetsToNuNu_HT400To600->Integral();
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_JetEnUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_JetEnUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_JetEnUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_JetEnDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_JetEnDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_JetEnDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_JetResUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_JetResUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_JetResUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_JetResDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_JetResDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_JetResDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_MuonEnUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_MuonEnUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_MuonEnUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_MuonEnDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_MuonEnDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_MuonEnDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_ElectronEnUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_ElectronEnUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_ElectronEnUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_ElectronEnDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_ElectronEnDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_ElectronEnDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_TauEnUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauEnUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauEnUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_TauEnDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauEnDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauEnDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_PhotonEnUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_PhotonEnUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_PhotonEnUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_PhotonEnDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_PhotonEnDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_PhotonEnDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_UnclusteredEnUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_UnclusteredEnUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_UnclusteredEnUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_UnclusteredEnDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_UnclusteredEnDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_UnclusteredEnDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_TauScaleUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauScaleUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauScaleUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_TauScaleDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauScaleDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauScaleDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_pileupUncertUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_pileupUncertUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_pileupUncertUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_pileupUncertDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_pileupUncertDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_pileupUncertDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_kFactorUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_kFactorUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_kFactorUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_kFactorDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_kFactorDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_kFactorDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_TauIDSFUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauIDSFUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauIDSFUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_TauIDSFDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  */  //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT400To600_lumiUp->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_lumiUp->Scale(wt_lumi_up);
-  mT_Stage1_ZJetsToNuNu_HT400To600_lumiUp->Scale(kfact_ZJetsToNuNu_HT400To600);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT400To600_lumiDown  = (TH1D*)file_ZJetsToNuNu_HT400To600->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT400To600_lumiDown->Scale(wt_ZJetsToNuNu_HT400To600);
-  mT_Stage1_ZJetsToNuNu_HT400To600_lumiDown->Scale(wt_lumi_down);
-  mT_Stage1_ZJetsToNuNu_HT400To600_lumiDown->Scale(kfact_ZJetsToNuNu_HT400To600);
-  */
-
-
-  //file_ZJetsToNuNu_HT600To800
-  TH1D* h1_evt_ZJetsToNuNu_HT600To800 = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/eventCount");
-  unsigned long long evt_ZJetsToNuNu_HT600To800 = h1_evt_ZJetsToNuNu_HT600To800->GetEntries(); //Integral();                                                                  
-  double wt_ZJetsToNuNu_HT600To800 = (xs_ZJetsToNuNu_HT600To800*lumi)/evt_ZJetsToNuNu_HT600To800 ;
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT600To800->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //  std::cout << mT_Stage1_ZJetsToNuNu_HT600To800->GetBinError(600) << std::endl;
-  std::cout << "ZJetsToNuNu_HT600To800 weighted nevt=" << mT_Stage1_ZJetsToNuNu_HT600To800->Integral() << std::endl;
-  totalMC += mT_Stage1_ZJetsToNuNu_HT600To800->Integral() ;
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_JetEnUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_JetEnUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_JetEnUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_JetEnDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_JetEnDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_JetEnDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_JetResUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_JetResUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_JetResUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_JetResDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_JetResDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_JetResDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_MuonEnUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_MuonEnUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_MuonEnUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_MuonEnDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_MuonEnDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_MuonEnDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_ElectronEnUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_ElectronEnUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_ElectronEnUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_ElectronEnDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_ElectronEnDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_ElectronEnDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_TauEnUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauEnUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauEnUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_TauEnDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauEnDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauEnDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_PhotonEnUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_PhotonEnUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_PhotonEnUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_PhotonEnDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_PhotonEnDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_PhotonEnDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_UnclusteredEnUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_UnclusteredEnUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_UnclusteredEnUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_UnclusteredEnDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_UnclusteredEnDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_UnclusteredEnDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_TauScaleUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauScaleUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauScaleUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_TauScaleDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauScaleDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauScaleDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_pileupUncertUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_pileupUncertUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_pileupUncertUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_pileupUncertDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_pileupUncertDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_pileupUncertDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_kFactorUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_kFactorUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_kFactorUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_kFactorDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_kFactorDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_kFactorDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_TauIDSFUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauIDSFUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauIDSFUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_TauIDSFDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  */ //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT600To800_lumiUp->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_lumiUp->Scale(wt_lumi_up);
-  mT_Stage1_ZJetsToNuNu_HT600To800_lumiUp->Scale(kfact_ZJetsToNuNu_HT600To800);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT600To800_lumiDown  = (TH1D*)file_ZJetsToNuNu_HT600To800->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT600To800_lumiDown->Scale(wt_ZJetsToNuNu_HT600To800);
-  mT_Stage1_ZJetsToNuNu_HT600To800_lumiDown->Scale(wt_lumi_down);
-  mT_Stage1_ZJetsToNuNu_HT600To800_lumiDown->Scale(kfact_ZJetsToNuNu_HT600To800);
-  */
-
-  //file_ZJetsToNuNu_HT800To1200
-  TH1D* h1_evt_ZJetsToNuNu_HT800To1200 = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/eventCount");
-  unsigned long long evt_ZJetsToNuNu_HT800To1200 = h1_evt_ZJetsToNuNu_HT800To1200->GetEntries(); //Integral();                                                            
-  double wt_ZJetsToNuNu_HT800To1200 = (xs_ZJetsToNuNu_HT800To1200*lumi)/evt_ZJetsToNuNu_HT800To1200 ;
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT800To1200->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //std::cout << mT_Stage1_ZJetsToNuNu_HT800To1200->GetBinError(600) << std::endl;
-  std::cout << "ZJetsToNuNu_HT800To1200 weighted nevt=" << mT_Stage1_ZJetsToNuNu_HT800To1200->Integral() << std::endl;
-  totalMC += mT_Stage1_ZJetsToNuNu_HT800To1200->Integral() ;
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_JetEnUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_JetEnUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_JetEnUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_JetEnDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_JetEnDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_JetEnDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_JetResUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_JetResUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_JetResUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_JetResDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_JetResDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_JetResDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_MuonEnUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_MuonEnUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_MuonEnUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_MuonEnDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_MuonEnDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_MuonEnDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_ElectronEnUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_ElectronEnUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_ElectronEnUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_ElectronEnDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_ElectronEnDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_ElectronEnDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_TauEnUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauEnUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauEnUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_TauEnDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauEnDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauEnDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_PhotonEnUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_PhotonEnUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_PhotonEnUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_PhotonEnDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_PhotonEnDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_PhotonEnDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_UnclusteredEnUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_UnclusteredEnUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_UnclusteredEnUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_UnclusteredEnDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_UnclusteredEnDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_UnclusteredEnDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_TauScaleUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauScaleUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauScaleUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_TauScaleDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauScaleDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauScaleDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_pileupUncertUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_pileupUncertUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_pileupUncertUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_pileupUncertDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_pileupUncertDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_pileupUncertDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_kFactorUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_kFactorUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_kFactorUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_kFactorDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_kFactorDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_kFactorDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_TauIDSFUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauIDSFUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauIDSFUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_TauIDSFDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  */ //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_lumiUp->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_lumiUp->Scale(wt_lumi_up);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_lumiUp->Scale(kfact_ZJetsToNuNu_HT800To1200);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT800To1200_lumiDown  = (TH1D*)file_ZJetsToNuNu_HT800To1200->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT800To1200_lumiDown->Scale(wt_ZJetsToNuNu_HT800To1200);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_lumiDown->Scale(wt_lumi_down);
-  mT_Stage1_ZJetsToNuNu_HT800To1200_lumiDown->Scale(kfact_ZJetsToNuNu_HT800To1200);
-  */
-
-  //file_ZJetsToNuNu_HT1200To2500
-  TH1D* h1_evt_ZJetsToNuNu_HT1200To2500 = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/eventCount");
-  unsigned long long evt_ZJetsToNuNu_HT1200To2500 = h1_evt_ZJetsToNuNu_HT1200To2500->GetEntries(); //Integral();                                                             
-  double wt_ZJetsToNuNu_HT1200To2500 = (xs_ZJetsToNuNu_HT1200To2500*lumi)/evt_ZJetsToNuNu_HT1200To2500 ;
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  //std::cout << mT_Stage1_ZJetsToNuNu_HT1200To2500->GetBinError(600) << std::endl;
-  std::cout << "ZJetsToNuNu_HT1200To2500 weighted nevt=" << mT_Stage1_ZJetsToNuNu_HT1200To2500->Integral() << std::endl;
-  totalMC += mT_Stage1_ZJetsToNuNu_HT1200To2500->Integral() ;
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_JetEnUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_JetEnUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_JetEnUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_JetEnDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_JetEnDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_JetEnDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_JetResUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_JetResUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_JetResUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_JetResDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_JetResDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_JetResDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_MuonEnUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_MuonEnUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_MuonEnUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_MuonEnDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_MuonEnDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_MuonEnDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_ElectronEnUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_ElectronEnUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_ElectronEnUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_ElectronEnDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_ElectronEnDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_ElectronEnDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_TauEnUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauEnUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauEnUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_TauEnDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauEnDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauEnDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_PhotonEnUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_PhotonEnUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_PhotonEnUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_PhotonEnDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_PhotonEnDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_PhotonEnDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_UnclusteredEnUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_UnclusteredEnUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_UnclusteredEnUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_UnclusteredEnDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_UnclusteredEnDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_UnclusteredEnDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_TauScaleUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauScaleUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauScaleUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_TauScaleDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauScaleDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauScaleDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-   //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_pileupUncertUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_pileupUncertUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_pileupUncertUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_pileupUncertDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_pileupUncertDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_pileupUncertDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_kFactorUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_kFactorUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_kFactorUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_kFactorDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_kFactorDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_kFactorDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_TauIDSFUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauIDSFUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauIDSFUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_TauIDSFDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  */ //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiUp->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiUp->Scale(wt_lumi_up);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiUp->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiDown  = (TH1D*)file_ZJetsToNuNu_HT1200To2500->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiDown->Scale(wt_ZJetsToNuNu_HT1200To2500);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiDown->Scale(wt_lumi_down);
-  mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiDown->Scale(kfact_ZJetsToNuNu_HT1200To2500);
-  */
-
-
-  //file_ZJetsToNuNu_HT2500ToInf
-  TH1D* h1_evt_ZJetsToNuNu_HT2500ToInf = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/eventCount");
-  unsigned long long evt_ZJetsToNuNu_HT2500ToInf = h1_evt_ZJetsToNuNu_HT2500ToInf->GetEntries(); //Integral();                                                         
-  double wt_ZJetsToNuNu_HT2500ToInf = (xs_ZJetsToNuNu_HT2500ToInf*lumi)/evt_ZJetsToNuNu_HT2500ToInf ;
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  // std::cout << mT_Stage1_ZJetsToNuNu_HT2500ToInf->GetBinError(600) << std::endl;
-  std::cout << "ZJetsToNuNu_HT2500ToInf weighted nevt=" << mT_Stage1_ZJetsToNuNu_HT2500ToInf->Integral() << std::endl;
-  totalMC += mT_Stage1_ZJetsToNuNu_HT2500ToInf->Integral();
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetEnUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_JetEnUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetEnUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetEnUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetEnDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_JetEnDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetEnDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetEnDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetResUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_JetResUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetResUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetResUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetResDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_JetResDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetResDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetResDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_MuonEnUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_MuonEnUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_MuonEnUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_MuonEnDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_MuonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_MuonEnDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_MuonEnDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_ElectronEnUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_ElectronEnUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_ElectronEnUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_ElectronEnDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_ElectronEnDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_ElectronEnDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_ElectronEnDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauEnUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_TauEnUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauEnUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauEnUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauEnDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_TauEnDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauEnDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauEnDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_PhotonEnUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_PhotonEnUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_PhotonEnUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_PhotonEnDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_PhotonEnDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_PhotonEnDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_PhotonEnDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_UnclusteredEnUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_UnclusteredEnUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_UnclusteredEnUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_UnclusteredEnDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_metUncert_UnclusteredEnDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_UnclusteredEnDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_UnclusteredEnDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauScaleUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_TauScaleUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauScaleUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauScaleUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauScaleDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_TauScaleDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauScaleDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauScaleDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_pileupUncertUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pileupUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_pileupUncertUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_pileupUncertUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_pileupUncertDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pileupUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_pileupUncertDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_pileupUncertDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_kFactorUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_kFactorUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_kFactorUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_kFactorUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_kFactorDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_kFactorDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_kFactorDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_kFactorDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauIDSFUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_TauIDSFUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauIDSFUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauIDSFUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauIDSFDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_TauIDSFDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauIDSFDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauIDSFDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pdfUncertUp");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1_pdfUncertDown");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  */  //
-  /*
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiUp  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiUp->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiUp->Scale(wt_lumi_up);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiUp->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-
-  TH1D* mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiDown  = (TH1D*)file_ZJetsToNuNu_HT2500ToInf->Get("demo/histoDir/mT_Stage1");
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiDown->Scale(wt_ZJetsToNuNu_HT2500ToInf);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiDown->Scale(wt_lumi_down);
-  mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiDown->Scale(kfact_ZJetsToNuNu_HT2500ToInf);
-  */
-
-  TH1D* total_QCD = (TH1D*)mT_Stage1_QCD_HT200to300->Clone();
-  total_QCD->Add(mT_Stage1_QCD_HT300to500);
-  total_QCD->Add(mT_Stage1_QCD_HT500to700);
-  total_QCD->Add(mT_Stage1_QCD_HT700to1000);
-  total_QCD->Add(mT_Stage1_QCD_HT1000to1500);
-  total_QCD->Add(mT_Stage1_QCD_HT1500to2000);
-  total_QCD->Add(mT_Stage1_QCD_HT2000toInf);
-
-  total_QCD->Add(mT_Stage1_ZJetsToNuNu_HT100To200);
-  total_QCD->Add(mT_Stage1_ZJetsToNuNu_HT200To400);
-  total_QCD->Add(mT_Stage1_ZJetsToNuNu_HT400To600);
-  total_QCD->Add(mT_Stage1_ZJetsToNuNu_HT600To800);
-  total_QCD->Add(mT_Stage1_ZJetsToNuNu_HT800To1200);
-  total_QCD->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500);
-  total_QCD->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf);
-  /*
-  TH1D* total_ZJets = (TH1D*)mT_Stage1_ZJetsToNuNu_HT100To200->Clone();
-  total_ZJets->Add(mT_Stage1_ZJetsToNuNu_HT200To400);
-  total_ZJets->Add(mT_Stage1_ZJetsToNuNu_HT400To600);
-  total_ZJets->Add(mT_Stage1_ZJetsToNuNu_HT600To800);
-  total_ZJets->Add(mT_Stage1_ZJetsToNuNu_HT800To1200);
-  total_ZJets->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500);
-  total_ZJets->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf);
-  */
-  /*
-  total_QCD->SetFillColorAlpha(kPink+1,0.5);
-  total_QCD->SetLineColor(kBlack);
-  total_QCD->Rebin(100);
-  */
-  total_QCD->SetFillColorAlpha(kYellow-9,0.5);
-  total_QCD->SetLineColor(kBlack);
-  total_QCD->Rebin(100);
+  //  TH1D* total_QCD = (TH1D*)->Clone();
+  //  total_QCD->SetFillColorAlpha(kPink+1,0.5);
+  // total_QCD->SetLineColor(kBlack);
+  // total_QCD->Rebin(100);
+
+  //  total_ZJets->SetFillColorAlpha(kYellow-9,0.5);
+  // total_ZJets->SetLineColor(kBlack);
+  //std::cout << "total=" <<  total_ZJets->GetBinError(600) << std::endl;
+  //  total_ZJets->Rebin(100);
 
   std::cout << "totalMC =" << totalMC << std::endl;
 
@@ -4775,12 +3415,12 @@ int Plot_mT_Stage1_WithSyst() {
   //--Signal--//
   TH1D* h1_evt_Wprime_M4000 = (TH1D*)file_Wprime_M4000->Get("demo/histoDir/eventCount");
   unsigned long long evt_Wprime_M4000 = h1_evt_Wprime_M4000->GetEntries(); //Integral();                                                                          
-  // std::cout << "evt_Wprime_M1000 = " << evt_Wprime_M1000 << std::endl;
+  // std::cout << "evt_Wprime_M4000 = " << evt_Wprime_M4000 << std::endl;
   double wt_Wprime_M4000 = (xs_Wprime_M4000*lumi)/evt_Wprime_M4000 ;
   TH1D* mT_Stage1_Wprime_M4000  = (TH1D*)file_Wprime_M4000->Get("demo/histoDir/mT_Stage1");
   std::cout << "Sig Eff W' M4000 : " << ( mT_Stage1_Wprime_M4000->GetEntries() / evt_Wprime_M4000 ) << std::endl;
   mT_Stage1_Wprime_M4000->Scale(wt_Wprime_M4000);
-  //  mT_Stage1_Wprime_M1000->SetFillColorAlpha(kGreen-7,0.5);
+  //  mT_Stage1_Wprime_M4000->SetFillColorAlpha(kGreen-7,0.5);
   mT_Stage1_Wprime_M4000->SetLineColor(kMagenta);
   mT_Stage1_Wprime_M4000->SetLineWidth(2);
   mT_Stage1_Wprime_M4000->SetLineStyle(5);
@@ -4830,7 +3470,9 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg->Add(mT_Stage1_WW);
   totalBkg->Add(mT_Stage1_WZ);
   totalBkg->Add(mT_Stage1_ZZ);
-  totalBkg->Add(mT_Stage1_QCD_HT200to300);
+  //  totalBkg->Add(mT_Stage1_Datadriven);
+
+  /*  totalBkg->Add(mT_Stage1_QCD_HT200to300);
   totalBkg->Add(mT_Stage1_QCD_HT300to500);
   totalBkg->Add(mT_Stage1_QCD_HT500to700);
   totalBkg->Add(mT_Stage1_QCD_HT700to1000);
@@ -4845,7 +3487,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500);
   totalBkg->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf);
 
-
+  */
   TH1D* totalBkg_JetEnUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_JetEnUp->Clone();
   totalBkg_JetEnUp->Add(mT_Stage1_DYJetsToLL_M5to50_JetEnUp);
   totalBkg_JetEnUp->Add(mT_Stage1_TT_JetEnUp);
@@ -4875,6 +3517,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_JetEnUp->Add(mT_Stage1_WW_JetEnUp);
   totalBkg_JetEnUp->Add(mT_Stage1_WZ_JetEnUp);
   totalBkg_JetEnUp->Add(mT_Stage1_ZZ_JetEnUp);
+  //  totalBkg_JetEnUp->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_JetEnUp->Add(mT_Stage1_QCD_HT200to300_JetEnUp);
   totalBkg_JetEnUp->Add(mT_Stage1_QCD_HT300to500_JetEnUp);
   totalBkg_JetEnUp->Add(mT_Stage1_QCD_HT500to700_JetEnUp);
@@ -4889,7 +3533,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_JetEnUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_JetEnUp);
   totalBkg_JetEnUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_JetEnUp);
   totalBkg_JetEnUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetEnUp);
-
+  */
   TH1D* totalBkg_JetEnDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_JetEnDown->Clone();
   totalBkg_JetEnDown->Add(mT_Stage1_DYJetsToLL_M5to50_JetEnDown);
   totalBkg_JetEnDown->Add(mT_Stage1_TT_JetEnDown);
@@ -4919,6 +3563,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_JetEnDown->Add(mT_Stage1_WW_JetEnDown);
   totalBkg_JetEnDown->Add(mT_Stage1_WZ_JetEnDown);
   totalBkg_JetEnDown->Add(mT_Stage1_ZZ_JetEnDown);
+  //  totalBkg_JetEnDown->Add(mT_Stage1_Datadriven);
+ /*
   totalBkg_JetEnDown->Add(mT_Stage1_QCD_HT200to300_JetEnDown);
   totalBkg_JetEnDown->Add(mT_Stage1_QCD_HT300to500_JetEnDown);
   totalBkg_JetEnDown->Add(mT_Stage1_QCD_HT500to700_JetEnDown);
@@ -4933,6 +3579,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_JetEnDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_JetEnDown);
   totalBkg_JetEnDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_JetEnDown);
   totalBkg_JetEnDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetEnDown);
+ */
   //
   TH1D* totalBkg_JetResUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_JetResUp->Clone();
   totalBkg_JetResUp->Add(mT_Stage1_DYJetsToLL_M5to50_JetResUp);
@@ -4963,6 +3610,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_JetResUp->Add(mT_Stage1_WW_JetResUp);
   totalBkg_JetResUp->Add(mT_Stage1_WZ_JetResUp);
   totalBkg_JetResUp->Add(mT_Stage1_ZZ_JetResUp);
+  //  totalBkg_JetResUp->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_JetResUp->Add(mT_Stage1_QCD_HT200to300_JetResUp);
   totalBkg_JetResUp->Add(mT_Stage1_QCD_HT300to500_JetResUp);
   totalBkg_JetResUp->Add(mT_Stage1_QCD_HT500to700_JetResUp);
@@ -4977,7 +3626,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_JetResUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_JetResUp);
   totalBkg_JetResUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_JetResUp);
   totalBkg_JetResUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetResUp);
-
+  */
   TH1D* totalBkg_JetResDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_JetResDown->Clone();
   totalBkg_JetResDown->Add(mT_Stage1_DYJetsToLL_M5to50_JetResDown);
   totalBkg_JetResDown->Add(mT_Stage1_TT_JetResDown);
@@ -5007,6 +3656,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_JetResDown->Add(mT_Stage1_WW_JetResDown);
   totalBkg_JetResDown->Add(mT_Stage1_WZ_JetResDown);
   totalBkg_JetResDown->Add(mT_Stage1_ZZ_JetResDown);
+  //  totalBkg_JetResDown->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_JetResDown->Add(mT_Stage1_QCD_HT200to300_JetResDown);
   totalBkg_JetResDown->Add(mT_Stage1_QCD_HT300to500_JetResDown);
   totalBkg_JetResDown->Add(mT_Stage1_QCD_HT500to700_JetResDown);
@@ -5021,6 +3672,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_JetResDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_JetResDown);
   totalBkg_JetResDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_JetResDown);
   totalBkg_JetResDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_JetResDown);
+  */
   //
   TH1D* totalBkg_MuonEnUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_MuonEnUp->Clone();
   totalBkg_MuonEnUp->Add(mT_Stage1_DYJetsToLL_M5to50_MuonEnUp);
@@ -5051,6 +3703,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_MuonEnUp->Add(mT_Stage1_WW_MuonEnUp);
   totalBkg_MuonEnUp->Add(mT_Stage1_WZ_MuonEnUp);
   totalBkg_MuonEnUp->Add(mT_Stage1_ZZ_MuonEnUp);
+  //  totalBkg_MuonEnUp->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_MuonEnUp->Add(mT_Stage1_QCD_HT200to300_MuonEnUp);
   totalBkg_MuonEnUp->Add(mT_Stage1_QCD_HT300to500_MuonEnUp);
   totalBkg_MuonEnUp->Add(mT_Stage1_QCD_HT500to700_MuonEnUp);
@@ -5065,12 +3719,12 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_MuonEnUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_MuonEnUp);
   totalBkg_MuonEnUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_MuonEnUp);
   totalBkg_MuonEnUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_MuonEnUp);
-
+  */
   TH1D* totalBkg_MuonEnDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_MuonEnDown->Clone();
   totalBkg_MuonEnDown->Add(mT_Stage1_DYJetsToLL_M5to50_MuonEnDown);
   totalBkg_MuonEnDown->Add(mT_Stage1_TT_MuonEnDown);
   totalBkg_MuonEnDown->Add(mT_Stage1_TT_Mtt_700to1000_MuonEnDown);
-  totalBkg_MuonEnDown->Add(mT_Stage1_TT_Mtt_1000toInf_MuonEnDown);
+      totalBkg_MuonEnDown->Add(mT_Stage1_TT_Mtt_1000toInf_MuonEnDown);
   totalBkg_MuonEnDown->Add(mT_Stage1_ST_tchannel_antitop_MuonEnDown);
   totalBkg_MuonEnDown->Add(mT_Stage1_ST_tchannel_top_MuonEnDown);
   totalBkg_MuonEnDown->Add(mT_Stage1_ST_tW_antitop_MuonEnDown);
@@ -5095,6 +3749,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_MuonEnDown->Add(mT_Stage1_WW_MuonEnDown);
   totalBkg_MuonEnDown->Add(mT_Stage1_WZ_MuonEnDown);
   totalBkg_MuonEnDown->Add(mT_Stage1_ZZ_MuonEnDown);
+  //  totalBkg_MuonEnDown->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_MuonEnDown->Add(mT_Stage1_QCD_HT200to300_MuonEnDown);
   totalBkg_MuonEnDown->Add(mT_Stage1_QCD_HT300to500_MuonEnDown);
   totalBkg_MuonEnDown->Add(mT_Stage1_QCD_HT500to700_MuonEnDown);
@@ -5109,6 +3765,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_MuonEnDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_MuonEnDown);
   totalBkg_MuonEnDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_MuonEnDown);
   totalBkg_MuonEnDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_MuonEnDown);
+  */
   //
   TH1D* totalBkg_ElectronEnUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_ElectronEnUp->Clone();
   totalBkg_ElectronEnUp->Add(mT_Stage1_DYJetsToLL_M5to50_ElectronEnUp);
@@ -5139,6 +3796,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_ElectronEnUp->Add(mT_Stage1_WW_ElectronEnUp);
   totalBkg_ElectronEnUp->Add(mT_Stage1_WZ_ElectronEnUp);
   totalBkg_ElectronEnUp->Add(mT_Stage1_ZZ_ElectronEnUp);
+  // totalBkg_ElectronEnUp->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_ElectronEnUp->Add(mT_Stage1_QCD_HT200to300_ElectronEnUp);
   totalBkg_ElectronEnUp->Add(mT_Stage1_QCD_HT300to500_ElectronEnUp);
   totalBkg_ElectronEnUp->Add(mT_Stage1_QCD_HT500to700_ElectronEnUp);
@@ -5153,7 +3812,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_ElectronEnUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_ElectronEnUp);
   totalBkg_ElectronEnUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_ElectronEnUp);
   totalBkg_ElectronEnUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_ElectronEnUp);
-
+  */
   TH1D* totalBkg_ElectronEnDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_ElectronEnDown->Clone();
   totalBkg_ElectronEnDown->Add(mT_Stage1_DYJetsToLL_M5to50_ElectronEnDown);
   totalBkg_ElectronEnDown->Add(mT_Stage1_TT_ElectronEnDown);
@@ -5183,6 +3842,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_ElectronEnDown->Add(mT_Stage1_WW_ElectronEnDown);
   totalBkg_ElectronEnDown->Add(mT_Stage1_WZ_ElectronEnDown);
   totalBkg_ElectronEnDown->Add(mT_Stage1_ZZ_ElectronEnDown);
+  //  totalBkg_ElectronEnDown->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_ElectronEnDown->Add(mT_Stage1_QCD_HT200to300_ElectronEnDown);
   totalBkg_ElectronEnDown->Add(mT_Stage1_QCD_HT300to500_ElectronEnDown);
   totalBkg_ElectronEnDown->Add(mT_Stage1_QCD_HT500to700_ElectronEnDown);
@@ -5197,7 +3858,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_ElectronEnDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_ElectronEnDown);
   totalBkg_ElectronEnDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_ElectronEnDown);
   totalBkg_ElectronEnDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_ElectronEnDown);
-
+  */
   //
   TH1D* totalBkg_TauEnUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_TauEnUp->Clone();
   totalBkg_TauEnUp->Add(mT_Stage1_DYJetsToLL_M5to50_TauEnUp);
@@ -5228,6 +3889,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauEnUp->Add(mT_Stage1_WW_TauEnUp);
   totalBkg_TauEnUp->Add(mT_Stage1_WZ_TauEnUp);
   totalBkg_TauEnUp->Add(mT_Stage1_ZZ_TauEnUp);
+  //  totalBkg_TauEnUp->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_TauEnUp->Add(mT_Stage1_QCD_HT200to300_TauEnUp);
   totalBkg_TauEnUp->Add(mT_Stage1_QCD_HT300to500_TauEnUp);
   totalBkg_TauEnUp->Add(mT_Stage1_QCD_HT500to700_TauEnUp);
@@ -5242,6 +3905,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauEnUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_TauEnUp);
   totalBkg_TauEnUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_TauEnUp);
   totalBkg_TauEnUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauEnUp);
+  */
 
   TH1D* totalBkg_TauEnDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_TauEnDown->Clone();
   totalBkg_TauEnDown->Add(mT_Stage1_DYJetsToLL_M5to50_TauEnDown);
@@ -5272,6 +3936,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauEnDown->Add(mT_Stage1_WW_TauEnDown);
   totalBkg_TauEnDown->Add(mT_Stage1_WZ_TauEnDown);
   totalBkg_TauEnDown->Add(mT_Stage1_ZZ_TauEnDown);
+  //  totalBkg_TauEnDown->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_TauEnDown->Add(mT_Stage1_QCD_HT200to300_TauEnDown);
   totalBkg_TauEnDown->Add(mT_Stage1_QCD_HT300to500_TauEnDown);
   totalBkg_TauEnDown->Add(mT_Stage1_QCD_HT500to700_TauEnDown);
@@ -5286,6 +3952,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauEnDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_TauEnDown);
   totalBkg_TauEnDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_TauEnDown);
   totalBkg_TauEnDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauEnDown);
+  */
   //
   TH1D* totalBkg_PhotonEnUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_PhotonEnUp->Clone();
   totalBkg_PhotonEnUp->Add(mT_Stage1_DYJetsToLL_M5to50_PhotonEnUp);
@@ -5316,6 +3983,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_PhotonEnUp->Add(mT_Stage1_WW_PhotonEnUp);
   totalBkg_PhotonEnUp->Add(mT_Stage1_WZ_PhotonEnUp);
   totalBkg_PhotonEnUp->Add(mT_Stage1_ZZ_PhotonEnUp);
+  //  totalBkg_PhotonEnUp->Add(mT_Stage1_Datadriven);
+ /*
   totalBkg_PhotonEnUp->Add(mT_Stage1_QCD_HT200to300_PhotonEnUp);
   totalBkg_PhotonEnUp->Add(mT_Stage1_QCD_HT300to500_PhotonEnUp);
   totalBkg_PhotonEnUp->Add(mT_Stage1_QCD_HT500to700_PhotonEnUp);
@@ -5330,12 +3999,12 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_PhotonEnUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_PhotonEnUp);
   totalBkg_PhotonEnUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_PhotonEnUp);
   totalBkg_PhotonEnUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_PhotonEnUp);
-
+  */
   TH1D* totalBkg_PhotonEnDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_PhotonEnDown->Clone();
   totalBkg_PhotonEnDown->Add(mT_Stage1_DYJetsToLL_M5to50_PhotonEnDown);
   totalBkg_PhotonEnDown->Add(mT_Stage1_TT_PhotonEnDown);
   totalBkg_PhotonEnDown->Add(mT_Stage1_TT_Mtt_700to1000_PhotonEnDown);
-  totalBkg_PhotonEnDown->Add(mT_Stage1_TT_Mtt_1000toInf_PhotonEnDown);
+ totalBkg_PhotonEnDown->Add(mT_Stage1_TT_Mtt_1000toInf_PhotonEnDown);
   totalBkg_PhotonEnDown->Add(mT_Stage1_ST_tchannel_antitop_PhotonEnDown);
   totalBkg_PhotonEnDown->Add(mT_Stage1_ST_tchannel_top_PhotonEnDown);
   totalBkg_PhotonEnDown->Add(mT_Stage1_ST_tW_antitop_PhotonEnDown);
@@ -5360,6 +4029,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_PhotonEnDown->Add(mT_Stage1_WW_PhotonEnDown);
   totalBkg_PhotonEnDown->Add(mT_Stage1_WZ_PhotonEnDown);
   totalBkg_PhotonEnDown->Add(mT_Stage1_ZZ_PhotonEnDown);
+  //  totalBkg_PhotonEnDown->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_PhotonEnDown->Add(mT_Stage1_QCD_HT200to300_PhotonEnDown);
   totalBkg_PhotonEnDown->Add(mT_Stage1_QCD_HT300to500_PhotonEnDown);
   totalBkg_PhotonEnDown->Add(mT_Stage1_QCD_HT500to700_PhotonEnDown);
@@ -5374,7 +4045,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_PhotonEnDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_PhotonEnDown);
   totalBkg_PhotonEnDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_PhotonEnDown);
   totalBkg_PhotonEnDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_PhotonEnDown);
-
+  */
   //
   TH1D* totalBkg_UnclusteredEnUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_UnclusteredEnUp->Clone();
   totalBkg_UnclusteredEnUp->Add(mT_Stage1_DYJetsToLL_M5to50_UnclusteredEnUp);
@@ -5405,6 +4076,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_UnclusteredEnUp->Add(mT_Stage1_WW_UnclusteredEnUp);
   totalBkg_UnclusteredEnUp->Add(mT_Stage1_WZ_UnclusteredEnUp);
   totalBkg_UnclusteredEnUp->Add(mT_Stage1_ZZ_UnclusteredEnUp);
+  //  totalBkg_UnclusteredEnUp->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_UnclusteredEnUp->Add(mT_Stage1_QCD_HT200to300_UnclusteredEnUp);
   totalBkg_UnclusteredEnUp->Add(mT_Stage1_QCD_HT300to500_UnclusteredEnUp);
   totalBkg_UnclusteredEnUp->Add(mT_Stage1_QCD_HT500to700_UnclusteredEnUp);
@@ -5419,7 +4092,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_UnclusteredEnUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_UnclusteredEnUp);
   totalBkg_UnclusteredEnUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_UnclusteredEnUp);
   totalBkg_UnclusteredEnUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_UnclusteredEnUp);
-
+  */
   TH1D* totalBkg_UnclusteredEnDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_UnclusteredEnDown->Clone();
   totalBkg_UnclusteredEnDown->Add(mT_Stage1_DYJetsToLL_M5to50_UnclusteredEnDown);
   totalBkg_UnclusteredEnDown->Add(mT_Stage1_TT_UnclusteredEnDown);
@@ -5449,6 +4122,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_UnclusteredEnDown->Add(mT_Stage1_WW_UnclusteredEnDown);
   totalBkg_UnclusteredEnDown->Add(mT_Stage1_WZ_UnclusteredEnDown);
   totalBkg_UnclusteredEnDown->Add(mT_Stage1_ZZ_UnclusteredEnDown);
+  //  totalBkg_UnclusteredEnDown->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_UnclusteredEnDown->Add(mT_Stage1_QCD_HT200to300_UnclusteredEnDown);
   totalBkg_UnclusteredEnDown->Add(mT_Stage1_QCD_HT300to500_UnclusteredEnDown);
   totalBkg_UnclusteredEnDown->Add(mT_Stage1_QCD_HT500to700_UnclusteredEnDown);
@@ -5463,12 +4138,13 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_UnclusteredEnDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_UnclusteredEnDown);
   totalBkg_UnclusteredEnDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_UnclusteredEnDown);
   totalBkg_UnclusteredEnDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_UnclusteredEnDown);
+  */
   //
   TH1D* totalBkg_TauScaleUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_TauScaleUp->Clone();
   totalBkg_TauScaleUp->Add(mT_Stage1_DYJetsToLL_M5to50_TauScaleUp);
   totalBkg_TauScaleUp->Add(mT_Stage1_TT_TauScaleUp);
   totalBkg_TauScaleUp->Add(mT_Stage1_TT_Mtt_700to1000_TauScaleUp);
-  totalBkg_TauScaleUp->Add(mT_Stage1_TT_Mtt_1000toInf_TauScaleUp);
+ totalBkg_TauScaleUp->Add(mT_Stage1_TT_Mtt_1000toInf_TauScaleUp);
   totalBkg_TauScaleUp->Add(mT_Stage1_ST_tchannel_antitop_TauScaleUp);
   totalBkg_TauScaleUp->Add(mT_Stage1_ST_tchannel_top_TauScaleUp);
   totalBkg_TauScaleUp->Add(mT_Stage1_ST_tW_antitop_TauScaleUp);
@@ -5493,6 +4169,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauScaleUp->Add(mT_Stage1_WW_TauScaleUp);
   totalBkg_TauScaleUp->Add(mT_Stage1_WZ_TauScaleUp);
   totalBkg_TauScaleUp->Add(mT_Stage1_ZZ_TauScaleUp);
+  //  totalBkg_TauScaleUp->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_TauScaleUp->Add(mT_Stage1_QCD_HT200to300_TauScaleUp);
   totalBkg_TauScaleUp->Add(mT_Stage1_QCD_HT300to500_TauScaleUp);
   totalBkg_TauScaleUp->Add(mT_Stage1_QCD_HT500to700_TauScaleUp);
@@ -5507,12 +4185,12 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauScaleUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_TauScaleUp);
   totalBkg_TauScaleUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_TauScaleUp);
   totalBkg_TauScaleUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauScaleUp);
-
+  */
   TH1D* totalBkg_TauScaleDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_TauScaleDown->Clone();
   totalBkg_TauScaleDown->Add(mT_Stage1_DYJetsToLL_M5to50_TauScaleDown);
   totalBkg_TauScaleDown->Add(mT_Stage1_TT_TauScaleDown);
   totalBkg_TauScaleDown->Add(mT_Stage1_TT_Mtt_700to1000_TauScaleDown);
-  totalBkg_TauScaleDown->Add(mT_Stage1_TT_Mtt_1000toInf_TauScaleDown);
+ totalBkg_TauScaleDown->Add(mT_Stage1_TT_Mtt_1000toInf_TauScaleDown);
   totalBkg_TauScaleDown->Add(mT_Stage1_ST_tchannel_antitop_TauScaleDown);
   totalBkg_TauScaleDown->Add(mT_Stage1_ST_tchannel_top_TauScaleDown);
   totalBkg_TauScaleDown->Add(mT_Stage1_ST_tW_antitop_TauScaleDown);
@@ -5537,6 +4215,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauScaleDown->Add(mT_Stage1_WW_TauScaleDown);
   totalBkg_TauScaleDown->Add(mT_Stage1_WZ_TauScaleDown);
   totalBkg_TauScaleDown->Add(mT_Stage1_ZZ_TauScaleDown);
+  //  totalBkg_TauScaleDown->Add(mT_Stage1_Datadriven);
+ /*
   totalBkg_TauScaleDown->Add(mT_Stage1_QCD_HT200to300_TauScaleDown);
   totalBkg_TauScaleDown->Add(mT_Stage1_QCD_HT300to500_TauScaleDown);
   totalBkg_TauScaleDown->Add(mT_Stage1_QCD_HT500to700_TauScaleDown);
@@ -5551,6 +4231,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauScaleDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_TauScaleDown);
   totalBkg_TauScaleDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_TauScaleDown);
   totalBkg_TauScaleDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauScaleDown);
+  */
  //
   TH1D* totalBkg_pileupUncertUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_pileupUncertUp->Clone();
   totalBkg_pileupUncertUp->Add(mT_Stage1_DYJetsToLL_M5to50_pileupUncertUp);
@@ -5581,6 +4262,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_pileupUncertUp->Add(mT_Stage1_WW_pileupUncertUp);
   totalBkg_pileupUncertUp->Add(mT_Stage1_WZ_pileupUncertUp);
   totalBkg_pileupUncertUp->Add(mT_Stage1_ZZ_pileupUncertUp);
+  //  totalBkg_pileupUncertUp->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_pileupUncertUp->Add(mT_Stage1_QCD_HT200to300_pileupUncertUp);
   totalBkg_pileupUncertUp->Add(mT_Stage1_QCD_HT300to500_pileupUncertUp);
   totalBkg_pileupUncertUp->Add(mT_Stage1_QCD_HT500to700_pileupUncertUp);
@@ -5595,7 +4278,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_pileupUncertUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_pileupUncertUp);
   totalBkg_pileupUncertUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_pileupUncertUp);
   totalBkg_pileupUncertUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_pileupUncertUp);
-
+  */
   TH1D* totalBkg_pileupUncertDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_pileupUncertDown->Clone();
   totalBkg_pileupUncertDown->Add(mT_Stage1_DYJetsToLL_M5to50_pileupUncertDown);
   totalBkg_pileupUncertDown->Add(mT_Stage1_TT_pileupUncertDown);
@@ -5625,6 +4308,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_pileupUncertDown->Add(mT_Stage1_WW_pileupUncertDown);
   totalBkg_pileupUncertDown->Add(mT_Stage1_WZ_pileupUncertDown);
   totalBkg_pileupUncertDown->Add(mT_Stage1_ZZ_pileupUncertDown);
+  //  totalBkg_pileupUncertDown->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_pileupUncertDown->Add(mT_Stage1_QCD_HT200to300_pileupUncertDown);
   totalBkg_pileupUncertDown->Add(mT_Stage1_QCD_HT300to500_pileupUncertDown);
   totalBkg_pileupUncertDown->Add(mT_Stage1_QCD_HT500to700_pileupUncertDown);
@@ -5639,7 +4324,9 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_pileupUncertDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_pileupUncertDown);
   totalBkg_pileupUncertDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_pileupUncertDown);
   totalBkg_pileupUncertDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_pileupUncertDown);
+  */
  //
+
   TH1D* totalBkg_kFactorUp = (TH1D*)mT_Stage1_WJetsToLNu_HT100To200_kFactorUp->Clone();
   totalBkg_kFactorUp->Add(mT_Stage1_WJetsToLNu_HT200To400_kFactorUp);
   totalBkg_kFactorUp->Add(mT_Stage1_WJetsToLNu_HT400To600_kFactorUp);
@@ -5648,15 +4335,16 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_kFactorUp->Add(mT_Stage1_WJetsToLNu_HT1200To2500_kFactorUp);
   totalBkg_kFactorUp->Add(mT_Stage1_WJetsToLNu_HT2500ToInf_kFactorUp);
   totalBkg_kFactorUp->Add(mT_Stage1_WJetsToLNu_kFactorUp);
-  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M100_kFactorUp);
-  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M200_kFactorUp);
-  totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M500_kFactorUp);
+    totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M100_kFactorUp);
+    totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M200_kFactorUp);
+   totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M500_kFactorUp);
   totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M1000_kFactorUp);
   totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M2000_kFactorUp);
   totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M3000_kFactorUp);
   totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M4000_kFactorUp);
   totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M5000_kFactorUp);
   totalBkg_kFactorUp->Add(mT_Stage1_WToTauNu_M6000_kFactorUp);
+ 
 
   TH1D* totalBkg_kFactorDown = (TH1D*)mT_Stage1_WJetsToLNu_HT100To200_kFactorDown->Clone();
   totalBkg_kFactorDown->Add(mT_Stage1_WJetsToLNu_HT200To400_kFactorDown);
@@ -5675,7 +4363,25 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M4000_kFactorDown);
   totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M5000_kFactorDown);
   totalBkg_kFactorDown->Add(mT_Stage1_WToTauNu_M6000_kFactorDown);
-  
+
+  TH1D* totalBkg_kFactor = (TH1D*)mT_Stage1_WJetsToLNu_HT100To200->Clone();
+  totalBkg_kFactor->Add(mT_Stage1_WJetsToLNu_HT200To400);
+  totalBkg_kFactor->Add(mT_Stage1_WJetsToLNu_HT400To600);
+  totalBkg_kFactor->Add(mT_Stage1_WJetsToLNu_HT600To800);
+  totalBkg_kFactor->Add(mT_Stage1_WJetsToLNu_HT800To1200);
+  totalBkg_kFactor->Add(mT_Stage1_WJetsToLNu_HT1200To2500);
+  totalBkg_kFactor->Add(mT_Stage1_WJetsToLNu_HT2500ToInf);
+  totalBkg_kFactor->Add(mT_Stage1_WJetsToLNu);
+  totalBkg_kFactor->Add(mT_Stage1_WToTauNu_M100);
+  totalBkg_kFactor->Add(mT_Stage1_WToTauNu_M200);
+  totalBkg_kFactor->Add(mT_Stage1_WToTauNu_M500);
+  totalBkg_kFactor->Add(mT_Stage1_WToTauNu_M1000);
+  totalBkg_kFactor->Add(mT_Stage1_WToTauNu_M2000);
+  totalBkg_kFactor->Add(mT_Stage1_WToTauNu_M3000);
+  totalBkg_kFactor->Add(mT_Stage1_WToTauNu_M4000);
+  totalBkg_kFactor->Add(mT_Stage1_WToTauNu_M5000);
+  totalBkg_kFactor->Add(mT_Stage1_WToTauNu_M6000);
+
 
   TH1D* totalBkg_TauIDSFUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_TauIDSFUp->Clone();
   totalBkg_TauIDSFUp->Add(mT_Stage1_DYJetsToLL_M5to50_TauIDSFUp);
@@ -5706,6 +4412,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauIDSFUp->Add(mT_Stage1_WW_TauIDSFUp);
   totalBkg_TauIDSFUp->Add(mT_Stage1_WZ_TauIDSFUp);
   totalBkg_TauIDSFUp->Add(mT_Stage1_ZZ_TauIDSFUp);
+  // totalBkg_TauIDSFUp->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_TauIDSFUp->Add(mT_Stage1_QCD_HT200to300_TauIDSFUp);
   totalBkg_TauIDSFUp->Add(mT_Stage1_QCD_HT300to500_TauIDSFUp);
   totalBkg_TauIDSFUp->Add(mT_Stage1_QCD_HT500to700_TauIDSFUp);
@@ -5720,7 +4428,7 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauIDSFUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_TauIDSFUp);
   totalBkg_TauIDSFUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_TauIDSFUp);
   totalBkg_TauIDSFUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauIDSFUp);
-
+  */
   TH1D* totalBkg_TauIDSFDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_TauIDSFDown->Clone();
   totalBkg_TauIDSFDown->Add(mT_Stage1_DYJetsToLL_M5to50_TauIDSFDown);
   totalBkg_TauIDSFDown->Add(mT_Stage1_TT_TauIDSFDown);
@@ -5750,6 +4458,8 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauIDSFDown->Add(mT_Stage1_WW_TauIDSFDown);
   totalBkg_TauIDSFDown->Add(mT_Stage1_WZ_TauIDSFDown);
   totalBkg_TauIDSFDown->Add(mT_Stage1_ZZ_TauIDSFDown);
+  //  totalBkg_TauIDSFDown->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_TauIDSFDown->Add(mT_Stage1_QCD_HT200to300_TauIDSFDown);
   totalBkg_TauIDSFDown->Add(mT_Stage1_QCD_HT300to500_TauIDSFDown);
   totalBkg_TauIDSFDown->Add(mT_Stage1_QCD_HT500to700_TauIDSFDown);
@@ -5764,17 +4474,81 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_TauIDSFDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_TauIDSFDown);
   totalBkg_TauIDSFDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_TauIDSFDown);
   totalBkg_TauIDSFDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_TauIDSFDown);
+  */
   //
+
+  TH1D* totalBkg_trigSFUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_trigSFUp->Clone();
+  totalBkg_trigSFUp->Add(mT_Stage1_DYJetsToLL_M5to50_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_TT_trigSFUp);
+ totalBkg_trigSFUp->Add(mT_Stage1_TT_Mtt_700to1000_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_TT_Mtt_1000toInf_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_ST_tchannel_antitop_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_ST_tchannel_top_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_ST_tW_antitop_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_ST_tW_top_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WJetsToLNu_HT100To200_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WJetsToLNu_HT200To400_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WJetsToLNu_HT400To600_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WJetsToLNu_HT600To800_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WJetsToLNu_HT800To1200_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WJetsToLNu_HT1200To2500_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WJetsToLNu_HT2500ToInf_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WToTauNu_M100_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WToTauNu_M200_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WToTauNu_M500_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WToTauNu_M1000_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WToTauNu_M2000_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WToTauNu_M3000_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WToTauNu_M4000_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WToTauNu_M5000_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WToTauNu_M6000_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WJetsToLNu_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WW_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_WZ_trigSFUp);
+  totalBkg_trigSFUp->Add(mT_Stage1_ZZ_trigSFUp);
+
+  TH1D* totalBkg_trigSFDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_trigSFDown->Clone();
+  totalBkg_trigSFDown->Add(mT_Stage1_DYJetsToLL_M5to50_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_TT_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_TT_Mtt_700to1000_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_TT_Mtt_1000toInf_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_ST_tchannel_antitop_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_ST_tchannel_top_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_ST_tW_antitop_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_ST_tW_top_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WJetsToLNu_HT100To200_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WJetsToLNu_HT200To400_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WJetsToLNu_HT400To600_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WJetsToLNu_HT600To800_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WJetsToLNu_HT800To1200_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WJetsToLNu_HT1200To2500_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WJetsToLNu_HT2500ToInf_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WToTauNu_M100_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WToTauNu_M200_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WToTauNu_M500_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WToTauNu_M1000_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WToTauNu_M2000_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WToTauNu_M3000_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WToTauNu_M4000_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WToTauNu_M5000_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WToTauNu_M6000_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WJetsToLNu_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WW_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_WZ_trigSFDown);
+  totalBkg_trigSFDown->Add(mT_Stage1_ZZ_trigSFDown);
+
+
   /*
+  //
   TH1D* totalBkg_pdfUncertUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_pdfUncertUp->Clone();
   totalBkg_pdfUncertUp->Add(mT_Stage1_DYJetsToLL_M5to50_pdfUncertUp);
-  totalBkg_pdfUncertUp->Add(mT_Stage1_TT_pdfUncertUp);
-  totalBkg_pdfUncertUp->Add(mT_Stage1_TT_Mtt_700to1000_pdfUncertUp);
-  totalBkg_pdfUncertUp->Add(mT_Stage1_TT_Mtt_1000toInf_pdfUncertUp);
-  // totalBkg_pdfUncertUp->Add(mT_Stage1_ST_tchannel_antitop_pdfUncertUp);
-  //  totalBkg_pdfUncertUp->Add(mT_Stage1_ST_tchannel_top_pdfUncertUp);
-  // totalBkg_pdfUncertUp->Add(mT_Stage1_ST_tW_antitop_pdfUncertUp);
-  //  totalBkg_pdfUncertUp->Add(mT_Stage1_ST_tW_top_pdfUncertUp);
+  // totalBkg_pdfUncertUp->Add(mT_Stage1_TT_pdfUncertUp);
+  // totalBkg_pdfUncertUp->Add(mT_Stage1_TT_Mtt_700to1000_pdfUncertUp);
+  // totalBkg_pdfUncertUp->Add(mT_Stage1_TT_Mtt_1000toInf_pdfUncertUp);
+  //  totalBkg_pdfUncertUp->Add(mT_Stage1_ST_tchannel_antitop);
+  //  totalBkg_pdfUncertUp->Add(mT_Stage1_ST_tchannel_top);
+  //  totalBkg_pdfUncertUp->Add(mT_Stage1_ST_tW_antitop);
+  //  totalBkg_pdfUncertUp->Add(mT_Stage1_ST_tW_top);
   totalBkg_pdfUncertUp->Add(mT_Stage1_WJetsToLNu_HT100To200_pdfUncertUp);
   totalBkg_pdfUncertUp->Add(mT_Stage1_WJetsToLNu_HT200To400_pdfUncertUp);
   totalBkg_pdfUncertUp->Add(mT_Stage1_WJetsToLNu_HT400To600_pdfUncertUp);
@@ -5782,19 +4556,21 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_pdfUncertUp->Add(mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertUp);
   totalBkg_pdfUncertUp->Add(mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertUp);
   totalBkg_pdfUncertUp->Add(mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertUp);
-  // totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M100_pdfUncertUp);
-  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M200_pdfUncertUp);
-  // totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M500_pdfUncertUp);
-  // totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M1000_pdfUncertUp);
-  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M2000_pdfUncertUp);
-  // totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M3000_pdfUncertUp);
-  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M4000_pdfUncertUp);
-  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M5000_pdfUncertUp);
-  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M6000_pdfUncertUp);
+  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M100);
+  // totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M200);
+  // totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M500);
+  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M1000);
+  // totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M2000);
+  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M3000);
+  // totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M4000);
+  // totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M5000);
+  // totalBkg_pdfUncertUp->Add(mT_Stage1_WToTauNu_M6000);
   totalBkg_pdfUncertUp->Add(mT_Stage1_WJetsToLNu_pdfUncertUp);
-  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WW_pdfUncertUp);
-  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WZ_pdfUncertUp);
-  //  totalBkg_pdfUncertUp->Add(mT_Stage1_ZZ_pdfUncertUp);
+  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WW);
+  //  totalBkg_pdfUncertUp->Add(mT_Stage1_WZ);
+  // totalBkg_pdfUncertUp->Add(mT_Stage1_ZZ);
+  // totalBkg_pdfUncertUp->Add(mT_Stage1_Datadriven);
+  /*
   totalBkg_pdfUncertUp->Add(mT_Stage1_QCD_HT200to300_pdfUncertUp);
   totalBkg_pdfUncertUp->Add(mT_Stage1_QCD_HT300to500_pdfUncertUp);
   totalBkg_pdfUncertUp->Add(mT_Stage1_QCD_HT500to700_pdfUncertUp);
@@ -5809,16 +4585,19 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_pdfUncertUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertUp);
   totalBkg_pdfUncertUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertUp);
   totalBkg_pdfUncertUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertUp);
+  */
+
+  /*
 
   TH1D* totalBkg_pdfUncertDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_pdfUncertDown->Clone();
   totalBkg_pdfUncertDown->Add(mT_Stage1_DYJetsToLL_M5to50_pdfUncertDown);
-  totalBkg_pdfUncertDown->Add(mT_Stage1_TT_pdfUncertDown);
-  totalBkg_pdfUncertDown->Add(mT_Stage1_TT_Mtt_700to1000_pdfUncertDown);
-  totalBkg_pdfUncertDown->Add(mT_Stage1_TT_Mtt_1000toInf_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_ST_tchannel_antitop_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_ST_tchannel_top_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_ST_tW_antitop_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_ST_tW_top_pdfUncertDown);
+  //totalBkg_pdfUncertDown->Add(mT_Stage1_TT_pdfUncertDown);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_TT_Mtt_700to1000_pdfUncertDown);
+  //  totalBkg_pdfUncertDown->Add(mT_Stage1_TT_Mtt_1000toInf_pdfUncertDown);
+  //  totalBkg_pdfUncertDown->Add(mT_Stage1_ST_tchannel_antitop);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_ST_tchannel_top);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_ST_tW_antitop);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_ST_tW_top);
   totalBkg_pdfUncertDown->Add(mT_Stage1_WJetsToLNu_HT100To200_pdfUncertDown);
   totalBkg_pdfUncertDown->Add(mT_Stage1_WJetsToLNu_HT200To400_pdfUncertDown);
   totalBkg_pdfUncertDown->Add(mT_Stage1_WJetsToLNu_HT400To600_pdfUncertDown);
@@ -5826,19 +4605,21 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_pdfUncertDown->Add(mT_Stage1_WJetsToLNu_HT800To1200_pdfUncertDown);
   totalBkg_pdfUncertDown->Add(mT_Stage1_WJetsToLNu_HT1200To2500_pdfUncertDown);
   totalBkg_pdfUncertDown->Add(mT_Stage1_WJetsToLNu_HT2500ToInf_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M100_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M200_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M500_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M1000_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M2000_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M3000_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M4000_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M5000_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M6000_pdfUncertDown);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M100);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M200);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M500);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M1000);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M2000);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M3000);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M4000);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M5000);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_WToTauNu_M6000);
   totalBkg_pdfUncertDown->Add(mT_Stage1_WJetsToLNu_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WW_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WZ_pdfUncertDown);
-  //  totalBkg_pdfUncertDown->Add(mT_Stage1_ZZ_pdfUncertDown);
+  //  totalBkg_pdfUncertDown->Add(mT_Stage1_WW);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_WZ);
+  // totalBkg_pdfUncertDown->Add(mT_Stage1_ZZ);
+  ///  totalBkg_pdfUncertDown->Add(mT_Stage1_Datadriven);
+ /*
   totalBkg_pdfUncertDown->Add(mT_Stage1_QCD_HT200to300_pdfUncertDown);
   totalBkg_pdfUncertDown->Add(mT_Stage1_QCD_HT300to500_pdfUncertDown);
   totalBkg_pdfUncertDown->Add(mT_Stage1_QCD_HT500to700_pdfUncertDown);
@@ -5853,100 +4634,24 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_pdfUncertDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_pdfUncertDown);
   totalBkg_pdfUncertDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_pdfUncertDown);
   totalBkg_pdfUncertDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_pdfUncertDown);
-  //
   */
- //
   /*
-  TH1D* totalBkg_lumiUp = (TH1D*)mT_Stage1_DYJetsToLL_M50_lumiUp->Clone();
-  totalBkg_lumiUp->Add(mT_Stage1_DYJetsToLL_M5to50_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_TT_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_TT_Mtt_700to1000_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_TT_Mtt_1000toInf_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ST_tchannel_antitop_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ST_tchannel_top_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ST_tW_antitop_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ST_tW_top_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WJetsToLNu_HT100To200_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WJetsToLNu_HT200To400_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WJetsToLNu_HT400To600_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WJetsToLNu_HT600To800_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WJetsToLNu_HT800To1200_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WJetsToLNu_HT1200To2500_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WJetsToLNu_HT2500ToInf_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WToTauNu_M100_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WToTauNu_M200_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WToTauNu_M500_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WToTauNu_M1000_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WToTauNu_M2000_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WToTauNu_M3000_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WToTauNu_M4000_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WToTauNu_M5000_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WToTauNu_M6000_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WJetsToLNu_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WW_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_WZ_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ZZ_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_QCD_HT200to300_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_QCD_HT300to500_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_QCD_HT500to700_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_QCD_HT700to1000_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_QCD_HT1000to1500_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_QCD_HT1500to2000_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_QCD_HT2000toInf_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ZJetsToNuNu_HT100To200_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ZJetsToNuNu_HT200To400_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ZJetsToNuNu_HT400To600_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ZJetsToNuNu_HT600To800_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiUp);
-  totalBkg_lumiUp->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiUp);
-
-  TH1D* totalBkg_lumiDown = (TH1D*)mT_Stage1_DYJetsToLL_M50_lumiDown->Clone();
-  totalBkg_lumiDown->Add(mT_Stage1_DYJetsToLL_M5to50_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_TT_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_TT_Mtt_700to1000_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_TT_Mtt_1000toInf_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ST_tchannel_antitop_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ST_tchannel_top_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ST_tW_antitop_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ST_tW_top_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WJetsToLNu_HT100To200_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WJetsToLNu_HT200To400_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WJetsToLNu_HT400To600_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WJetsToLNu_HT600To800_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WJetsToLNu_HT800To1200_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WJetsToLNu_HT1200To2500_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WJetsToLNu_HT2500ToInf_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WToTauNu_M100_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WToTauNu_M200_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WToTauNu_M500_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WToTauNu_M1000_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WToTauNu_M2000_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WToTauNu_M3000_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WToTauNu_M4000_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WToTauNu_M5000_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WToTauNu_M6000_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WJetsToLNu_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WW_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_WZ_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ZZ_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_QCD_HT200to300_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_QCD_HT300to500_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_QCD_HT500to700_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_QCD_HT700to1000_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_QCD_HT1000to1500_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_QCD_HT1500to2000_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_QCD_HT2000toInf_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ZJetsToNuNu_HT100To200_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ZJetsToNuNu_HT200To400_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ZJetsToNuNu_HT400To600_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ZJetsToNuNu_HT600To800_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ZJetsToNuNu_HT800To1200_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ZJetsToNuNu_HT1200To2500_lumiDown);
-  totalBkg_lumiDown->Add(mT_Stage1_ZJetsToNuNu_HT2500ToInf_lumiDown);
+  TH1D* totalBkg_pdfUncert = (TH1D*)mT_Stage1_DYJetsToLL_M50->Clone();
+  totalBkg_pdfUncert->Add(mT_Stage1_DYJetsToLL_M5to50);
+  // totalBkg_pdfUncert->Add(mT_Stage1_TT);
+  // totalBkg_pdfUncert->Add(mT_Stage1_TT_Mtt_700to1000);
+  // totalBkg_pdfUncert->Add(mT_Stage1_TT_Mtt_1000toInf);
+  totalBkg_pdfUncert->Add(mT_Stage1_WJetsToLNu_HT100To200);
+  totalBkg_pdfUncert->Add(mT_Stage1_WJetsToLNu_HT200To400);
+  totalBkg_pdfUncert->Add(mT_Stage1_WJetsToLNu_HT400To600);
+  totalBkg_pdfUncert->Add(mT_Stage1_WJetsToLNu_HT600To800);
+  totalBkg_pdfUncert->Add(mT_Stage1_WJetsToLNu_HT800To1200);
+  totalBkg_pdfUncert->Add(mT_Stage1_WJetsToLNu_HT1200To2500);
+  totalBkg_pdfUncert->Add(mT_Stage1_WJetsToLNu_HT2500ToInf);
+  totalBkg_pdfUncert->Add(mT_Stage1_WJetsToLNu);
+  //
  //
  */
-
   totalBkg->Rebin(100);
 
   totalBkg_JetEnUp->Rebin(100);
@@ -5976,17 +4681,22 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg_pileupUncertUp->Rebin(100);
   totalBkg_pileupUncertDown->Rebin(100);
 
+  totalBkg_kFactor->Rebin(100);
   totalBkg_kFactorUp->Rebin(100);
   totalBkg_kFactorDown->Rebin(100);
 
   totalBkg_TauIDSFUp->Rebin(100);
   totalBkg_TauIDSFDown->Rebin(100);
 
+  totalBkg_trigSFUp->Rebin(100);
+  totalBkg_trigSFDown->Rebin(100);
+
   //  totalBkg_pdfUncertUp->Rebin(100);
-  //  totalBkg_pdfUncertDown->Rebin(100);
+  // totalBkg_pdfUncertDown->Rebin(100);
+  // totalBkg_pdfUncert->Rebin(100);
 
   // totalBkg_lumiUp->Rebin(100);
-  // totalBkg_lumiDown->Rebin(100)  ;
+  // totalBkg_lumiDown->Rebin(100)    ;
 
   TH1D* bkg_lumi_up = (TH1D*)totalBkg->Clone();
   bkg_lumi_up->Scale(wt_lumi_up);
@@ -5996,151 +4706,242 @@ int Plot_mT_Stage1_WithSyst() {
 
   int nbin1 = totalBkg->GetNbinsX();
   std::cout << "Nbin=" << nbin1 << std::endl;
-  Double_t  x[200] = {0} ;
-  Double_t  y_JetEn[200] = {0} ;
+  Double_t x[200] = {0} ;
+  Double_t y_JetEn[200] = {0} ;
   Double_t  y_JetRes[200] = {0} ;
   Double_t  y_MuonEn[200] = {0} ;
+  Double_t  y_ElectronEn[200] = {0} ;
+  Double_t  y_TauEn[200] = {0};
+  Double_t  y_PhotonEn[200] = {0};
+  Double_t  y_UnclusteredEn[200] = {0};
+  Double_t  y_TauScale[200] = {0};
+  Double_t  y_pileupUncert[200] = {0};
+  Double_t  y_TauIDSF[200] = {0};
+  // Double_t  y_pdfUncert[200] = {0};
+  Double_t  y_lumi[200] = {0};
+  Double_t  y_DD[200] = {0} ;
+  Double_t  y_kFactor[200] = {0} ;
+  Double_t  y_trigSF[200] = {0} ;
+  // delta_kFactorUp
 
   for (int n=0; n<nbin1; n++) {
     std::cout << "n=" << n << std::endl;
+    //    x[n] = totalBkg->GetBinContent(n) ;
     x[n] = totalBkg->GetXaxis()->GetBinCenter(n) ;
+    std::cout << "x=" << x[n] << std::endl;
 
     double delta_JetEnUp   = fabs(totalBkg_JetEnUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_JetEnDown = fabs(totalBkg_JetEnDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_JetEn = min(delta_JetEnUp,delta_JetEnDown);
+    double delta_syst_JetEn = (delta_JetEnUp+delta_JetEnDown)/2.0;
     if (totalBkg->GetBinContent(n) > 0)  y_JetEn[n] = delta_syst_JetEn/(totalBkg->GetBinContent(n)) ;
-    std::cout << "JES " << delta_syst_JetEn << std::endl;
-  
+    std::cout << "JET EN = " << y_JetEn[n] << std::endl;
+
     double delta_JetResUp   = fabs(totalBkg_JetResUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_JetResDown = fabs(totalBkg_JetResDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_JetRes = min(delta_JetResUp,delta_JetResDown);
+    double delta_syst_JetRes = (delta_JetResUp+delta_JetResDown)/2.0;
     if (totalBkg->GetBinContent(n) > 0)  y_JetRes[n] = delta_syst_JetRes/(totalBkg->GetBinContent(n)) ;
-    std::cout << "JER " << delta_syst_JetRes << std::endl;
+    std::cout << "JET RES = " << y_JetRes[n] << std::endl;
 
     double delta_MuonEnUp   = fabs(totalBkg_MuonEnUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_MuonEnDown = fabs(totalBkg_MuonEnDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_MuonEn = min(delta_MuonEnUp,delta_MuonEnDown);
+    double delta_syst_MuonEn = (delta_MuonEnUp+delta_MuonEnDown)/2.0;
     if (totalBkg->GetBinContent(n) > 0)  y_MuonEn[n] = delta_syst_MuonEn/(totalBkg->GetBinContent(n)) ;
-    std::cout << "MuonEn " << delta_syst_MuonEn << std::endl;
+    std::cout << "Muon EN = " << y_MuonEn[n] << std::endl;
 
     double delta_ElectronEnUp   = fabs(totalBkg_ElectronEnUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_ElectronEnDown = fabs(totalBkg_ElectronEnDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_ElectronEn = min(delta_ElectronEnUp,delta_ElectronEnDown);
-    Double_t  y_ElectronEn[200] ;
-    y_ElectronEn[n] = delta_syst_ElectronEn ;
-
+    double delta_syst_ElectronEn = (delta_ElectronEnUp+delta_ElectronEnDown)/2.0;
+    if (totalBkg->GetBinContent(n) > 0)  y_ElectronEn[n] = delta_syst_ElectronEn/(totalBkg->GetBinContent(n)) ;
+    std::cout << "Electron EN = " << y_ElectronEn[n] << std::endl;
+ 
     double delta_TauEnUp   = fabs(totalBkg_TauEnUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_TauEnDown = fabs(totalBkg_TauEnDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_TauEn = min(delta_TauEnUp,delta_TauEnDown);
-    Double_t  y_TauEn[200] ;
-    y_TauEn[n] = delta_syst_TauEn ;
-
+    double delta_syst_TauEn = (delta_TauEnUp+delta_TauEnDown)/2.0;
+    if (totalBkg->GetBinContent(n) > 0)  y_TauEn[n] = delta_syst_TauEn/(totalBkg->GetBinContent(n)) ;
+    std::cout << "Tau EN = " << y_TauEn[n] << std::endl;
+    
     double delta_PhotonEnUp   = fabs(totalBkg_PhotonEnUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_PhotonEnDown = fabs(totalBkg_PhotonEnDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_PhotonEn = min(delta_PhotonEnUp,delta_PhotonEnDown);
-    Double_t  y_PhotonEn[200] ;
-    y_PhotonEn[n] = delta_syst_PhotonEn ;
-
+    double delta_syst_PhotonEn = (delta_PhotonEnUp+delta_PhotonEnDown)/2.0;
+    if (totalBkg->GetBinContent(n) > 0)  y_PhotonEn[n] = delta_syst_PhotonEn/(totalBkg->GetBinContent(n)) ;
+    std::cout << "Photon EN = " << y_PhotonEn[n] << std::endl;
+  
     double delta_UnclusteredEnUp   = fabs(totalBkg_UnclusteredEnUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_UnclusteredEnDown = fabs(totalBkg_UnclusteredEnDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_UnclusteredEn = min(delta_UnclusteredEnUp,delta_UnclusteredEnDown);
-    Double_t  y_UnclusteredEn[200] ;
-    y_UnclusteredEn[n] = delta_syst_UnclusteredEn ;
-
+    double delta_syst_UnclusteredEn = (delta_UnclusteredEnUp+delta_UnclusteredEnDown)/2.0;
+    if (totalBkg->GetBinContent(n) > 0)  y_UnclusteredEn[n] = delta_syst_UnclusteredEn/(totalBkg->GetBinContent(n)) ;
+    std::cout << "Unclustered EN = " << y_UnclusteredEn[n] << std::endl;
+  
     double delta_TauScaleUp   = fabs(totalBkg_TauScaleUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_TauScaleDown = fabs(totalBkg_TauScaleDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_TauScale = min(delta_TauScaleUp,delta_TauScaleDown);
-    //    std::cout << "\ndelta_syst_TauScale = " << delta_syst_TauScale << std::endl;
-    Double_t  y_TauScale[200] ;
-    y_TauScale[n] = delta_syst_TauScale ;
+    double delta_syst_TauScale = (delta_TauScaleUp+delta_TauScaleDown)/2.0;
+    if (totalBkg->GetBinContent(n) > 0)  y_TauScale[n] = delta_syst_TauScale/(totalBkg->GetBinContent(n)) ;
+    std::cout << "TAUscale = " << y_TauScale[n] << std::endl;
 
+    double delta_trigSFUp   = fabs(totalBkg_trigSFUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
+    double delta_trigSFDown = fabs(totalBkg_trigSFDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
+    double delta_syst_trigSF = (delta_trigSFUp+delta_trigSFDown)/2.0;
+    if (totalBkg->GetBinContent(n) > 0)  y_trigSF[n] = delta_syst_trigSF/(totalBkg->GetBinContent(n)) ;
+    std::cout << "trigscale = " << y_trigSF[n] << std::endl;
+  
     double delta_pileupUncertUp   = fabs(totalBkg_pileupUncertUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_pileupUncertDown = fabs(totalBkg_pileupUncertDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_pileupUncert = min(delta_pileupUncertUp,delta_pileupUncertDown);
-    Double_t  y_pileupUncert[200] ;
-    y_pileupUncert[n] = delta_syst_pileupUncert ;
+    double delta_syst_pileupUncert = (delta_pileupUncertUp+delta_pileupUncertDown)/2.0;
+    if (totalBkg->GetBinContent(n) > 0)  y_pileupUncert[n] = delta_syst_pileupUncert/(totalBkg->GetBinContent(n)) ;
+    std::cout << "pileUp = " << y_pileupUncert[n] << std::endl;
 
-    double delta_kFactorUp   = fabs(totalBkg_kFactorUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
-    double delta_kFactorDown = fabs(totalBkg_kFactorDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_kFactor = min(delta_kFactorUp,delta_kFactorDown);
-    //  std::cout << "delta_syst_kFactor = " << delta_syst_kFactor << std::endl;
- 
+    double delta_kFactorUp   = fabs(totalBkg_kFactorUp->GetBinContent(n)   - totalBkg_kFactor->GetBinContent(n)) ;
+    double delta_kFactorDown = fabs(totalBkg_kFactorDown->GetBinContent(n) - totalBkg_kFactor->GetBinContent(n)) ;
+    double delta_syst_kFactor = (delta_kFactorUp+delta_kFactorDown)/2.0;
+    if (totalBkg_kFactor->GetBinContent(n) > 0)  y_kFactor[n] = delta_syst_kFactor/(totalBkg_kFactor->GetBinContent(n)) ;
+    std::cout << "kFactor = " << y_kFactor[n] << std::endl;
+   
     double delta_TauIDSFUp   = fabs(totalBkg_TauIDSFUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_TauIDSFDown = fabs(totalBkg_TauIDSFDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_TauIDSF = min(delta_TauIDSFUp,delta_TauIDSFDown);
-    Double_t  y_TauIDSF[200] ;
-    y_TauIDSF[n] = delta_syst_TauIDSF ;
-
-    //    double delta_pdfUncertUp   = fabs(totalBkg_pdfUncertUp->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
-    // double delta_pdfUncertDown = fabs(totalBkg_pdfUncertDown->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
+    double delta_syst_TauIDSF = (delta_TauIDSFUp+delta_TauIDSFDown)/2.0;
+    if (totalBkg->GetBinContent(n) > 0)  y_TauIDSF[n] = delta_syst_TauIDSF/(totalBkg->GetBinContent(n)) ;
+    std::cout << "tauIDSF = " << y_TauIDSF[n] << std::endl;
+ 
+    //    double delta_pdfUncertUp   = fabs(totalBkg_pdfUncertUp->GetBinContent(n)   - totalBkg_pdfUncert->GetBinContent(n)) ;
+    // double delta_pdfUncertDown = fabs(totalBkg_pdfUncertDown->GetBinContent(n) - totalBkg_pdfUncert->GetBinContent(n)) ;
     // double delta_syst_pdfUncert = min(delta_pdfUncertUp,delta_pdfUncertDown);
     // std::cout << "delta_syst_pdfUncert = " << delta_syst_pdfUncert << std::endl;
-    //  Double_t  y_pdfUncert[200] ;
-    // y_pdfUncert[n] = delta_syst_pdfUncert ;
-    
+    // if (totalBkg_pdfUncert->GetBinContent(n) > 0)  y_pdfUncert[n] = delta_syst_pdfUncert/(totalBkg_pdfUncert->GetBinContent(n)) ;
+    // std::cout << "pdf uncert = " << y_pdfUncert[n] << std::endl;
+     
     double delta_lumiUp   = fabs(bkg_lumi_up->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_lumiDown = fabs(bkg_lumi_down->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
-    double delta_syst_lumi = min(delta_lumiUp,delta_lumiDown);
-    //    std::cout << "delta_syst_lumi = " << delta_syst_lumi << std::endl;
-    Double_t  y_lumi[200] ;
-    y_lumi[n] = delta_syst_lumi ;
+    double delta_syst_lumi = (delta_lumiUp+delta_lumiDown)/2.0;
+    if (totalBkg->GetBinContent(n) > 0)  y_lumi[n] = delta_syst_lumi/(totalBkg->GetBinContent(n)) ;
+    std::cout << "lumi uncert = " << y_lumi[n] << std::endl;
+    //  y_lumi[n] = delta_syst_lumi ;
+
+    //mT_Stage1_Datadriven_up
+    double delta_DDUp   = fabs(mT_Stage1_Datadriven_up->GetBinContent(n)   -  mT_Stage1_Datadriven->GetBinContent(n)) ;
+    double delta_DDDown = fabs(mT_Stage1_Datadriven_down->GetBinContent(n) - mT_Stage1_Datadriven->GetBinContent(n)) ;
+    double delta_syst_DD = min(delta_DDUp,delta_DDDown);
+    if (mT_Stage1_Datadriven->GetBinContent(n) > 0)  y_DD[n] = delta_syst_DD/(mT_Stage1_Datadriven->GetBinContent(n)) ;
+    std::cout << "DD uncert = " << y_DD[n] << std::endl;
+    //    y_DD[n] = delta_syst_DD ;
+
 
     double delta_syst_tot = sqrt( (delta_syst_JetEn*delta_syst_JetEn) + (delta_syst_JetRes*delta_syst_JetRes) + (delta_syst_MuonEn*delta_syst_MuonEn) + (delta_syst_ElectronEn*delta_syst_ElectronEn) + (delta_syst_TauEn*delta_syst_TauEn) + (delta_syst_PhotonEn*delta_syst_PhotonEn) + (delta_syst_UnclusteredEn*delta_syst_UnclusteredEn) + (delta_syst_TauScale*delta_syst_TauScale) + (delta_syst_pileupUncert*delta_syst_pileupUncert) + (delta_syst_TauIDSF*delta_syst_TauIDSF) + 
-				  //(delta_syst_pdfUncert*delta_syst_pdfUncert) + 
-(delta_syst_lumi*delta_syst_lumi) + (delta_syst_kFactor*delta_syst_kFactor) );
+				  //(delta_syst_pdfUncert*delta_syst_pdfUncert) 
++ (delta_syst_lumi*delta_syst_lumi) + (delta_syst_DD*delta_syst_DD) + (delta_syst_kFactor*delta_syst_kFactor)  + (delta_syst_trigSF*delta_syst_trigSF) );
 
     totalBkg->SetBinError(n,delta_syst_tot);
   }
 
-
-  TCanvas *syst_canv = new TCanvas("systematic","Systematics");
+  TCanvas *syst_canv = new TCanvas("systematics_MET","Systematics_MET");
 
   TGraph *gr_JetEn = new TGraph(nbin1,x,y_JetEn);
-  gr_JetEn->SetLineColor(4);                             
+  gr_JetEn->SetLineColor(4);
   gr_JetEn->SetLineWidth(4);
   gr_JetEn->SetMarkerColor(4);
   gr_JetEn->SetMarkerStyle(21);
-  gr_JetEn->SetMaximum(0.8);
+  gr_JetEn->SetMaximum(0.5);
+  //  gr_JetEn->SetMinimum(0.0001);
   gr_JetEn->SetTitle(" ");
-  gr_JetEn->GetXaxis()->SetTitle("M_{T} in GeV");   
-  gr_JetEn->GetYaxis()->SetTitle("Systematic uncertainty");   
-  gr_JetEn->GetXaxis()->SetLimits(200,4000);
+  gr_JetEn->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_JetEn->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_JetEn->GetXaxis()->SetLimits(300,3000);
 
   TGraph *gr_JetRes = new TGraph(nbin1,x,y_JetRes);
-  gr_JetRes->SetLineColor(8);                             
+  gr_JetRes->SetLineColor(8);
   gr_JetRes->SetLineWidth(4);
   gr_JetRes->SetMarkerColor(8);
   gr_JetRes->SetMarkerStyle(22);
-  gr_JetRes->SetMaximum(0.8);
+  gr_JetRes->SetMaximum(0.5);
+  // gr_JetRes->SetMinimum(0.0001);
   gr_JetRes->SetTitle(" ");
-  gr_JetRes->GetXaxis()->SetTitle("M_{T} in GeV");   
-  gr_JetRes->GetYaxis()->SetTitle("Systematic uncertainty");   
-  gr_JetRes->GetXaxis()->SetLimits(200,4000);
+  gr_JetRes->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_JetRes->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_JetRes->GetXaxis()->SetLimits(300,3000);
 
   TGraph *gr_MuonEn = new TGraph(nbin1,x,y_MuonEn);
-  gr_MuonEn->SetLineColor(8);                             
+  gr_MuonEn->SetLineColor(6);
+  gr_MuonEn->SetMarkerColor(6);
   gr_MuonEn->SetLineWidth(4);
-  gr_MuonEn->SetMarkerColor(8);
   gr_MuonEn->SetMarkerStyle(22);
-  gr_MuonEn->SetMaximum(0.8);
+  gr_MuonEn->SetMaximum(0.5);
+  // gr_MuonEn->SetMinimum(0.0001);
   gr_MuonEn->SetTitle(" ");
-  gr_MuonEn->GetXaxis()->SetTitle("M_{T} in GeV");   
-  gr_MuonEn->GetYaxis()->SetTitle("Systematic uncertainty");   
-  gr_MuonEn->GetXaxis()->SetLimits(200,4000);
-  
+  gr_MuonEn->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_MuonEn->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_MuonEn->GetXaxis()->SetLimits(300,3000);
+
+  TGraph *gr_ElectronEn = new TGraph(nbin1,x,y_ElectronEn);
+  gr_ElectronEn->SetLineColor(2);
+  gr_ElectronEn->SetMarkerColor(2);
+  gr_ElectronEn->SetLineWidth(4);
+  gr_ElectronEn->SetMarkerStyle(26);
+  gr_ElectronEn->SetMaximum(0.5);
+  // gr_ElectronEn->SetMinimum(0.0001);
+  gr_ElectronEn->SetTitle(" ");
+  gr_ElectronEn->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_ElectronEn->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_ElectronEn->GetXaxis()->SetLimits(300,3000);
+
+  TGraph *gr_TauEn = new TGraph(nbin1,x,y_TauEn);
+  gr_TauEn->SetLineColor(44);
+  gr_TauEn->SetMarkerColor(44);
+  gr_TauEn->SetLineWidth(4);
+  gr_TauEn->SetMarkerStyle(20);
+  gr_TauEn->SetMaximum(0.5);
+  // gr_TauEn->SetMinimum(0.0001);
+  gr_TauEn->SetTitle(" ");
+  gr_TauEn->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_TauEn->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_TauEn->GetXaxis()->SetLimits(300,3000);
+
+  TGraph *gr_PhotonEn = new TGraph(nbin1,x,y_PhotonEn);
+  gr_PhotonEn->SetLineColor(7);
+  gr_PhotonEn->SetMarkerColor(7);
+  gr_PhotonEn->SetLineWidth(4);
+  gr_PhotonEn->SetMarkerStyle(20);
+  gr_PhotonEn->SetMaximum(0.5);
+  // gr_PhotonEn->SetMinimum(0.0001);
+  gr_PhotonEn->SetTitle(" ");
+  gr_PhotonEn->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_PhotonEn->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_PhotonEn->GetXaxis()->SetLimits(300,3000);
+
+  TGraph *gr_UnclusteredEn = new TGraph(nbin1,x,y_UnclusteredEn);
+  gr_UnclusteredEn->SetLineColor(16);
+  gr_UnclusteredEn->SetMarkerColor(16);
+  gr_UnclusteredEn->SetLineWidth(4);
+  gr_UnclusteredEn->SetMarkerStyle(20);
+  gr_UnclusteredEn->SetMaximum(0.5);
+  // gr_UnclusteredEn->SetMinimum(0.0001);
+  gr_UnclusteredEn->SetTitle(" ");
+  gr_UnclusteredEn->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_UnclusteredEn->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_UnclusteredEn->GetXaxis()->SetLimits(300,3000);
+
   syst_canv->cd();
+  syst_canv->SetGrid();
+
   gr_JetEn->Draw("APL");
   gr_JetRes->Draw("PL SAME");
   gr_MuonEn->Draw("PL SAME");
+  gr_ElectronEn->Draw("PL SAME");
+  gr_TauEn->Draw("PL SAME");
+  gr_PhotonEn->Draw("PL SAME");
+  gr_UnclusteredEn->Draw("PL SAME");
 
-  TLegend *leg_example5 = new TLegend(0.75,0.60,0.94,0.94);
+  TLegend *leg_example5 = new TLegend(0.45,0.65,0.94,0.94);
+  leg_example5->SetNColumns(2);
   leg_example5->SetFillColor(0);
   leg_example5->SetTextFont(42);
-  leg_example5->SetHeader("Systematics");
+  leg_example5->SetHeader("MET Uncertainty");
   leg_example5->SetBorderSize(0);
-  leg_example5->AddEntry(gr_JetEn, "JES","PL");
-  leg_example5->AddEntry(gr_MuonEn, "JER","PL");
- 
+  leg_example5->AddEntry(gr_JetEn,  "JES","PL");
+  leg_example5->AddEntry(gr_JetRes, "JER","PL");
+  leg_example5->AddEntry(gr_MuonEn, "Muon Energy","PL");
+  leg_example5->AddEntry(gr_ElectronEn, "Electron Energy","PL");
+  leg_example5->AddEntry(gr_TauEn, "Tau Energy","PL");
+  leg_example5->AddEntry(gr_PhotonEn, "Photon Energy","PL");
+  leg_example5->AddEntry(gr_UnclusteredEn, "Unclustered Energy","PL");
   leg_example5->Draw("same");
 
   TLatex* CMS_text1 = new TLatex(0.20,0.90,"CMS");
@@ -6163,10 +4964,158 @@ int Plot_mT_Stage1_WithSyst() {
   lumiText1->Draw("same");
 
   syst_canv->Update();
-
-
   syst_canv->Write();
-  syst_canv->Print("SystematicUncertPlot.pdf");
+  syst_canv->Print("METSystematicUncertPlot.pdf");
+
+
+
+  TCanvas *syst_canv_2 = new TCanvas("Othersystematics","OtherSystematics");
+
+  TGraph *gr_TauScale = new TGraph(nbin1,x,y_TauScale);
+  gr_TauScale->SetLineColor(4);
+  gr_TauScale->SetMarkerColor(4);
+  gr_TauScale->SetLineWidth(4);
+  gr_TauScale->SetMarkerStyle(28);
+  gr_TauScale->SetMaximum(1.0);
+  // gr_TauScale->SetMinimum(0.0001);
+  gr_TauScale->SetTitle(" ");
+  gr_TauScale->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_TauScale->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_TauScale->GetXaxis()->SetLimits(300,3000);
+
+  //y_pileupUncert
+  TGraph *gr_pileupUncert = new TGraph(nbin1,x,y_pileupUncert);
+  gr_pileupUncert->SetLineColor(8);
+  gr_pileupUncert->SetMarkerColor(8);
+  gr_pileupUncert->SetLineWidth(4);
+  //  gr_pileupUncert->SetLineStyle(4);
+  gr_pileupUncert->SetMarkerStyle(33);
+  gr_pileupUncert->SetMaximum(1.0);
+  // gr_pileupUncert->SetMinimum(0.0001);
+  gr_pileupUncert->SetTitle(" ");
+  gr_pileupUncert->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_pileupUncert->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_pileupUncert->GetXaxis()->SetLimits(300,3000);
+
+  //y_TauIDSF
+  TGraph *gr_TauIDSF = new TGraph(nbin1,x,y_TauIDSF);
+  gr_TauIDSF->SetLineColor(6);
+  gr_TauIDSF->SetMarkerColor(6);
+  gr_TauIDSF->SetLineWidth(4);
+  //  gr_TauIDSF->SetLineStyle(2);
+  gr_TauIDSF->SetMarkerStyle(33);
+  gr_TauIDSF->SetMaximum(1.0);
+  // gr_TauIDSF->SetMinimum(0.0001);
+  gr_TauIDSF->SetTitle(" ");
+  gr_TauIDSF->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_TauIDSF->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_TauIDSF->GetXaxis()->SetLimits(300,3000);
+
+  //y_pdfUncert
+  //  TGraph *gr_pdfUncert = new TGraph(nbin1,x,y_pdfUncert);
+  // gr_pdfUncert->SetLineColor(2);
+  // gr_pdfUncert->SetMarkerColor(2);
+  // gr_pdfUncert->SetLineWidth(4);
+  //  gr_pdfUncert->SetLineStyle(9);
+  // gr_pdfUncert->SetMarkerStyle(25);
+  // gr_pdfUncert->SetMaximum(1.0);
+  // gr_pdfUncert->SetMinimum(0.0001);
+  // gr_pdfUncert->SetTitle(" ");
+  // gr_pdfUncert->GetXaxis()->SetTitle("M_{T} in GeV");
+  // gr_pdfUncert->GetYaxis()->SetTitle("Systematic uncertainty");
+  // gr_pdfUncert->GetXaxis()->SetLimits(300,3000);
+
+  TGraph *gr_lumi = new TGraph(nbin1,x,y_lumi);
+  gr_lumi->SetLineColor(7);
+  gr_lumi->SetMarkerColor(7);
+  gr_lumi->SetLineWidth(4);
+  //  gr_lumi->SetLineStyle(10);
+  gr_lumi->SetMarkerStyle(24);
+  gr_lumi->SetMaximum(1.0);
+  // gr_lumi->SetMinimum(0.0001);
+  gr_lumi->SetTitle(" ");
+  gr_lumi->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_lumi->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_lumi->GetXaxis()->SetLimits(300,3000);
+
+  TGraph *gr_DD = new TGraph(nbin1,x,y_DD);
+  gr_DD->SetLineColor(42);
+  gr_DD->SetMarkerColor(42);
+  gr_DD->SetLineWidth(4);
+  //  gr_DD->SetLineStyle(2);
+  gr_DD->SetMarkerStyle(29);
+  gr_DD->SetMaximum(1.0);
+  // gr_DD->SetMinimum(0.0001);
+  gr_DD->SetTitle(" ");
+  gr_DD->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_DD->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_DD->GetXaxis()->SetLimits(300,3000);
+
+  //y_kFactor[n]
+  TGraph *gr_kFactor = new TGraph(nbin1,x,y_kFactor);
+  gr_kFactor->SetLineColor(1);
+  gr_kFactor->SetMarkerColor(1);
+  gr_kFactor->SetLineWidth(4);
+  //  gr_kFactor->SetLineStyle(6);
+  gr_kFactor->SetMarkerStyle(21);
+  gr_kFactor->SetMaximum(1.0);
+  // gr_kFactor->SetMinimum(0.0001);
+  gr_kFactor->SetTitle(" ");
+  gr_kFactor->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_kFactor->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_kFactor->GetXaxis()->SetLimits(300,3000);
+
+  TGraph *gr_trigSF = new TGraph(nbin1,x,y_trigSF);
+  gr_trigSF->SetLineColor(48);
+  gr_trigSF->SetMarkerColor(48);
+  gr_trigSF->SetLineWidth(4);
+  //  gr_trigSF->SetLineStyle(9);
+  gr_trigSF->SetMarkerStyle(27);
+  gr_trigSF->SetMaximum(1.0);
+  // gr_trigSF->SetMinimum(0.0001);
+  gr_trigSF->SetTitle(" ");
+  gr_trigSF->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_trigSF->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_trigSF->GetXaxis()->SetLimits(300,3000);
+
+
+  syst_canv_2->cd();
+  syst_canv_2->SetGrid();
+
+  gr_TauScale->Draw("APL");
+  gr_pileupUncert->Draw("PL SAME");
+  gr_TauIDSF->Draw("PL SAME");
+  // gr_pdfUncert->Draw("PL SAME");
+  gr_lumi->Draw("PL SAME");
+  gr_DD->Draw("PL SAME");
+  gr_kFactor->Draw("PL SAME");
+  gr_trigSF->Draw("PL SAME");
+
+  TLegend *leg_example6 = new TLegend(0.45,0.68,0.94,0.94);
+  leg_example6->SetNColumns(2);
+  leg_example6->SetFillColor(0);
+  leg_example6->SetTextFont(42);
+  leg_example6->SetHeader("Other Systematics");
+  leg_example6->SetBorderSize(0);
+  leg_example6->AddEntry(gr_TauScale, "Tau Energy","PL");
+  leg_example6->AddEntry(gr_pileupUncert, "PileUp","PL");
+  leg_example6->AddEntry(gr_TauIDSF, "TauID SF","PL");
+  // leg_example6->AddEntry(gr_pdfUncert, "PDF","PL");
+  leg_example6->AddEntry(gr_lumi, "lumi","PL");
+  leg_example6->AddEntry(gr_DD, "Datadriven","PL");
+  leg_example6->AddEntry(gr_kFactor, "W k-factor","PL");
+  leg_example6->AddEntry(gr_trigSF, "Trigger SF","PL");
+
+  leg_example6->Draw("same");
+
+  CMS_text1->Draw("same");
+  CMS_text_21->Draw("same");
+  lumiText1->Draw("same");
+
+  syst_canv_2->Update();
+  syst_canv_2->Write();
+  syst_canv_2->Print("SystematicUncertPlot.pdf");
+
  
   //--//
   THStack *hs = new THStack("hs","");
@@ -6176,8 +5125,8 @@ int Plot_mT_Stage1_WithSyst() {
   hs->Add(total_DY);
   hs->Add(total_ST);
   hs->Add(total_TT);
-  hs->Add(total_QCD);
-  //  hs->Add(total_ZJets);
+  hs->Add(mT_Stage1_Datadriven);
+  // hs->Add(total_ZJets);
   hs->Add(total_WJets);
   //mT_Stage1_->SetTitle("");
     /*
@@ -6187,6 +5136,24 @@ int Plot_mT_Stage1_WithSyst() {
   eff1->SetLineColor(kBlack);
   eff1->SetLineWidth(2);
   */
+
+  TH1* c_total_diboson =       total_diboson->GetCumulative();
+  TH1* c_total_DY =            total_DY->GetCumulative();
+  TH1* c_total_ST =            total_ST->GetCumulative();
+  TH1* c_total_TT =            total_TT->GetCumulative();
+  TH1* c_mT_Stage1_Datadriven =  mT_Stage1_Datadriven->GetCumulative();
+  TH1* c_total_WJets =  total_WJets->GetCumulative();
+
+
+  THStack *c_hs = new THStack("c_hs"," ");
+  c_hs->Add(c_total_diboson);
+  c_hs->Add(c_total_DY);
+  c_hs->Add(c_total_ST);
+  c_hs->Add(c_total_TT);
+  c_hs->Add(c_mT_Stage1_Datadriven);
+  c_hs->Add(c_total_WJets);
+
+
   TCanvas* my_canvas = new TCanvas("canvas","canvas",800,600);
   my_canvas->cd();
   //  hs->Draw();
@@ -6194,13 +5161,13 @@ int Plot_mT_Stage1_WithSyst() {
   hs->Draw("HIST");                                                                                                                                        
   hs->SetMaximum(100000);
   hs->SetMinimum(0.1);
-  hs->GetXaxis()->SetLimits(0, 3200);
+  hs->GetXaxis()->SetLimits(200, 3200);
   hs->GetXaxis()->SetTitle("M_{T} [GeV]");
   hs->GetYaxis()->SetTitle("Events");
   totalBkg->SetFillColor(kGray+1);
   totalBkg->SetFillStyle(3001);
   // totalBkg->Draw("same e2");
-  totalBkg->GetXaxis()->SetRangeUser(0,3200);
+  totalBkg->GetXaxis()->SetRangeUser(200,3200);
 
   TH1F* total =  (TH1F*)hs->GetStack()->Last()->Clone();
   // total->SetFillStyle(3004);                                                                                                                                      
@@ -6239,14 +5206,13 @@ int Plot_mT_Stage1_WithSyst() {
   lumiText->SetTextAlign(32);
   lumiText->Draw("same");     
 
-  TLegend *leg_example = new TLegend(0.70,0.50,0.94,0.94);
+  TLegend *leg_example = new TLegend(0.75,0.50,0.94,0.94);
   leg_example->SetFillColor(0);
-  // leg_example->SetNColumns(2);
   leg_example->SetTextFont(42);
   leg_example->SetBorderSize(0);
   leg_example->AddEntry(total_WJets, "Wjets","f");
-  leg_example->AddEntry(total_QCD, "QCD", "f");
-  // leg_example->AddEntry(total_ZJets, "Z(#nu#nu)jets", "f");
+  leg_example->AddEntry(mT_Stage1_Datadriven, "QCD datadriven", "f");
+  //  leg_example->AddEntry(total_ZJets, "Z(#nu#nu)jets", "f");
   leg_example->AddEntry(total_TT, "t#bart","f");
   //leg_example->AddEntry(mT_Stage1_WJetsToLNu, "Wjets","f");
   leg_example->AddEntry(total_ST, "Single Top", "f");
@@ -6260,7 +5226,56 @@ int Plot_mT_Stage1_WithSyst() {
   
   my_canvas->Write();
   my_canvas->Print("mT_Stage1_Syst.png");
-  my_canvas->Print("mT_Stage1_Syst.pdf");
+  my_canvas->Print("mT_Stage1_Syst_DD.pdf");
+
+
+  TCanvas* c_my_canvas = new TCanvas("cumulative","c_cumulative",800,600);
+  c_my_canvas->cd();
+  //  hs->Draw();
+  gPad->SetLogy();
+  //  c_my_canvas->SetGrid();
+
+  //  gPad->SetLogx();
+  c_hs->Draw("HIST");                                                                                                                                        
+  c_hs->SetMaximum(100000);
+  c_hs->SetMinimum(10);
+  c_hs->GetXaxis()->SetLimits(200, 3200);
+  c_hs->GetXaxis()->SetTitle("M_{T} [GeV]");
+  c_hs->GetYaxis()->SetTitle("Events");
+
+  TH1* c_mT_Stage1_Run2016all =   mT_Stage1_Run2016all->GetCumulative();
+  c_mT_Stage1_Run2016all->Draw("SAME E0");
+  //
+  TH1* c_mT_Stage1_Wprime_M4000 =   mT_Stage1_Wprime_M4000->GetCumulative();
+  c_mT_Stage1_Wprime_M4000->Draw("SAME HIST");
+  //  hs->SetOption("HIST L");
+  
+  CMS_text->Draw("same");
+  CMS_text_2->Draw("same");    
+  lumiText->Draw("same");     
+
+  TLegend *c_leg_example = new TLegend(0.54,0.80,0.94,0.94);
+  c_leg_example->SetNColumns(2);
+  c_leg_example->SetFillColor(0);
+  c_leg_example->SetTextFont(42);
+  c_leg_example->SetBorderSize(0);
+  c_leg_example->AddEntry(c_total_WJets, "Wjets","f");
+  c_leg_example->AddEntry(c_mT_Stage1_Datadriven, "QCD", "f");
+  //  c_leg_example->AddEntry(total_ZJets, "Z(#nu#nu)jets", "f");
+  c_leg_example->AddEntry(c_total_TT, "t#bart","f");
+  //c_leg_example->AddEntry(mT_Stage1_WJetsToLNu, "Wjets","f");
+  c_leg_example->AddEntry(c_total_ST, "Single Top", "f");
+  c_leg_example->AddEntry(c_total_DY, "DY","f");
+  c_leg_example->AddEntry(c_total_diboson, "Diboson", "f");
+  c_leg_example->AddEntry(c_mT_Stage1_Wprime_M4000, "SSM W' 4 TeV", "l");
+  c_leg_example->AddEntry(c_mT_Stage1_Run2016all, "Data", "pl" );
+  // c_leg_example->AddEntry(mT_Stage1_Run2016E, "Data", "pl" );
+  // c_leg_example->AddEntry(mT_Stage1_Run2016D, "Data", "pl" );
+  c_leg_example->Draw("same");
+  
+  c_my_canvas->Write();
+  c_my_canvas->Print("Cumulative.png");
+  c_my_canvas->Print("Cumulative.pdf");
 
 
   /*
@@ -6284,7 +5299,7 @@ int Plot_mT_Stage1_WithSyst() {
   gPad->SetPad(.005, .30, .995, .995);
   TPad* pad1 = (TPad*)ratio_c->GetPad(1); 
   pad1->SetTopMargin(0.05);
-  pad1->SetBottomMargin(0.05); 
+  pad1->SetBottomMargin(0.04); 
   
   ratio_c->Update();
   gPad->SetLogy();
@@ -6292,13 +5307,13 @@ int Plot_mT_Stage1_WithSyst() {
   hs->Draw("HIST");                                                                                                                                        
   hs->SetMaximum(100000);
   hs->SetMinimum(0.01);
-  hs->GetXaxis()->SetLimits(0, 3200);
+  hs->GetXaxis()->SetLimits(200, 3200);
   hs->GetXaxis()->SetTitle("");
   // total->Draw("SAME E2");
   totalBkg->SetFillColor(kGray+1);
   totalBkg->SetFillStyle(3001);
   // totalBkg->Draw("same e2");
-  totalBkg->GetXaxis()->SetRangeUser(0,3200);
+  totalBkg->GetXaxis()->SetRangeUser(200,3200);
 
   mydata->Draw("SAME E1");
   mT_Stage1_Wprime_M4000->Draw("SAME HIST");
@@ -6312,8 +5327,8 @@ int Plot_mT_Stage1_WithSyst() {
   gStyle->SetOptStat(false);
   ratio_c->Update();
   TPad* pad2 = (TPad*)ratio_c->GetPad(2);
-  pad2->SetTopMargin(0.04); 
-  pad2->SetBottomMargin(0.30); 
+  pad2->SetTopMargin(0.05); 
+  pad2->SetBottomMargin(0.32); 
   pad2->SetGridx();
   pad2->SetGridy();
 
@@ -6349,7 +5364,7 @@ int Plot_mT_Stage1_WithSyst() {
   //  TH1F* data_by_MC = (TH1F*)mydata->Clone();
   // data_by_MC->Divide(total);
   data_by_MC->SetMarkerStyle(20);
-  data_by_MC_syst->SetFillColor(kGray);
+  data_by_MC_syst->SetFillColor(kGray+2);
   data_by_MC_syst->SetFillStyle(3001);
   data_by_MC_syst->Draw("e2");
   data_by_MC->Draw("same E");
@@ -6360,37 +5375,40 @@ int Plot_mT_Stage1_WithSyst() {
   data_by_MC_syst->GetYaxis()->SetTitleSize(0.18);
   data_by_MC_syst->GetXaxis()->SetTitleSize(0.18);
   data_by_MC_syst->GetYaxis()->SetTitleOffset(0.20);
-  data_by_MC_syst->GetXaxis()->SetTitleOffset(0.75);
+  data_by_MC_syst->GetXaxis()->SetTitleOffset(0.78);
   data_by_MC_syst->SetTitle("");
-  data_by_MC_syst->GetXaxis()->SetRangeUser(0, 3200);
+  data_by_MC_syst->GetXaxis()->SetRangeUser(200, 3200);
   data_by_MC_syst->SetMaximum(3);
   data_by_MC_syst->SetMinimum(0);
   data_by_MC_syst->GetYaxis()->SetNdivisions(3);
 
-  TLine *l=new TLine(0,1,3200,1);
+  TLine *l=new TLine(200,1,3200,1);
   l->SetLineColor(kRed);
   l->Draw("same");
 
   std::cout << "D/MC bins=" << data_by_MC->GetNbinsX() << " width=" << data_by_MC->GetBinWidth(2) << std::endl;
   ratio_c->Write();
-  ratio_c->Print("mT_Stage1_ratio_syst.pdf");
-  ratio_c->Print("mT_Stage1_ratio_syst.png");
-  /////
+  ratio_c->Print("mT_Stage1_ratio_syst_DD.pdf");
+  ratio_c->Print("mT_Stage1_ratio_syst_DD.png");
+  //ratio_c->Close();
 
 
-  TCanvas* ratio_noband = new TCanvas("ratio1","ratio_nobandanvas",600,800);
-  ratio_noband->SetTopMargin(0.); 
-  ratio_noband->SetBottomMargin(0.); 
-  ratio_noband->Update();
-  ratio_noband->Divide(1, 2);
-  ratio_noband->cd(1);
+  ////
+
+  
+  TCanvas* ratio_noBand = new TCanvas("ratio_1","ratio_noBandanvas",600,800);
+  ratio_noBand->SetTopMargin(0.); 
+  ratio_noBand->SetBottomMargin(0.); 
+  ratio_noBand->Update();
+  ratio_noBand->Divide(1, 2);
+  ratio_noBand->cd(1);
 
   gPad->SetPad(.005, .30, .995, .995);
-  TPad* pad12 = (TPad*)ratio_noband->GetPad(1); 
-  pad12->SetTopMargin(0.05);
-  pad12->SetBottomMargin(0.05); 
+  TPad* pad11 = (TPad*)ratio_noBand->GetPad(1); 
+  pad11->SetTopMargin(0.05);
+  pad11->SetBottomMargin(0.04); 
   
-  ratio_noband->Update();
+  ratio_noBand->Update();
   gPad->SetLogy();
   
   hs->Draw("HIST");                                                                                                                                        
@@ -6410,14 +5428,14 @@ int Plot_mT_Stage1_WithSyst() {
   CMS_text_2->Draw("same");
   lumiText->Draw("same");
   leg_example->Draw("same");
-  ratio_noband->cd(2);
+  ratio_noBand->cd(2);
 
   gPad->SetPad(.005, .08, .995, .24); 
   gStyle->SetOptStat(false);
-  ratio_noband->Update();
-  TPad* pad22 = (TPad*)ratio_noband->GetPad(2);
-  pad22->SetTopMargin(0.04); 
-  pad22->SetBottomMargin(0.30); 
+  ratio_noBand->Update();
+  TPad* pad22 = (TPad*)ratio_noBand->GetPad(2);
+  pad22->SetTopMargin(0.05); 
+  pad22->SetBottomMargin(0.28); 
   pad22->SetGridx();
   pad22->SetGridy();
 
@@ -6426,14 +5444,14 @@ int Plot_mT_Stage1_WithSyst() {
 
   int nbin5=mydata->GetNbinsX() ;
   float width5=mydata->GetBinWidth(2);
-  TH1F *data_by_MC5 = new TH1F("h1", "ratio5", nbin5, 0, 8000);
-  //TH1F *data_by_MC_syst = new TH1F("h2", "ratio_syst5", nbin5, 0, 8000);
-  // std::cout << "before D/MC bins=" << data_by_MC->GetNbinsX() << " width=" << data_by_MC->GetBinWidth(2) << std::endl;
+  TH1F *data_by_MC5 = new TH1F("h15", "ratio5", nbin5, 0, 8000);
+  // TH1F *data_by_MC_syst = new TH1F("h2", "ratio_syst", nbin, 0, 8000);
+  std::cout << "before D/MC bins=" << data_by_MC5->GetNbinsX() << " width=" << data_by_MC5->GetBinWidth(2) << std::endl;
 
   for (int i=0; i<nbin5; i++) {
     float data5 = mydata->GetBinContent(i);
     float MC5 = total->GetBinContent(i);
-    // float syst_err = totalBkg->GetBinError(i);
+    //float syst_err = totalBkg->GetBinError(i);
     float ratio5=0;
     if (MC5>0) ratio5=data5/MC5 ;
     data_by_MC5->SetBinContent(i,ratio5);
@@ -6441,11 +5459,11 @@ int Plot_mT_Stage1_WithSyst() {
       float stat_err5 = sqrt(data5)/data5 ;  
       data_by_MC5->SetBinError(i,stat_err5);
     }
-    //   data_by_MC_syst->SetBinContent(i,1.0);
+    //    data_by_MC_syst->SetBinContent(i,1.0);
     //   float ratio_syst_err = (data/(MC*MC))*syst_err  ;  // abs error : sigma_f , where f = data/mc
     //  float ratio_syst_err = (syst_err/MC) ;  // relative error : sigma_f / f , where f = data/mc
     //  if (data==0 && MC==0) ratio_syst_err=0;
-    // data_by_MC_syst->SetBinError(i,ratio_syst_err);
+    //  data_by_MC_syst->SetBinError(i,ratio_syst_err);
     
     // data_by_MC->SetBinWidth(i,width);  
   }
@@ -6455,8 +5473,8 @@ int Plot_mT_Stage1_WithSyst() {
   data_by_MC5->SetMarkerStyle(20);
   data_by_MC5->SetFillColor(kGray);
   data_by_MC5->SetFillStyle(3001);
-  /// data_by_MC5->Draw("e2");
-  data_by_MC5->Draw("same E");
+  // data_by_MC_syst->Draw("e2");
+  data_by_MC5->Draw("E");
   data_by_MC5->GetXaxis()->SetTitle("M_{T} [GeV]");
   data_by_MC5->GetYaxis()->SetTitle("#frac{DATA}{MC}");
   data_by_MC5->GetYaxis()->SetLabelSize(0.12);
@@ -6464,7 +5482,7 @@ int Plot_mT_Stage1_WithSyst() {
   data_by_MC5->GetYaxis()->SetTitleSize(0.18);
   data_by_MC5->GetXaxis()->SetTitleSize(0.18);
   data_by_MC5->GetYaxis()->SetTitleOffset(0.20);
-  data_by_MC5->GetXaxis()->SetTitleOffset(0.75);
+  data_by_MC5->GetXaxis()->SetTitleOffset(0.78);
   data_by_MC5->SetTitle("");
   data_by_MC5->GetXaxis()->SetRangeUser(0, 3200);
   data_by_MC5->SetMaximum(3);
@@ -6476,13 +5494,10 @@ int Plot_mT_Stage1_WithSyst() {
   l5->Draw("same");
 
   //  std::cout << "D/MC bins=" << data_by_MC->GetNbinsX() << " width=" << data_by_MC->GetBinWidth(2) << std::endl;
-  ratio_noband->Write();
-  ratio_noband->Print("mT_Stage1_ratio_noBAND.pdf");
-  ratio_noband->Print("mT_Stage1_ratio_noBAND.png");
+  ratio_noBand->Write();
+  ratio_noBand->Print("mT_Stage1_ratio_NoBand_DD.pdf");
+  ratio_noBand->Print("mT_Stage1_ratio_NoBand_DD.png");
 
- 
   return 0;
 
 }
-
-//  LocalWords:  SetLineColor
