@@ -6147,7 +6147,7 @@ int Plot_mT_Stage1_WithSyst() {
   CMS_text1->SetNDC();
   CMS_text1->SetTextSize(0.05);
   CMS_text1->SetTextAngle(0);
-  CMS_text1->Draw("same");
+  // CMS_text1->Draw("same");
   TLatex* CMS_text_21 = new TLatex(0.20,0.85,"Preliminary");
   CMS_text_21->SetNDC();
   CMS_text_21->SetTextFont(42);
@@ -6192,15 +6192,15 @@ int Plot_mT_Stage1_WithSyst() {
   //  hs->Draw();
   gPad->SetLogy();
   hs->Draw("HIST");                                                                                                                                        
-  hs->SetMaximum(100000);
+  hs->SetMaximum(10000);
   hs->SetMinimum(0.1);
-  hs->GetXaxis()->SetLimits(0, 3200);
+  hs->GetXaxis()->SetLimits(200, 3200);
   hs->GetXaxis()->SetTitle("M_{T} [GeV]");
   hs->GetYaxis()->SetTitle("Events");
   totalBkg->SetFillColor(kGray+1);
   totalBkg->SetFillStyle(3001);
   // totalBkg->Draw("same e2");
-  totalBkg->GetXaxis()->SetRangeUser(0,3200);
+  totalBkg->GetXaxis()->SetRangeUser(200,3200);
 
   TH1F* total =  (TH1F*)hs->GetStack()->Last()->Clone();
   // total->SetFillStyle(3004);                                                                                                                                      
@@ -6211,6 +6211,28 @@ int Plot_mT_Stage1_WithSyst() {
   // hs->Draw("SAME HIST");
 
   //  mT_Stage1_Run2016E->Draw("SAME E0");
+
+  mT_Stage1_Run2016all->GetXaxis()->SetRangeUser(200,800);
+
+  TLine *l1=new TLine(800,0,800,700);
+  l1->SetLineColor(12);
+  l1->SetLineWidth(4);
+  l1->SetLineStyle(2);
+  l1->Draw("same");
+
+  TArrow *l2=new TArrow(800,700,1100,700,0.04,">");
+  l2->SetLineColor(12);
+  l2->SetLineWidth(4);
+  l2->SetLineStyle(2);
+  l2->Draw();
+
+  TLatex* CMS_text_22 = new TLatex(0.38,0.65,"Blinded");
+  CMS_text_22->SetNDC();
+  CMS_text_22->SetTextFont(42);
+  CMS_text_22->SetTextSize(0.04);
+  CMS_text_22->SetTextAngle(0);
+  CMS_text_22->Draw("same");
+
   mT_Stage1_Run2016all->Draw("SAME E0");
   TH1F* mydata =  (TH1F*)mT_Stage1_Run2016all->Clone();
 
@@ -6224,8 +6246,8 @@ int Plot_mT_Stage1_WithSyst() {
   CMS_text->SetNDC();
   CMS_text->SetTextSize(0.05);
   CMS_text->SetTextAngle(0);
-  CMS_text->Draw("same");
-  TLatex* CMS_text_2 = new TLatex(0.20,0.85,"Preliminary");
+  // CMS_text->Draw("same");
+  TLatex* CMS_text_2 = new TLatex(0.20,0.85,"Work in progress");
   CMS_text_2->SetNDC();
   CMS_text_2->SetTextFont(42);
   CMS_text_2->SetTextSize(0.05);
@@ -6245,7 +6267,7 @@ int Plot_mT_Stage1_WithSyst() {
   leg_example->SetTextFont(42);
   leg_example->SetBorderSize(0);
   leg_example->AddEntry(total_WJets, "Wjets","f");
-  leg_example->AddEntry(total_QCD, "QCD", "f");
+  leg_example->AddEntry(total_QCD, "QCD from MC", "f");
   // leg_example->AddEntry(total_ZJets, "Z(#nu#nu)jets", "f");
   leg_example->AddEntry(total_TT, "t#bart","f");
   //leg_example->AddEntry(mT_Stage1_WJetsToLNu, "Wjets","f");
@@ -6290,7 +6312,7 @@ int Plot_mT_Stage1_WithSyst() {
   gPad->SetLogy();
   
   hs->Draw("HIST");                                                                                                                                        
-  hs->SetMaximum(100000);
+  hs->SetMaximum(10000);
   hs->SetMinimum(0.01);
   hs->GetXaxis()->SetLimits(0, 3200);
   hs->GetXaxis()->SetTitle("");
@@ -6298,11 +6320,11 @@ int Plot_mT_Stage1_WithSyst() {
   totalBkg->SetFillColor(kGray+1);
   totalBkg->SetFillStyle(3001);
   // totalBkg->Draw("same e2");
-  totalBkg->GetXaxis()->SetRangeUser(0,3200);
+  totalBkg->GetXaxis()->SetRangeUser(200,3200);
 
   mydata->Draw("SAME E1");
   mT_Stage1_Wprime_M4000->Draw("SAME HIST");
-  CMS_text->Draw("same");
+  //CMS_text->Draw("same");
   CMS_text_2->Draw("same");
   lumiText->Draw("same");
   leg_example->Draw("same");
@@ -6362,7 +6384,7 @@ int Plot_mT_Stage1_WithSyst() {
   data_by_MC_syst->GetYaxis()->SetTitleOffset(0.20);
   data_by_MC_syst->GetXaxis()->SetTitleOffset(0.75);
   data_by_MC_syst->SetTitle("");
-  data_by_MC_syst->GetXaxis()->SetRangeUser(0, 3200);
+  data_by_MC_syst->GetXaxis()->SetRangeUser(200, 3200);
   data_by_MC_syst->SetMaximum(3);
   data_by_MC_syst->SetMinimum(0);
   data_by_MC_syst->GetYaxis()->SetNdivisions(3);
@@ -6394,7 +6416,7 @@ int Plot_mT_Stage1_WithSyst() {
   gPad->SetLogy();
   
   hs->Draw("HIST");                                                                                                                                        
-  hs->SetMaximum(100000);
+  hs->SetMaximum(10000);
   hs->SetMinimum(0.01);
   hs->GetXaxis()->SetLimits(0, 3200);
   hs->GetXaxis()->SetTitle("");
@@ -6406,7 +6428,7 @@ int Plot_mT_Stage1_WithSyst() {
 
   mydata->Draw("SAME E1");
   mT_Stage1_Wprime_M4000->Draw("SAME HIST");
-  CMS_text->Draw("same");
+  //CMS_text->Draw("same");
   CMS_text_2->Draw("same");
   lumiText->Draw("same");
   leg_example->Draw("same");

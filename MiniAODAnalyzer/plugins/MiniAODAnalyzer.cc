@@ -979,7 +979,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  //  std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
+  std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
@@ -1227,22 +1227,30 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    bool passTauTrig=0;
    //   std::cout << "=== TRIGGER PATHS === " << std::endl;
    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     /*
-     if (triggerBits->accept(i) ) { 
-       std::cout << "Trigger " << names.triggerName(i) <<
-	 ", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
-	 ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)")
-		 << std::endl;
-		 }*/
+     
+     //    if (triggerBits->accept(i) ) { 
+       //       std::cout << "Trigger " << names.triggerName(i) <<
+       // ", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
+       // ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)")
+       //	 << std::endl;
+     // }
      if ( (names.triggerName(i)).find("HLT_LooseIsoPFTau50_Trk30_eta2p1_MET90") != std::string::npos ) {
        // std::cout << names.triggerName(i) << std::endl;
        passTauTrig=triggerBits->accept(i) ;
      }
-     if ( (names.triggerName(i)).find("HLT_Mu45_eta2p1_v") != std::string::npos or
-          (names.triggerName(i)).find("HLT_Mu50_eta2p1_v") != std::string::npos or
-          (names.triggerName(i)).find("HLT_Mu50_v") != std::string::npos or
-          (names.triggerName(i)).find("HLT_IsoMu24_eta2p1_v") != std::string::npos or
-          (names.triggerName(i)).find("HLT_IsoMu24_eta2p1_IterTrk02_v") != std::string::npos
+     if ( (names.triggerName(i)).find("HLT_IsoMu22_eta2p1") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoTkMu22_eta2p1") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoMu22") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoTkMu22") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoMu24") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoTkMu24") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoMu24_eta2p1") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoTkMu24_eta2p1") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoMu27") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoTkMu27") != std::string::npos or
+          (names.triggerName(i)).find("HLT_Mu45_eta2p1") != std::string::npos or
+	  (names.triggerName(i)).find("HLT_50") != std::string::npos or
+          (names.triggerName(i)).find("HLT_TkMu50") != std::string::npos
      ) {
        passMuonTrig=triggerBits->accept(i) ;
        if (passMuonTrig==true) break;
@@ -1261,10 +1269,18 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        passMuonTrig_ForEff=triggerBits->accept(i) ;
        if (passMuonTrig_ForEff==true) break;
      }
-     if ( (names.triggerName(i)).find("HLT_Ele115_CaloIdVT_GsfTrkIdT_v") != std::string::npos or
-          (names.triggerName(i)).find("HLT_Ele105_CaloIdVT_GsfTrkIdT_v") != std::string::npos or
-          (names.triggerName(i)).find("HLT_Ele27_eta2p1_WP75_Gsf_v") != std::string::npos or
-          (names.triggerName(i)).find("HLT_Ele27_eta2p1_WPLoose_Gsf_v") != std::string::npos
+     if ( (names.triggerName(i)).find("HLT_Ele25_eta2p1_WPTight_Gsf") != std::string::npos or
+          (names.triggerName(i)).find("HLT_Ele25_WPTight_Gsf") != std::string::npos or
+          (names.triggerName(i)).find("HLT_Ele27_WPTight_Gsf") != std::string::npos or
+	  (names.triggerName(i)).find("HLT_Ele27_eta2p1_WPTight_Gsf") != std::string::npos or
+          (names.triggerName(i)).find("HLT_Ele30_eta2p1_WPTight_Gsf") != std::string::npos or
+	  (names.triggerName(i)).find("HLT_Ele30_WPTight_Gsf") != std::string::npos or
+          (names.triggerName(i)).find("HLT_Ele32_eta2p1_WPTight_Gsf") != std::string::npos or
+	  (names.triggerName(i)).find("HLT_Ele32_WPTight_Gsf") != std::string::npos or
+          (names.triggerName(i)).find("HLT_Ele105_CaloIdVT_GsfTrkIdT") != std::string::npos or
+	  (names.triggerName(i)).find("HLT_Ele115_CaloIdVT_GsfTrkIdT") != std::string::npos or
+          (names.triggerName(i)).find("HLT_Ele145_CaloIdVT_GsfTrkIdT") != std::string::npos or
+          (names.triggerName(i)).find("HLT_Ele200_CaloIdVT_GsfTrkIdT") != std::string::npos
      ) {
        passEleTrig=triggerBits->accept(i) ;
        if (passEleTrig==true) break;

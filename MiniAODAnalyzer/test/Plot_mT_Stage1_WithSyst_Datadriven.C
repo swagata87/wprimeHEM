@@ -35,6 +35,11 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   // lumi error 
   double wt_lumi_up = 1.026; // 1.062; 
   double wt_lumi_down = 0.974; //0.938;
+  //
+  // pdf error 
+  double wt_pdf_up = 1.25; 
+  double wt_pdf_down = 0.75;
+
   // 
   // DD error 50 %
   double wt_DD_up = 1.5; 
@@ -3435,7 +3440,7 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   gStyle->SetTitleXOffset(1.05);
   gStyle->SetTitleYSize(0.05);
   gStyle->SetTitleYOffset(1.05);
-
+  
   //////// Output File /////////
   TFile* outputFile = new TFile("Out_mT_Stage1_Syst.root","RECREATE");
   outputFile->cd();
@@ -4696,13 +4701,18 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   // totalBkg_pdfUncert->Rebin(100);
 
   // totalBkg_lumiUp->Rebin(100);
-  // totalBkg_lumiDown->Rebin(100)    ;
+  // totalBkg_lumiDown->Rebin(100) ;
 
   TH1D* bkg_lumi_up = (TH1D*)totalBkg->Clone();
   bkg_lumi_up->Scale(wt_lumi_up);
-
   TH1D* bkg_lumi_down = (TH1D*)totalBkg->Clone();
   bkg_lumi_down->Scale(wt_lumi_down);
+
+  TH1D* bkg_pdf_up = (TH1D*)totalBkg->Clone();
+  bkg_pdf_up->Scale(wt_pdf_up);
+  TH1D* bkg_pdf_down = (TH1D*)totalBkg->Clone();
+  bkg_pdf_down->Scale(wt_pdf_down);
+
 
   int nbin1 = totalBkg->GetNbinsX();
   std::cout << "Nbin=" << nbin1 << std::endl;
@@ -4719,6 +4729,7 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   Double_t  y_TauIDSF[200] = {0};
   // Double_t  y_pdfUncert[200] = {0};
   Double_t  y_lumi[200] = {0};
+  Double_t  y_pdf[200] = {0};
   Double_t  y_DD[200] = {0} ;
   Double_t  y_kFactor[200] = {0} ;
   Double_t  y_trigSF[200] = {0} ;
@@ -4808,6 +4819,12 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
     // std::cout << "delta_syst_pdfUncert = " << delta_syst_pdfUncert << std::endl;
     // if (totalBkg_pdfUncert->GetBinContent(n) > 0)  y_pdfUncert[n] = delta_syst_pdfUncert/(totalBkg_pdfUncert->GetBinContent(n)) ;
     // std::cout << "pdf uncert = " << y_pdfUncert[n] << std::endl;
+
+    double delta_pdfUp   = fabs(bkg_pdf_up->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
+    double delta_pdfDown = fabs(bkg_pdf_down->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
+    double delta_syst_pdf = (delta_pdfUp+delta_pdfDown)/2.0;
+    if (totalBkg->GetBinContent(n) > 0)  y_pdf[n] = delta_syst_pdf/(totalBkg->GetBinContent(n)) ;
+    std::cout << "pdf uncert = " << y_pdf[n] << std::endl;
      
     double delta_lumiUp   = fabs(bkg_lumi_up->GetBinContent(n)   - totalBkg->GetBinContent(n)) ;
     double delta_lumiDown = fabs(bkg_lumi_down->GetBinContent(n) - totalBkg->GetBinContent(n)) ;
@@ -4827,7 +4844,7 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
 
     double delta_syst_tot = sqrt( (delta_syst_JetEn*delta_syst_JetEn) + (delta_syst_JetRes*delta_syst_JetRes) + (delta_syst_MuonEn*delta_syst_MuonEn) + (delta_syst_ElectronEn*delta_syst_ElectronEn) + (delta_syst_TauEn*delta_syst_TauEn) + (delta_syst_PhotonEn*delta_syst_PhotonEn) + (delta_syst_UnclusteredEn*delta_syst_UnclusteredEn) + (delta_syst_TauScale*delta_syst_TauScale) + (delta_syst_pileupUncert*delta_syst_pileupUncert) + (delta_syst_TauIDSF*delta_syst_TauIDSF) + 
 				  //(delta_syst_pdfUncert*delta_syst_pdfUncert) 
-+ (delta_syst_lumi*delta_syst_lumi) + (delta_syst_DD*delta_syst_DD) + (delta_syst_kFactor*delta_syst_kFactor)  + (delta_syst_trigSF*delta_syst_trigSF) );
+				  + (delta_syst_lumi*delta_syst_lumi) + (delta_syst_DD*delta_syst_DD) + (delta_syst_kFactor*delta_syst_kFactor)  + (delta_syst_trigSF*delta_syst_trigSF) + (delta_syst_pdf*delta_syst_pdf));
 
     totalBkg->SetBinError(n,delta_syst_tot);
   }
@@ -4948,8 +4965,8 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   CMS_text1->SetNDC();
   CMS_text1->SetTextSize(0.05);
   CMS_text1->SetTextAngle(0);
-  CMS_text1->Draw("same");
-  TLatex* CMS_text_21 = new TLatex(0.20,0.85,"Preliminary");
+  //CMS_text1->Draw("same");
+  TLatex* CMS_text_21 = new TLatex(0.20,0.85,"Work in progress");
   CMS_text_21->SetNDC();
   CMS_text_21->SetTextFont(42);
   CMS_text_21->SetTextSize(0.05);
@@ -5024,6 +5041,19 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   // gr_pdfUncert->GetXaxis()->SetTitle("M_{T} in GeV");
   // gr_pdfUncert->GetYaxis()->SetTitle("Systematic uncertainty");
   // gr_pdfUncert->GetXaxis()->SetLimits(300,3000);
+
+  TGraph *gr_pdf = new TGraph(nbin1,x,y_pdf);
+  gr_pdf->SetLineColor(2);
+  gr_pdf->SetMarkerColor(2);
+  gr_pdf->SetLineWidth(4);
+  //  gr_pdf->SetLineStyle(10);
+  gr_pdf->SetMarkerStyle(25);
+  gr_pdf->SetMaximum(1.0);
+  // gr_pdf->SetMinimum(0.0001);
+  gr_pdf->SetTitle(" ");
+  gr_pdf->GetXaxis()->SetTitle("M_{T} in GeV");
+  gr_pdf->GetYaxis()->SetTitle("Systematic uncertainty");
+  gr_pdf->GetXaxis()->SetLimits(300,2000);
 
   TGraph *gr_lumi = new TGraph(nbin1,x,y_lumi);
   gr_lumi->SetLineColor(7);
@@ -5108,13 +5138,38 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
 
   leg_example6->Draw("same");
 
-  CMS_text1->Draw("same");
+  //  CMS_text1->Draw("same");
   CMS_text_21->Draw("same");
   lumiText1->Draw("same");
 
   syst_canv_2->Update();
   syst_canv_2->Write();
   syst_canv_2->Print("SystematicUncertPlot.pdf");
+
+  ///
+  TCanvas *syst_canv_3 = new TCanvas("pdfsystematics","pdfSystematics");
+
+  syst_canv_3->cd();
+  syst_canv_3->SetGrid();
+
+  gr_pdf->Draw("APL");
+
+  TLegend *leg_example7 = new TLegend(0.72,0.70,0.94,0.94);
+  leg_example7->SetFillColor(0);
+  leg_example7->SetTextFont(42);
+  leg_example7->SetHeader("PDF Systematics");
+  leg_example7->SetBorderSize(0);
+  leg_example7->AddEntry(gr_pdf, "pdf","PL");
+ 
+  leg_example7->Draw("same");
+
+  //  CMS_text1->Draw("same");
+  CMS_text_21->Draw("same");
+  //  lumiText1->Draw("same");
+
+  syst_canv_3->Update();
+  syst_canv_3->Write();
+  syst_canv_3->Print("FlatPDFSystematicUncertPlot.pdf");
 
  
   //--//
@@ -5137,13 +5192,13 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   eff1->SetLineWidth(2);
   */
 
+  //forward cumulative//
   TH1* c_total_diboson =       total_diboson->GetCumulative();
   TH1* c_total_DY =            total_DY->GetCumulative();
   TH1* c_total_ST =            total_ST->GetCumulative();
   TH1* c_total_TT =            total_TT->GetCumulative();
   TH1* c_mT_Stage1_Datadriven =  mT_Stage1_Datadriven->GetCumulative();
   TH1* c_total_WJets =  total_WJets->GetCumulative();
-
 
   THStack *c_hs = new THStack("c_hs"," ");
   c_hs->Add(c_total_diboson);
@@ -5154,12 +5209,29 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   c_hs->Add(c_total_WJets);
 
 
+  //backward cumulative//
+  TH1* b_total_diboson =       total_diboson->GetCumulative(kFALSE);
+  TH1* b_total_DY =            total_DY->GetCumulative(kFALSE);
+  TH1* b_total_ST =            total_ST->GetCumulative(kFALSE);
+  TH1* b_total_TT =            total_TT->GetCumulative(kFALSE);
+  TH1* b_mT_Stage1_Datadriven =  mT_Stage1_Datadriven->GetCumulative(kFALSE);
+  TH1* b_total_WJets =  total_WJets->GetCumulative(kFALSE);
+
+  THStack *b_hs = new THStack("b_hs"," ");
+  b_hs->Add(b_total_diboson);
+  b_hs->Add(b_total_DY);
+  b_hs->Add(b_total_ST);
+  b_hs->Add(b_total_TT);
+  b_hs->Add(b_mT_Stage1_Datadriven);
+  b_hs->Add(b_total_WJets);
+
+
   TCanvas* my_canvas = new TCanvas("canvas","canvas",800,600);
   my_canvas->cd();
   //  hs->Draw();
   gPad->SetLogy();
   hs->Draw("HIST");                                                                                                                                        
-  hs->SetMaximum(100000);
+  hs->SetMaximum(10000);
   hs->SetMinimum(0.1);
   hs->GetXaxis()->SetLimits(200, 3200);
   hs->GetXaxis()->SetTitle("M_{T} [GeV]");
@@ -5178,7 +5250,30 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   // hs->Draw("SAME HIST");
 
   //  mT_Stage1_Run2016E->Draw("SAME E0");
+  mT_Stage1_Run2016all->GetXaxis()->SetRangeUser(200,800);
   mT_Stage1_Run2016all->Draw("SAME E0");
+
+  TLine *l1=new TLine(800,0,800,700);
+  l1->SetLineColor(12);
+  l1->SetLineWidth(4);
+  l1->SetLineStyle(2);
+  l1->Draw("same");
+
+  TArrow *l2=new TArrow(800,700,1100,700,0.04,">");
+  l2->SetLineColor(12);
+  l2->SetLineWidth(4);
+  l2->SetLineStyle(2);
+  l2->Draw();
+
+  TLatex* CMS_text_22 = new TLatex(0.38,0.65,"Blinded");
+  CMS_text_22->SetNDC();
+  CMS_text_22->SetTextFont(42);
+  CMS_text_22->SetTextSize(0.04);
+  CMS_text_22->SetTextAngle(0);
+  CMS_text_22->Draw("same");    
+
+
+
   TH1F* mydata =  (TH1F*)mT_Stage1_Run2016all->Clone();
 
   //mT_Stage1_Run2016C->Draw("SAME E0");
@@ -5191,8 +5286,8 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   CMS_text->SetNDC();
   CMS_text->SetTextSize(0.05);
   CMS_text->SetTextAngle(0);
-  CMS_text->Draw("same");
-  TLatex* CMS_text_2 = new TLatex(0.20,0.85,"Preliminary");
+  // CMS_text->Draw("same");
+  TLatex* CMS_text_2 = new TLatex(0.20,0.85,"Work in progress");
   CMS_text_2->SetNDC();
   CMS_text_2->SetTextFont(42);
   CMS_text_2->SetTextSize(0.05);
@@ -5228,7 +5323,7 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   my_canvas->Print("mT_Stage1_Syst.png");
   my_canvas->Print("mT_Stage1_Syst_DD.pdf");
 
-
+  //draw forward cumulative//
   TCanvas* c_my_canvas = new TCanvas("cumulative","c_cumulative",800,600);
   c_my_canvas->cd();
   //  hs->Draw();
@@ -5237,7 +5332,7 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
 
   //  gPad->SetLogx();
   c_hs->Draw("HIST");                                                                                                                                        
-  c_hs->SetMaximum(100000);
+  c_hs->SetMaximum(10000);
   c_hs->SetMinimum(10);
   c_hs->GetXaxis()->SetLimits(200, 3200);
   c_hs->GetXaxis()->SetTitle("M_{T} [GeV]");
@@ -5254,7 +5349,7 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   CMS_text_2->Draw("same");    
   lumiText->Draw("same");     
 
-  TLegend *c_leg_example = new TLegend(0.54,0.80,0.94,0.94);
+  TLegend *c_leg_example = new TLegend(0.50,0.78,0.94,0.94);
   c_leg_example->SetNColumns(2);
   c_leg_example->SetFillColor(0);
   c_leg_example->SetTextFont(42);
@@ -5276,6 +5371,40 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   c_my_canvas->Write();
   c_my_canvas->Print("Cumulative.png");
   c_my_canvas->Print("Cumulative.pdf");
+
+  ///
+
+  //draw backward cumulative//
+  TCanvas* b_my_canvas = new TCanvas("backwardcumulative","b_cumulative",800,600);
+  b_my_canvas->cd();
+  //  hs->Draw();
+  gPad->SetLogy();
+  //  c_my_canvas->SetGrid();
+
+  //  gPad->SetLogx();
+  b_hs->Draw("HIST");                                                                                                                                        
+  b_hs->SetMaximum(10000);
+  b_hs->SetMinimum(0.1);
+  b_hs->GetXaxis()->SetLimits(200, 3200);
+  b_hs->GetXaxis()->SetTitle("M_{T} [GeV]");
+  b_hs->GetYaxis()->SetTitle("Events");
+
+  TH1* b_mT_Stage1_Run2016all =   mT_Stage1_Run2016all->GetCumulative(kFALSE);
+  b_mT_Stage1_Run2016all->Draw("SAME E0");
+  //
+  TH1* b_mT_Stage1_Wprime_M4000 =   mT_Stage1_Wprime_M4000->GetCumulative(kFALSE);
+  b_mT_Stage1_Wprime_M4000->Draw("SAME HIST");
+  //  hs->SetOption("HIST L");
+  
+  CMS_text->Draw("same");
+  CMS_text_2->Draw("same");    
+  lumiText->Draw("same");     
+
+  c_leg_example->Draw("same");
+  
+  b_my_canvas->Write();
+  b_my_canvas->Print("BackwardCumulative.png");
+  b_my_canvas->Print("BackwardCumulative.pdf");
 
 
   /*
@@ -5305,7 +5434,7 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   gPad->SetLogy();
   
   hs->Draw("HIST");                                                                                                                                        
-  hs->SetMaximum(100000);
+  hs->SetMaximum(10000);
   hs->SetMinimum(0.01);
   hs->GetXaxis()->SetLimits(200, 3200);
   hs->GetXaxis()->SetTitle("");
@@ -5316,8 +5445,9 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   totalBkg->GetXaxis()->SetRangeUser(200,3200);
 
   mydata->Draw("SAME E1");
+  mydata->GetXaxis()->SetRangeUser(200,800);
   mT_Stage1_Wprime_M4000->Draw("SAME HIST");
-  CMS_text->Draw("same");
+  // CMS_text->Draw("same");
   CMS_text_2->Draw("same");
   lumiText->Draw("same");
   leg_example->Draw("same");
@@ -5412,7 +5542,7 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   gPad->SetLogy();
   
   hs->Draw("HIST");                                                                                                                                        
-  hs->SetMaximum(100000);
+  hs->SetMaximum(10000);
   hs->SetMinimum(0.01);
   hs->GetXaxis()->SetLimits(0, 3200);
   hs->GetXaxis()->SetTitle("");
@@ -5423,6 +5553,8 @@ int Plot_mT_Stage1_WithSyst_Datadriven() {
   totalBkg->GetXaxis()->SetRangeUser(0,3200);
 
   mydata->Draw("SAME E1");
+  mydata->GetXaxis()->SetRangeUser(200,800);
+
   mT_Stage1_Wprime_M4000->Draw("SAME HIST");
   CMS_text->Draw("same");
   CMS_text_2->Draw("same");

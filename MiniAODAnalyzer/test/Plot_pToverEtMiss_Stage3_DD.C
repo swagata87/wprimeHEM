@@ -692,8 +692,8 @@ int Plot_pToverEtMiss_Stage3_DD() {
   CMS_text->SetNDC();
   CMS_text->SetTextSize(0.05);
   CMS_text->SetTextAngle(0);
-  CMS_text->Draw("same");
-  TLatex* CMS_text_2 = new TLatex(0.20,0.85,"Preliminary");
+  // CMS_text->Draw("same");
+  TLatex* CMS_text_2 = new TLatex(0.20,0.85,"Work in progress");
   CMS_text_2->SetNDC();
   CMS_text_2->SetTextFont(42);
   CMS_text_2->SetTextSize(0.05);
@@ -706,6 +706,20 @@ int Plot_pToverEtMiss_Stage3_DD() {
   lumiText->SetTextSize(0.04);
   lumiText->SetTextAlign(32);
   lumiText->Draw("same");     
+
+
+  TLine *l1=new TLine(0.7,0,0.7,10000);
+  l1->SetLineColor(12);
+  l1->SetLineWidth(4);
+  l1->SetLineStyle(2);
+  l1->Draw("same");
+
+  TLine *l2=new TLine(1.3,0,1.3,10000);
+  l2->SetLineColor(12);
+  l2->SetLineWidth(4);
+  l2->SetLineStyle(2);
+  l2->Draw("same");
+
 
   TLegend *leg_example = new TLegend(0.55,0.70,0.94,0.94);
   leg_example->SetFillColor(0);
@@ -764,22 +778,23 @@ int Plot_pToverEtMiss_Stage3_DD() {
   // total->Draw("SAME E2");
   mydata->Draw("SAME E1");
   pToverEtMiss_Stage3_Wprime_M4000->Draw("SAME HIST");
-  CMS_text->Draw("same");
+  //CMS_text->Draw("same");
   CMS_text_2->Draw("same");
   lumiText->Draw("same");
   leg_example->Draw("same");
 
 
-  TLine *l1=new TLine(0.7,0,0.7,10000);
+  /*  TLine *l1=new TLine(0.7,0,0.7,10000);
   l1->SetLineColor(12);
   l1->SetLineWidth(4);
-  l1->SetLineStyle(2);
+  l1->SetLineStyle(2);*/
   l1->Draw("same");
 
+  /*
   TLine *l2=new TLine(1.3,0,1.3,10000);
   l2->SetLineColor(12);
   l2->SetLineWidth(4);
-  l2->SetLineStyle(2);
+  l2->SetLineStyle(2);*/
   l2->Draw("same");
 
 
