@@ -1518,8 +1518,13 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    int nGoodTau_ScaleDown=0;
    double tau_pt_ScaleDown[10]={0};
    double tau_phi_ScaleDown[10]={0};
-   double tauScaleShiftUp=1.012;
-   double tauScaleShiftDown=0.988;
+   
+   double tauScaleShiftUp=1;
+   double tauScaleShiftDown=1;
+   if (!RunOnData) {
+     tauScaleShiftUp=1.012;
+     tauScaleShiftDown=0.988;
+   }
    TLorentzVector tau_NoESCorr(0,0,0,0);
    TLorentzVector tau_NoShift(0,0,0,0);
    TLorentzVector tau_NoShift_acc(0,0,0,0);
@@ -1534,6 +1539,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    iEvent.getByToken(tauToken_, taus);
    //  std::cout << "Tau size from main loop " << taus->size() << std::endl;
    for (const pat::Tau &tau : *taus) {
+     std::cout << "TAKE THIS TAU" << std::endl;
      int tauDM=tau.decayMode();
      /*
        kNull = -1
@@ -1557,12 +1563,14 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      // One prong = 0 , One prong pi0 = 1,2,3,4, Three prong = 10,11,12,13,14
      tau_NoESCorr.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
      float TES = 1.0 ;
-     if (tauDM==0) {
-       TES = 0.982 ;
-     } else if ((tauDM>0) && (tauDM<5)) {
-       TES = 1.01;
-     } else if ((tauDM>9) && (tauDM<15)) {
-       TES = 0.996;
+     if (!RunOnData) {
+       if (tauDM==0) {
+	 TES = 0.982 ;
+       } else if ((tauDM>0) && (tauDM<5)) {
+	 TES = 1.01;
+       } else if ((tauDM>9) && (tauDM<15)) {
+	 TES = 0.996;
+       }
      }
      std::cout << "tauDM=" << tauDM << " TES=" << TES << std::endl;
      tau_NoShift_acc=tau_NoESCorr*TES;
@@ -1666,8 +1674,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      tauID_SF = GetTauIDScaleFactor(tau_pt[0], "nominal");
      tauID_SF_syst_up = GetTauIDScaleFactor(tau_pt[0], "up");
      tauID_SF_syst_down = GetTauIDScaleFactor(tau_pt[0], "down");
-     std::cout <<"tauPt=" << tau_pt[0] <<  " tauID_SF | tauID_SF_syst_up | tauID_SF_syst_down " <<  tauID_SF << " | " << tauID_SF_syst_up << " | " <<  tauID_SF_syst_down << std::endl ;
+ 
    }
+    std::cout <<"tauPt=" << tau_pt[0] <<  " tauID_SF | tauID_SF_syst_up | tauID_SF_syst_down " <<  tauID_SF << " | " << tauID_SF_syst_up << " | " <<  tauID_SF_syst_down << std::endl ;
    /*
   if (!RunOnData) {
      tauISO_SF = 0.97;
@@ -2119,12 +2128,13 @@ double MiniAODAnalyzer::GetTauIDScaleFactor(double tau_pt, std::string mode) {
   if (mode=="nominal") tauSF=0.95 ;
   double flat_uncert = (0.95 * (5.0/100.0) );
   double ptDep_uncert = (20.0/100.0)*(tau_pt/1000.0);
-  std::cout << "SF=" << tauSF << " flat_uncert=" << flat_uncert << " ptDep_uncert=" << ptDep_uncert << std::endl;
   if (mode=="up") tauSF=(0.95+flat_uncert+ptDep_uncert);
   if (mode=="down") {
     tauSF=(0.95-flat_uncert-ptDep_uncert);
     if (tauSF<0.0) tauSF=(0.95-flat_uncert);
   }
+  std::cout << "SF=" << tauSF << " flat_uncert=" << flat_uncert << " ptDep_uncert=" << ptDep_uncert << std::endl;
+
   return tauSF;
 }
 
