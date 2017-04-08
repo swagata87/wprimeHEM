@@ -484,8 +484,8 @@ private:
   double final_weight_kfact_DOWN=1;
   double final_weight_tauIDSF_UP=1;
   double final_weight_tauIDSF_DOWN=1;
-  double final_weight_tauISOSF_UP=1;
-  double final_weight_tauISOSF_DOWN=1;
+  //  double final_weight_tauISOSF_UP=1;
+  //  double final_weight_tauISOSF_DOWN=1;
   double final_weight_alpha_UP=1;
   double final_weight_alpha_DOWN=1;
   double final_weight_trigSF_UP=1;
@@ -1518,7 +1518,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    int nGoodTau_ScaleDown=0;
    double tau_pt_ScaleDown[10]={0};
    double tau_phi_ScaleDown[10]={0};
-   double tauScaleShift=0.03;
+   double tauScaleShiftUp=1.012;
+   double tauScaleShiftDown=0.988;
+   TLorentzVector tau_NoESCorr(0,0,0,0);
    TLorentzVector tau_NoShift(0,0,0,0);
    TLorentzVector tau_NoShift_acc(0,0,0,0);
    TLorentzVector tau_NoShift_decay(0,0,0,0);
@@ -1532,17 +1534,54 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    iEvent.getByToken(tauToken_, taus);
    //  std::cout << "Tau size from main loop " << taus->size() << std::endl;
    for (const pat::Tau &tau : *taus) {
-  
-     tau_NoShift_acc.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
+     int tauDM=tau.decayMode();
+     /*
+       kNull = -1
+       kOneProng0PiZero = 0 
+       kOneProng1PiZero = 1 
+       kOneProng2PiZero = 2 
+       kOneProng3PiZero = 3
+       kOneProngNPiZero = 4
+       kTwoProng0PiZero = 5
+       kTwoProng1PiZero = 6
+       kTwoProng2PiZero = 7
+       kTwoProng3PiZero = 8
+       kTwoProngNPiZero = 9
+       kThreeProng0PiZero = 10
+       kThreeProng1PiZero = 11
+       kThreeProng2PiZero = 12
+       kThreeProng3PiZero = 13
+       kThreeProngNPiZero = 14
+       kRareDecayMode = 15
+     */
+     // One prong = 0 , One prong pi0 = 1,2,3,4, Three prong = 10,11,12,13,14
+     tau_NoESCorr.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
+     float TES = 1.0 ;
+     if (tauDM==0) {
+       TES = 0.982 ;
+     } else if ((tauDM>0) && (tauDM<5)) {
+       TES = 1.01;
+     } else if ((tauDM>9) && (tauDM<15)) {
+       TES = 0.996;
+     }
+     std::cout << "tauDM=" << tauDM << " TES=" << TES << std::endl;
+     tau_NoShift_acc=tau_NoESCorr*TES;
+     //     tau_NoShift_acc.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
      if (PassTauAcceptance(tau_NoShift_acc)==true) {
        nGoodTau_acc++;
      }
      
- 
+     
      if ( (PassTauID(tau)==true) ) {
-       tau_NoShift.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
-       tau_ScaleUp.SetPxPyPzE((1+tauScaleShift)*(tau.px()),(1+tauScaleShift)*(tau.py()),(1+tauScaleShift)*(tau.pz()),(1+tauScaleShift)*(tau.energy()));
-       tau_ScaleDown.SetPxPyPzE((1-tauScaleShift)*(tau.px()),(1-tauScaleShift)*(tau.py()),(1-tauScaleShift)*(tau.pz()),(1-tauScaleShift)*(tau.energy()));
+       
+       //define Tau energy scale
+       //       float TES = 0.982 ;
+       tau_NoShift=tau_NoESCorr*TES;       
+       tau_ScaleUp=tau_NoShift*tauScaleShiftUp;
+       tau_ScaleDown=tau_NoShift*tauScaleShiftDown;
+       //tau_ScaleUp.SetPxPyPzE((1+tauScaleShift)*(tau.px()),(1+tauScaleShift)*(tau.py()),(1+tauScaleShift)*(tau.pz()),(1+tauScaleShift)*(tau.energy()));
+       // tau_ScaleDown.SetPxPyPzE((1-tauScaleShift)*(tau.px()),(1-tauScaleShift)*(tau.py()),(1-tauScaleShift)*(tau.pz()),(1-tauScaleShift)*(tau.energy()));
+       std::cout << "TauNoCorr pt=" << tau_NoESCorr.Pt() << " TauNoShift pt=" << tau_NoShift.Pt() << " tauScaleUp pt=" << tau_ScaleUp.Pt() << " tauScaleDown pt=" << tau_ScaleDown.Pt() << std::endl;      
        
        if (PassTauAcceptance(tau_NoShift)==true) {
 	 //std::cout << "\nTau selected" << std::endl;
@@ -1556,7 +1595,6 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 tau_neuIso[nGoodTau]=tau.tauID("neutralIsoPtSum");
 
 	 //	 std::cout << "Tau decaymode = " << tau.decayMode() << std::endl;
-	 int tauDM=tau.decayMode();
 	 tau_DM[nGoodTau] = tauDM;
 	 
 	 /* if (tauDM>=0 && tauDM<=4)     tau_OneProng[nGoodTau] = tauDM;
