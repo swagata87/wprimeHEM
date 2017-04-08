@@ -202,15 +202,16 @@ private:
   double tauID_SF_syst_up =1.0 ;
   double tauID_SF_syst_down =1.0;
 
-  double tauISO_SF =1.0;
-  double tauISO_SF_syst_up =1.0 ;
-  double tauISO_SF_syst_down =1.0;
+  //  double tauISO_SF =1.0;
+  //  double tauISO_SF_syst_up =1.0 ;
+  // double tauISO_SF_syst_down =1.0;
   //
   double trig_SF =1.0;
   double trig_SF_syst_up =1.0 ;
   double trig_SF_syst_down =1.0;
   //
   double genHT = 0.0;
+  //  double genHT_fake = 0.0;
   double genMTT = 0.0;
 
   float alpha_s_wt_down = 1.0;
@@ -979,13 +980,16 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  //  std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
+  std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
     iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
+    std::cout << "EvtHandle.isValid() = " << EvtHandle.isValid() << std::endl;
     //Gen-HT//
     if (EvtHandle.isValid() ) {
+      //
+      std::cout << "event handle valid" << std::endl;
       if (  (sourceFileString.find("WJetsToLNu") != std::string::npos) ) {
 	lhef::HEPEUP lheParticleInfo = EvtHandle->hepeup();
         // get the five vector
@@ -1005,6 +1009,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	genHT=ht;
 	//std::cout << "genHT=" << genHT << std::endl;
       } // if (  (sourceFileString.find("WJetsToLNu") != std::string::npos) ) ends
+      //
       //
       if (  (sourceFileString.find("TT_") != std::string::npos) ) {
 	lhef::HEPEUP lheParticleInfo = EvtHandle->hepeup();
@@ -1616,42 +1621,43 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    }
 
-   //   std::cout << "nGoodTau=" << nGoodTau << std::endl;
+   std::cout << "nGoodTau=" << nGoodTau << std::endl;
    // In each event, the tau-ID scale factor is obtained using the first good tau //
    // This should be fine because in the end we select events with one good tau //
    if (!RunOnData) {
      tauID_SF = GetTauIDScaleFactor(tau_pt[0], "nominal");
      tauID_SF_syst_up = GetTauIDScaleFactor(tau_pt[0], "up");
      tauID_SF_syst_down = GetTauIDScaleFactor(tau_pt[0], "down");
+     std::cout <<"tauPt=" << tau_pt[0] <<  " tauID_SF | tauID_SF_syst_up | tauID_SF_syst_down " <<  tauID_SF << " | " << tauID_SF_syst_up << " | " <<  tauID_SF_syst_down << std::endl ;
    }
-
+   /*
   if (!RunOnData) {
      tauISO_SF = 0.97;
      tauISO_SF_syst_up = 0.97+0.05;
      tauISO_SF_syst_down = 0.97-0.05;
    }
-
+   */
 
    //----------------//
    //--Final Weight--//
    //----------------//
    if (!RunOnData) {
-     final_weight               = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * tauISO_SF * trig_SF;
-     final_wt_NOPU = mc_event_weight * k_fak * tauID_SF * tauISO_SF * trig_SF;
+     final_weight               = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * trig_SF;
+     final_wt_NOPU = mc_event_weight * k_fak * tauID_SF * trig_SF;
 
      // syst //
-     final_weight_PUweight_UP   = Lumi_Wt_UP * mc_event_weight * k_fak * tauID_SF * tauISO_SF * trig_SF;
-     final_weight_PUweight_DOWN = Lumi_Wt_DOWN * mc_event_weight * k_fak * tauID_SF * tauISO_SF * trig_SF;
-     final_weight_kfact_UP      = Lumi_Wt * mc_event_weight * k_fak_up * tauID_SF *tauISO_SF * trig_SF;
-     final_weight_kfact_DOWN    = Lumi_Wt * mc_event_weight * k_fak_down * tauID_SF * tauISO_SF *trig_SF;
-     final_weight_tauIDSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_up * tauISO_SF *trig_SF;
-     final_weight_tauIDSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_down * tauISO_SF *trig_SF;
+     final_weight_PUweight_UP   = Lumi_Wt_UP * mc_event_weight * k_fak * tauID_SF * trig_SF;
+     final_weight_PUweight_DOWN = Lumi_Wt_DOWN * mc_event_weight * k_fak * tauID_SF * trig_SF;
+     final_weight_kfact_UP      = Lumi_Wt * mc_event_weight * k_fak_up * tauID_SF * trig_SF;
+     final_weight_kfact_DOWN    = Lumi_Wt * mc_event_weight * k_fak_down * tauID_SF *trig_SF;
+     final_weight_tauIDSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_up  *trig_SF;
+     final_weight_tauIDSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_down *trig_SF;
 
-     final_weight_tauISOSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauISO_SF_syst_up * tauID_SF *trig_SF;
-     final_weight_tauISOSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauISO_SF_syst_down * tauID_SF *trig_SF;
+     //     final_weight_tauISOSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauISO_SF_syst_up * tauID_SF *trig_SF;
+     //  final_weight_tauISOSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauISO_SF_syst_down * tauID_SF *trig_SF;
 
-     final_weight_trigSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * tauISO_SF *trig_SF_syst_up;
-     final_weight_trigSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * tauISO_SF *trig_SF_syst_down;
+     final_weight_trigSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauID_SF *trig_SF_syst_up;
+     final_weight_trigSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauID_SF *trig_SF_syst_down;
    }
    else {
      final_weight               = 1.0;
@@ -1871,8 +1877,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	       }
 	     }
 
-	     final_weight_alpha_UP   = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * tauISO_SF * alpha_s_wt_up ;
-	     final_weight_alpha_DOWN = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * tauISO_SF * alpha_s_wt_down ;
+	     final_weight_alpha_UP   = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_up ;
+	     final_weight_alpha_DOWN = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_down ;
 	     std::cout << "final_weight_alpha_UP = " << final_weight_alpha_UP << " final_weight_alpha_DOWN=" << final_weight_alpha_DOWN << std::endl;
 	     
 	     h1_MT_Stage1_alphaUp->Fill(MT,final_weight_alpha_UP);
@@ -2072,13 +2078,14 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
 double MiniAODAnalyzer::GetTauIDScaleFactor(double tau_pt, std::string mode) {
   double tauSF=1.0;
-  if (mode=="nominal") tauSF=0.90 ;
-  double flat_uncert = (0.90 * (10.0/100.0) );
+  if (mode=="nominal") tauSF=0.95 ;
+  double flat_uncert = (0.95 * (5.0/100.0) );
   double ptDep_uncert = (20.0/100.0)*(tau_pt/1000.0);
-  if (mode=="up") tauSF=(0.90+flat_uncert+ptDep_uncert);
+  std::cout << "SF=" << tauSF << " flat_uncert=" << flat_uncert << " ptDep_uncert=" << ptDep_uncert << std::endl;
+  if (mode=="up") tauSF=(0.95+flat_uncert+ptDep_uncert);
   if (mode=="down") {
-    tauSF=(0.90-flat_uncert-ptDep_uncert);
-    if (tauSF<0.0) tauSF=(0.90-flat_uncert);
+    tauSF=(0.95-flat_uncert-ptDep_uncert);
+    if (tauSF<0.0) tauSF=(0.95-flat_uncert);
   }
   return tauSF;
 }
