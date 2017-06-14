@@ -122,6 +122,7 @@ private:
   bool PassTauAcceptanceForTrigEff(TLorentzVector tau); 
   bool FindTauIDEfficiency(const edm::Event&,TLorentzVector gen_p4);
   bool FindTauTrigEfficiency(bool passRefTrigger, bool passAnaTrigger, int nTau, double met, double tauPt, double tauEta);
+  bool FindTauTrigEfficiency_Signal(bool passAnaTrigger, int nTau, double met, double tauPt, double tauEta);
   bool PassFinalCuts(int nGoodTau_, double met_val_, double met_phi_, double tau_pt_, double tau_phi_);
   bool PassFinalCuts(TLorentzVector part1, const pat::MET part2, pat::MET::METUncertainty metUncert);
   bool PassFinalCuts(TLorentzVector part1, const pat::MET part2);
@@ -141,7 +142,7 @@ private:
   virtual void Create_Trees();
   virtual void Fill_Tree(TLorentzVector sel_lepton, const pat::MET sel_met,double weight, std::string systematic);
   //virtual void Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, const pat::MET sel_met, double weight);
-  virtual void Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lepton_n, edm::Handle<std::vector<pat::Jet>> JetList,const pat::MET sel_met, double weight,int ifake);
+  virtual void Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lepton_n, edm::Handle<std::vector<pat::Jet>> JetList,const pat::MET sel_met, double weight,int ifake, int tauDM, int nTRK, double chiso, double neuiso);
 
   std::unordered_map< std::string,float > mLeptonTree;
   //  std::unordered_map< std::string,float > *mLeptonTree = new std::unordered_map< std::string,float >;
@@ -201,10 +202,10 @@ private:
   double tauID_SF =1.0;
   double tauID_SF_syst_up =1.0 ;
   double tauID_SF_syst_down =1.0;
-
-  //  double tauISO_SF =1.0;
-  //  double tauISO_SF_syst_up =1.0 ;
-  // double tauISO_SF_syst_down =1.0;
+  //
+  double tauELE_SF =1.0;
+  double tauELE_SF_syst_up =1.0 ;
+  double tauELE_SF_syst_down =1.0;
   //
   double trig_SF =1.0;
   double trig_SF_syst_up =1.0 ;
@@ -216,7 +217,8 @@ private:
 
   float alpha_s_wt_down = 1.0;
   float alpha_s_wt_up = 1.0;
-
+  //
+  int tauDM=100;
   //  double genMTT2 = 0.0;
   //discriminators
   std::vector<std::string> *d_mydisc = new std::vector<std::string> ;
@@ -371,6 +373,13 @@ private:
   TH1F *h1_TauEta_TrigEff_Num;
   TH1F *h1_met_TrigEff_Deno;
   TH1F *h1_met_TrigEff_Num;
+  //
+  TH1F *h1_TauPt_TrigEff_Sig_Deno;
+  TH1F *h1_TauPt_TrigEff_Sig_Num;
+  TH1F *h1_TauEta_TrigEff_Sig_Deno;
+  TH1F *h1_TauEta_TrigEff_Sig_Num;
+  TH1F *h1_met_TrigEff_Sig_Deno;
+  TH1F *h1_met_TrigEff_Sig_Num;
   // TH1F *h1_TauPt_goodreco;
   //  TH1F *h1_TauEta_goodreco;
   TH1F *h1_TauPt_Stage1;
@@ -442,6 +451,8 @@ private:
   TH1F *h1_MT_Stage1_kFactorDown;
   TH1F *h1_MT_Stage1_TauIDSFUp;
   TH1F *h1_MT_Stage1_TauIDSFDown;
+  TH1F *h1_MT_Stage1_TauELESFUp;
+  TH1F *h1_MT_Stage1_TauELESFDown;
   TH1F *h1_MT_Stage1_trigSFUp;
   TH1F *h1_MT_Stage1_trigSFDown;
   //
@@ -454,8 +465,8 @@ private:
   TH1F *h1_recoVtx_NoPUWt;
   TH1F *h1_recoVtx_WithPUWt;
   //TauID
-  //  TH1F *h1_TauID_decayModeFindingNewDMs;
-  //  TH1F *h1_TauID_byMediumIsolationMVArun2v1DBnewDMwLT;
+  //  TH1F *h1_TauID_decayModeFinding;
+  //  TH1F *h1_TauID_byMediumIsolationMVArun2v1DBoldDMwLT;
   //  TH1F *h1_TauID_againstElectronLooseMVA6;
   //  TH1F *h1_TauID_againstMuonLoose3;
   
@@ -484,8 +495,8 @@ private:
   double final_weight_kfact_DOWN=1;
   double final_weight_tauIDSF_UP=1;
   double final_weight_tauIDSF_DOWN=1;
-  //  double final_weight_tauISOSF_UP=1;
-  //  double final_weight_tauISOSF_DOWN=1;
+  double final_weight_tauELESF_UP=1;
+  double final_weight_tauELESF_DOWN=1;
   double final_weight_alpha_UP=1;
   double final_weight_alpha_DOWN=1;
   double final_weight_trigSF_UP=1;
@@ -584,6 +595,14 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_TauEta_TrigEff_Num  = histoDir.make<TH1F>("tauEta_TrigEff_Num", "TauEta_TrigEff_Num", 48, -2.4, 2.4);
   h1_met_TrigEff_Deno = histoDir.make<TH1F>("met_TrigEff_Deno", "MET_TrigEff_Deno", 2000, 0, 2000);
   h1_met_TrigEff_Num  = histoDir.make<TH1F>("met_TrigEff_Num", "MET_TrigEff_Num", 2000, 0, 2000);
+  //
+  h1_TauPt_TrigEff_Sig_Deno = histoDir.make<TH1F>("tauPt_TrigEff_Sig_Deno", "TauPt_TrigEff_Sig_Deno", 4000, 0, 4000);
+  h1_TauPt_TrigEff_Sig_Num  = histoDir.make<TH1F>("tauPt_TrigEff_Sig_Num", "TauPt_TrigEff_Sig_Num", 4000, 0, 4000);
+  h1_TauEta_TrigEff_Sig_Deno = histoDir.make<TH1F>("tauEta_TrigEff_Sig_Deno", "TauEta_TrigEff_Sig_Deno", 48, -2.4, 2.4);
+  h1_TauEta_TrigEff_Sig_Num  = histoDir.make<TH1F>("tauEta_TrigEff_Sig_Num", "TauEta_TrigEff_Sig_Num", 48, -2.4, 2.4);
+  h1_met_TrigEff_Sig_Deno = histoDir.make<TH1F>("met_TrigEff_Sig_Deno", "MET_TrigEff_Sig_Deno", 4000, 0, 4000);
+  h1_met_TrigEff_Sig_Num  = histoDir.make<TH1F>("met_TrigEff_Sig_Num", "MET_TrigEff_Sig_Num", 4000, 0, 4000);
+  //
   // h1_TauEta_reco = histoDir.make<TH1F>("tauEta_reco", "TauEta_reco", 48, -2.4, 2.4);
   // h1_TauEta_goodreco = histoDir.make<TH1F>("tauEta_goodreco", "TauEta_goodreco", 48, -2.4, 2.4);
   h1_TauPt_Stage1 = histoDir.make<TH1F>("tauPt_Stage1", "TauPt_Stage1", 1000, 0, 4000);
@@ -663,13 +682,16 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   //
   h1_MT_Stage1_TauIDSFUp =histoDir.make<TH1F>("mT_Stage1_TauIDSFUp", "MT_Stage1_TauIDSFUp", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_TauIDSFDown =histoDir.make<TH1F>("mT_Stage1_TauIDSFDown", "MT_Stage1_TauIDSFDown", nbinMT, xlowMT, xupMT);
+  //
+  h1_MT_Stage1_TauELESFUp =histoDir.make<TH1F>("mT_Stage1_TauELESFUp", "MT_Stage1_TauELESFUp", nbinMT, xlowMT, xupMT);
+  h1_MT_Stage1_TauELESFDown =histoDir.make<TH1F>("mT_Stage1_TauELESFDown", "MT_Stage1_TauELESFDown", nbinMT, xlowMT, xupMT);
   //  TH1F *h1_MT_Stage1_trigSFUp;
   //   TH1F *h1_MT_Stage1_trigSFDown;
   h1_MT_Stage1_trigSFUp =histoDir.make<TH1F>("mT_Stage1_trigSFUp", "MT_Stage1_trigSFUp", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_trigSFDown =histoDir.make<TH1F>("mT_Stage1_trigSFDown", "MT_Stage1_trigSFDown", nbinMT, xlowMT, xupMT);
   //
-  //  h1_TauID_decayModeFindingNewDMs = histoDir.make<TH1F>("decayModeFindingNewDMs", "TauID_decayModeFindingNewDMs", 30, -1, 2);
-  //  h1_TauID_byMediumIsolationMVArun2v1DBnewDMwLT = histoDir.make<TH1F>("byMediumIsolationMVArun2v1DBnewDMwLT", "TauID_byMediumIsolationMVArun2v1DBnewDMwLT", 30, -1, 2);
+  //  h1_TauID_decayModeFinding = histoDir.make<TH1F>("decayModeFinding", "TauID_decayModeFinding", 30, -1, 2);
+  //  h1_TauID_byMediumIsolationMVArun2v1DBoldDMwLT = histoDir.make<TH1F>("byMediumIsolationMVArun2v1DBoldDMwLT", "TauID_byMediumIsolationMVArun2v1DBoldDMwLT", 30, -1, 2);
   //  h1_TauID_againstElectronLooseMVA6 = histoDir.make<TH1F>("againstElectronLooseMVA6", "TauID_againstElectronLooseMVA6", 30, -1, 2);
   //  h1_TauID_againstMuonLoose3 = histoDir.make<TH1F>("againstMuonLoose3", "TauID_againstMuonLoose3", 30, -1, 2);
  
@@ -980,16 +1002,16 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
+  //std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
     iEvent.getByToken( LHEEventToken_ , EvtHandle ) ;
-    std::cout << "EvtHandle.isValid() = " << EvtHandle.isValid() << std::endl;
+    // std::cout << "EvtHandle.isValid() = " << EvtHandle.isValid() << std::endl;
     //Gen-HT//
     if (EvtHandle.isValid() ) {
       //
-      std::cout << "event handle valid" << std::endl;
+      //      std::cout << "event handle valid" << std::endl;
       if (  (sourceFileString.find("WJetsToLNu") != std::string::npos) ) {
 	lhef::HEPEUP lheParticleInfo = EvtHandle->hepeup();
         // get the five vector
@@ -1050,7 +1072,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	    - (antitop[2]+top[2])*(antitop[2]+top[2]); */
 	}
 	//	std::cout << "MTT=" << genMTT  << std::endl;
-      } 
+      }
     } // if (EvtHandle.isValid() ) ends
   }
   
@@ -1230,18 +1252,19 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
    bool passTauTrig=0;
-   //   std::cout << "=== TRIGGER PATHS === " << std::endl;
+   //std::cout << "=== TRIGGER PATHS === " << std::endl;
    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
      
-     //    if (triggerBits->accept(i) ) { 
-       //       std::cout << "Trigger " << names.triggerName(i) <<
-       // ", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
-       // ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)")
-       //	 << std::endl;
-     // }
+     //     if (triggerBits->accept(i)==true ) { 
+     //    std::cout << "Trigger " << names.triggerName(i) <<
+     //	 ", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
+     //	 ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)")
+     //		 << std::endl;
+     //  }
      if ( (names.triggerName(i)).find("HLT_LooseIsoPFTau50_Trk30_eta2p1_MET90") != std::string::npos ) {
-       // std::cout << names.triggerName(i) << std::endl;
+       //  std::cout << names.triggerName(i) << " "  << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
        passTauTrig=triggerBits->accept(i) ;
+       // std::cout << "passTauTrig=" << passTauTrig << std::endl;
      }
      if ( (names.triggerName(i)).find("HLT_IsoMu22_eta2p1") != std::string::npos or
           (names.triggerName(i)).find("HLT_IsoTkMu22_eta2p1") != std::string::npos or
@@ -1394,61 +1417,6 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    //   std::cout << "Number of good vertices " << nvtx << std::endl;
 
 
-   edm::Handle<pat::METCollection> mets;
-   if (!RunOnData) { 
-     iEvent.getByToken(metToken_, mets);
-   } else if (RunOnData) {
-     iEvent.getByToken(metToken_reminiaod_, mets);
-   }
-
-   const pat::MET &met = mets->front();
-   double met_val=met.pt();
-   double met_phi=met.phi();
-   //-------------------------//
-   //**--MET UNCERTAINTIES--**//
-   //-------------------------//
-   //--JetEnergy Up--//
-   double met_val_JetEnUp=met.shiftedPt(pat::MET::JetEnUp);
-   double met_phi_JetEnUp=met.shiftedPhi(pat::MET::JetEnUp);
-   //--JetEnergy Down--//
-   double met_val_JetEnDown=met.shiftedPt(pat::MET::JetEnDown);
-   double met_phi_JetEnDown=met.shiftedPhi(pat::MET::JetEnDown);
-   //--JetRes Up--//
-   double met_val_JetResUp=met.shiftedPt(pat::MET::JetResUp);
-   double met_phi_JetResUp=met.shiftedPhi(pat::MET::JetResUp);
-   //--JetRes Down--//
-   double met_val_JetResDown=met.shiftedPt(pat::MET::JetResDown);
-   double met_phi_JetResDown=met.shiftedPhi(pat::MET::JetResDown);
-   //--MuonEnergy Up--//
-   double met_val_MuonEnUp=met.shiftedPt(pat::MET::MuonEnUp);
-   double met_phi_MuonEnUp=met.shiftedPhi(pat::MET::MuonEnUp);
-   //--MuonEnergy Down--//
-   double met_val_MuonEnDown=met.shiftedPt(pat::MET::MuonEnDown);
-   double met_phi_MuonEnDown=met.shiftedPhi(pat::MET::MuonEnDown);
-   //--ElectronEnergy Up--//
-   double met_val_ElectronEnUp=met.shiftedPt(pat::MET::ElectronEnUp);
-   double met_phi_ElectronEnUp=met.shiftedPhi(pat::MET::ElectronEnUp);
-   //--ElectronEnergy Down--//
-   double met_val_ElectronEnDown=met.shiftedPt(pat::MET::ElectronEnDown);
-   double met_phi_ElectronEnDown=met.shiftedPhi(pat::MET::ElectronEnDown);
-   //--TauEnergy Up--//
-   double met_val_TauEnUp=met.shiftedPt(pat::MET::TauEnUp);
-   double met_phi_TauEnUp=met.shiftedPhi(pat::MET::TauEnUp);
-   //--TauEnergy Down--//
-   double met_val_TauEnDown=met.shiftedPt(pat::MET::TauEnDown);
-   double met_phi_TauEnDown=met.shiftedPhi(pat::MET::TauEnDown);
-   //--PhotonEnergy Up--//
-   double met_val_PhotonEnUp=met.shiftedPt(pat::MET::PhotonEnUp);
-   double met_phi_PhotonEnUp=met.shiftedPhi(pat::MET::PhotonEnUp);
-   //--PhotonEnergy Down--//
-   double met_val_PhotonEnDown=met.shiftedPt(pat::MET::PhotonEnDown);
-   double met_phi_PhotonEnDown=met.shiftedPhi(pat::MET::PhotonEnDown);
-   //--UnclusteredEnergy Up--//
-   double met_val_UnclusteredEnUp=met.shiftedPt(pat::MET::UnclusteredEnUp);
-   double met_phi_UnclusteredEnUp=met.shiftedPhi(pat::MET::UnclusteredEnUp);
-   //--UnclusteredEnergy Down--//
-   double met_val_UnclusteredEnDown=met.shiftedPt(pat::MET::UnclusteredEnDown);
-   double met_phi_UnclusteredEnDown=met.shiftedPhi(pat::MET::UnclusteredEnDown);
 
    int nTightMu=0;
    //edm::Handle<pat::MuonCollection> muons;  ///in header now
@@ -1483,7 +1451,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        EleIDPassed->push_back(1);}
      else {EleIDPassed->push_back(0);}
    }
-   //  std::cout << "nLooseEle=" << nLooseEle << std::endl;
+   //   std::cout << "nLooseEle=" << nLooseEle << std::endl;
 
    //
    /*
@@ -1539,8 +1507,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    iEvent.getByToken(tauToken_, taus);
    //  std::cout << "Tau size from main loop " << taus->size() << std::endl;
    for (const pat::Tau &tau : *taus) {
-     std::cout << "TAKE THIS TAU" << std::endl;
-     int tauDM=tau.decayMode();
+     // std::cout << "TAKE THIS TAU" << std::endl;
+     tauDM=tau.decayMode();
      /*
        kNull = -1
        kOneProng0PiZero = 0 
@@ -1572,7 +1540,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 TES = 0.996;
        }
      }
-     std::cout << "tauDM=" << tauDM << " TES=" << TES << std::endl;
+     //     std::cout << "tauDM=" << tauDM << " TES=" << TES << std::endl;
      tau_NoShift_acc=tau_NoESCorr*TES;
      //     tau_NoShift_acc.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
      if (PassTauAcceptance(tau_NoShift_acc)==true) {
@@ -1581,7 +1549,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      
      
      if ( (PassTauID(tau)==true) ) {
-       
+       // std::cout << "This Tau passed ID " << std::endl;
        //define Tau energy scale
        //       float TES = 0.982 ;
        tau_NoShift=tau_NoESCorr*TES;       
@@ -1589,7 +1557,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        tau_ScaleDown=tau_NoShift*tauScaleShiftDown;
        //tau_ScaleUp.SetPxPyPzE((1+tauScaleShift)*(tau.px()),(1+tauScaleShift)*(tau.py()),(1+tauScaleShift)*(tau.pz()),(1+tauScaleShift)*(tau.energy()));
        // tau_ScaleDown.SetPxPyPzE((1-tauScaleShift)*(tau.px()),(1-tauScaleShift)*(tau.py()),(1-tauScaleShift)*(tau.pz()),(1-tauScaleShift)*(tau.energy()));
-       std::cout << "TauNoCorr pt=" << tau_NoESCorr.Pt() << " TauNoShift pt=" << tau_NoShift.Pt() << " tauScaleUp pt=" << tau_ScaleUp.Pt() << " tauScaleDown pt=" << tau_ScaleDown.Pt() << std::endl;      
+       // std::cout << "TauNoCorr pt=" << tau_NoESCorr.Pt() << " TauNoShift pt=" << tau_NoShift.Pt() << " tauScaleUp pt=" << tau_ScaleUp.Pt() << " tauScaleDown pt=" << tau_ScaleDown.Pt() << std::endl;      
        
        if (PassTauAcceptance(tau_NoShift)==true) {
 	 //std::cout << "\nTau selected" << std::endl;
@@ -1667,7 +1635,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    }
 
-   std::cout << "nGoodTau=" << nGoodTau << std::endl;
+   //    std::cout << "nGoodTau=" << nGoodTau << std::endl;
    // In each event, the tau-ID scale factor is obtained using the first good tau //
    // This should be fine because in the end we select events with one good tau //
    if (!RunOnData) {
@@ -1676,35 +1644,102 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      tauID_SF_syst_down = GetTauIDScaleFactor(tau_pt[0], "down");
  
    }
-    std::cout <<"tauPt=" << tau_pt[0] <<  " tauID_SF | tauID_SF_syst_up | tauID_SF_syst_down " <<  tauID_SF << " | " << tauID_SF_syst_up << " | " <<  tauID_SF_syst_down << std::endl ;
-   /*
-  if (!RunOnData) {
-     tauISO_SF = 0.97;
-     tauISO_SF_syst_up = 0.97+0.05;
-     tauISO_SF_syst_down = 0.97-0.05;
+   //    std::cout <<"tauPt=" << tau_pt[0] <<  " tauID_SF | tauID_SF_syst_up | tauID_SF_syst_down " <<  tauID_SF << " | " << tauID_SF_syst_up << " | " <<  tauID_SF_syst_down << std::endl ;
+   
+    if (!RunOnData) {
+
+      if ( fabs(tau_eta[0]) < 1.460) {
+	tauELE_SF = 1.32;
+	tauELE_SF_syst_up = 1.32+0.03;
+	tauELE_SF_syst_down = 1.32-0.03;
+      }
+      
+      else if ( fabs(tau_eta[0]) >= 1.460) {
+	tauELE_SF = 1.38;
+	tauELE_SF_syst_up = 1.38+0.04;
+	tauELE_SF_syst_down = 1.38-0.04;
+      }
+    }
+   
+
+    ////// MET //////
+   edm::Handle<pat::METCollection> mets;
+   if (!RunOnData) { 
+     iEvent.getByToken(metToken_, mets);
+   } else if (RunOnData) {
+     iEvent.getByToken(metToken_reminiaod_, mets);
    }
-   */
+
+   const pat::MET &met = mets->front();
+   double met_val=met.pt();
+   double met_phi=met.phi();
+   //-------------------------//
+   //**--MET UNCERTAINTIES--**//
+   //-------------------------//
+   //--JetEnergy Up--//
+   double met_val_JetEnUp=met.shiftedPt(pat::MET::JetEnUp);
+   double met_phi_JetEnUp=met.shiftedPhi(pat::MET::JetEnUp);
+   //--JetEnergy Down--//
+   double met_val_JetEnDown=met.shiftedPt(pat::MET::JetEnDown);
+   double met_phi_JetEnDown=met.shiftedPhi(pat::MET::JetEnDown);
+   //--JetRes Up--//
+   double met_val_JetResUp=met.shiftedPt(pat::MET::JetResUp);
+   double met_phi_JetResUp=met.shiftedPhi(pat::MET::JetResUp);
+   //--JetRes Down--//
+   double met_val_JetResDown=met.shiftedPt(pat::MET::JetResDown);
+   double met_phi_JetResDown=met.shiftedPhi(pat::MET::JetResDown);
+   //--MuonEnergy Up--//
+   double met_val_MuonEnUp=met.shiftedPt(pat::MET::MuonEnUp);
+   double met_phi_MuonEnUp=met.shiftedPhi(pat::MET::MuonEnUp);
+   //--MuonEnergy Down--//
+   double met_val_MuonEnDown=met.shiftedPt(pat::MET::MuonEnDown);
+   double met_phi_MuonEnDown=met.shiftedPhi(pat::MET::MuonEnDown);
+   //--ElectronEnergy Up--//
+   double met_val_ElectronEnUp=met.shiftedPt(pat::MET::ElectronEnUp);
+   double met_phi_ElectronEnUp=met.shiftedPhi(pat::MET::ElectronEnUp);
+   //--ElectronEnergy Down--//
+   double met_val_ElectronEnDown=met.shiftedPt(pat::MET::ElectronEnDown);
+   double met_phi_ElectronEnDown=met.shiftedPhi(pat::MET::ElectronEnDown);
+   //--TauEnergy Up--//
+   double met_val_TauEnUp=met.shiftedPt(pat::MET::TauEnUp);
+   double met_phi_TauEnUp=met.shiftedPhi(pat::MET::TauEnUp);
+   //--TauEnergy Down--//
+   double met_val_TauEnDown=met.shiftedPt(pat::MET::TauEnDown);
+   double met_phi_TauEnDown=met.shiftedPhi(pat::MET::TauEnDown);
+   //--PhotonEnergy Up--//
+   double met_val_PhotonEnUp=met.shiftedPt(pat::MET::PhotonEnUp);
+   double met_phi_PhotonEnUp=met.shiftedPhi(pat::MET::PhotonEnUp);
+   //--PhotonEnergy Down--//
+   double met_val_PhotonEnDown=met.shiftedPt(pat::MET::PhotonEnDown);
+   double met_phi_PhotonEnDown=met.shiftedPhi(pat::MET::PhotonEnDown);
+   //--UnclusteredEnergy Up--//
+   double met_val_UnclusteredEnUp=met.shiftedPt(pat::MET::UnclusteredEnUp);
+   double met_phi_UnclusteredEnUp=met.shiftedPhi(pat::MET::UnclusteredEnUp);
+   //--UnclusteredEnergy Down--//
+   double met_val_UnclusteredEnDown=met.shiftedPt(pat::MET::UnclusteredEnDown);
+   double met_phi_UnclusteredEnDown=met.shiftedPhi(pat::MET::UnclusteredEnDown);
+
 
    //----------------//
    //--Final Weight--//
    //----------------//
    if (!RunOnData) {
-     final_weight               = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * trig_SF;
-     final_wt_NOPU = mc_event_weight * k_fak * tauID_SF * trig_SF;
+     final_weight               = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * trig_SF * tauELE_SF;
+     final_wt_NOPU = mc_event_weight * k_fak * tauID_SF * trig_SF * tauELE_SF;
 
      // syst //
-     final_weight_PUweight_UP   = Lumi_Wt_UP * mc_event_weight * k_fak * tauID_SF * trig_SF;
-     final_weight_PUweight_DOWN = Lumi_Wt_DOWN * mc_event_weight * k_fak * tauID_SF * trig_SF;
-     final_weight_kfact_UP      = Lumi_Wt * mc_event_weight * k_fak_up * tauID_SF * trig_SF;
-     final_weight_kfact_DOWN    = Lumi_Wt * mc_event_weight * k_fak_down * tauID_SF *trig_SF;
-     final_weight_tauIDSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_up  *trig_SF;
-     final_weight_tauIDSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_down *trig_SF;
+     final_weight_PUweight_UP   = Lumi_Wt_UP * mc_event_weight * k_fak * tauID_SF * trig_SF * tauELE_SF;
+     final_weight_PUweight_DOWN = Lumi_Wt_DOWN * mc_event_weight * k_fak * tauID_SF * trig_SF * tauELE_SF;
+     final_weight_kfact_UP      = Lumi_Wt * mc_event_weight * k_fak_up * tauID_SF * trig_SF * tauELE_SF;
+     final_weight_kfact_DOWN    = Lumi_Wt * mc_event_weight * k_fak_down * tauID_SF *trig_SF * tauELE_SF;
+     final_weight_tauIDSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_up  *trig_SF * tauELE_SF;
+     final_weight_tauIDSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauID_SF_syst_down *trig_SF * tauELE_SF;
 
-     //     final_weight_tauISOSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauISO_SF_syst_up * tauID_SF *trig_SF;
-     //  final_weight_tauISOSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauISO_SF_syst_down * tauID_SF *trig_SF;
+     final_weight_tauELESF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauELE_SF_syst_up * tauID_SF *trig_SF;
+     final_weight_tauELESF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauELE_SF_syst_down * tauID_SF *trig_SF;
 
-     final_weight_trigSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauID_SF *trig_SF_syst_up;
-     final_weight_trigSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauID_SF *trig_SF_syst_down;
+     final_weight_trigSF_UP    = Lumi_Wt * mc_event_weight * k_fak * tauID_SF *trig_SF_syst_up * tauELE_SF;
+     final_weight_trigSF_DOWN  = Lumi_Wt * mc_event_weight * k_fak * tauID_SF *trig_SF_syst_down * tauELE_SF;
    }
    else {
      final_weight               = 1.0;
@@ -1715,10 +1750,12 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      final_weight_kfact_DOWN    = 1.0;
      final_weight_tauIDSF_UP    = 1.0;
      final_weight_tauIDSF_DOWN  = 1.0;
+     final_weight_tauELESF_UP    = 1.0;
+     final_weight_tauELESF_DOWN  = 1.0;
      final_weight_trigSF_UP = 1.0;
      final_weight_trigSF_DOWN = 1.0;
    }
-   /*
+   /*   
    std::cout << "Data ? " << RunOnData <<
      " LumiWt=" << Lumi_Wt <<
      " LumiWtUP=" << Lumi_Wt_UP <<
@@ -1729,7 +1766,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      " kfak_down=" << k_fak_down <<
      " tauID_SF=" << tauID_SF <<
      " tauID_SF_up=" << tauID_SF_syst_up <<
-     " tauID_SF_down=" << tauID_SF_syst_down << std::endl;
+     " tauID_SF_down=" << tauID_SF_syst_down <<
+     " tauELE_SF_up=" << tauELE_SF_syst_up <<
+     " tauELE_SF_down=" << tauELE_SF_syst_down << std::endl;
    */
 
 
@@ -1752,11 +1791,12 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    h1_nGoodTau_Reco->Fill(nGoodTau,final_weight);
    //   if (nGenTau==1) FindTauIDEfficiency(iEvent,tauGen_p4[0]);
    
-   if (RunOnData) {
+   if (!RunOnData) {
      //     std::cout << "passMuonTrig_ForEff=" << passMuonTrig_ForEff << " nGoodTauTrig=" << nGoodTauTrig 
      //	       << " tauPt1=" << tau_pt_trig[0] << " tauEta1=" << tau_eta_trig[0] 
      //        << " MET=" << met_val << std::endl;
      FindTauTrigEfficiency(passMuonTrig_ForEff, passTauTrig, nGoodTauTrig, met_val, tau_pt_trig[0], tau_eta_trig[0]);
+     FindTauTrigEfficiency_Signal(passTauTrig, nGoodTauTrig, met_val, tau_pt_trig[0], tau_eta_trig[0]);
    }   
    //---------------//
    //---Selection---//
@@ -1852,8 +1892,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 }
 
 	 //
-	 //	 h1_TauID_decayModeFindingNewDMs->Fill(tau.tauID("decayModeFindingNewDMs"),final_weight);
-	 //	 h1_TauID_byMediumIsolationMVArun2v1DBnewDMwLT->Fill(tau.tauID("byMediumIsolationMVArun2v1DBnewDMwLT"),final_weight);
+	 //	 h1_TauID_decayModeFinding->Fill(tau.tauID("decayModeFinding"),final_weight);
+	 //	 h1_TauID_byMediumIsolationMVArun2v1DBoldDMwLT->Fill(tau.tauID("byMediumIsolationMVArun2v1DBoldDMwLT"),final_weight);
 	 //	 h1_TauID_againstElectronLooseMVA6->Fill(tau.tauID("againstElectronLooseMVA6"),final_weight);
 	 //	 h1_TauID_againstMuonLoose3->Fill(tau.tauID("againstMuonLoose3"),final_weight);
 	 //
@@ -1881,6 +1921,13 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	   h1_MT_Stage1_TauIDSFDown->Fill(MT,final_weight_tauIDSF_DOWN);
 	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_tauIDSF_UP,   "TauIDSFUp");
 	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_tauIDSF_DOWN, "TauIDSFDown");
+	 }
+
+	 if (!RunOnData) {
+	   h1_MT_Stage1_TauELESFUp->Fill(MT,final_weight_tauELESF_UP);
+	   h1_MT_Stage1_TauELESFDown->Fill(MT,final_weight_tauELESF_DOWN);
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_tauELESF_UP,   "TauELESFUp");
+	   if (nGoodTau==1) setShiftedTree(tau_NoShift, met, final_weight_tauELESF_DOWN, "TauELESFDown");
 	 }
 
 	 //final_weight_trigSF_UP
@@ -1924,8 +1971,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	       }
 	     }
 
-	     final_weight_alpha_UP   = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_up ;
-	     final_weight_alpha_DOWN = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_down ;
+	     final_weight_alpha_UP   = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_up * tauELE_SF ;
+	     final_weight_alpha_DOWN = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_down * tauELE_SF ;
 	     std::cout << "final_weight_alpha_UP = " << final_weight_alpha_UP << " final_weight_alpha_DOWN=" << final_weight_alpha_DOWN << std::endl;
 	     
 	     h1_MT_Stage1_alphaUp->Fill(MT,final_weight_alpha_UP);
@@ -2097,14 +2144,20 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    if (passTauTrig) {
        if (doQCDAna) {
-	 //std::cout << "Call QCDAnalyse " << std::endl;
+	 //	  std::cout << "Call QCDAnalyse " << std::endl;
 	 QCDAnalyse(met);
        }
-       Fill_QCD_Tree(true,tau_NoShift,15,jets,met,final_weight,0);
+       //       std::cout << "nGoodTau=" << nGoodTau << std::endl;
+       // std::cout << "Call Fill_QCD_Tree for isolated tau" << std::endl;
+       if (nGoodTau==1) Fill_QCD_Tree(true,tau_NoShift,15,jets,met,final_weight,0, tau_DM[0], tau_nTrack[0], tau_chIso[0], tau_neuIso[0]);
+
+       //       std::cout << "qcd_lepton_tau->size() = " << qcd_lepton_tau->size() << std::endl;
+       
        for(unsigned int ifake=0; ifake<qcd_lepton_tau->size(); ifake++){
 	 pat::Tau qcd_lepton=(*qcd_lepton_tau)[ifake];
 	 if(qcd_lepton.pt()>50 && calcMT(qcd_lepton,met)>50){
-           Fill_QCD_Tree(false,tau_NoShift,15,jets,met,final_weight,ifake);
+	   //  std::cout << "qcd_tau pt=" << qcd_lepton.pt() << " MT=" << calcMT(qcd_lepton,met) << " Call Fill_QCD_Tree for non_isolated tau" << std::endl;
+           Fill_QCD_Tree(false,tau_NoShift,15,jets,met,final_weight,ifake,tauDM,tau_nTrack[0], tau_chIso[0], tau_neuIso[0]);
 	 }
        }
        Fill_Tree(tau_NoShift,met,final_weight,"");
@@ -2133,7 +2186,7 @@ double MiniAODAnalyzer::GetTauIDScaleFactor(double tau_pt, std::string mode) {
     tauSF=(0.95-flat_uncert-ptDep_uncert);
     if (tauSF<0.0) tauSF=(0.95-flat_uncert);
   }
-  std::cout << "SF=" << tauSF << " flat_uncert=" << flat_uncert << " ptDep_uncert=" << ptDep_uncert << std::endl;
+  //  std::cout << "SF=" << tauSF << " flat_uncert=" << flat_uncert << " ptDep_uncert=" << ptDep_uncert << std::endl;
 
   return tauSF;
 }
@@ -2212,6 +2265,38 @@ bool MiniAODAnalyzer::FindTauTrigEfficiency(bool passRefTrigger, bool passAnaTri
   return true;
 }
 
+
+bool MiniAODAnalyzer::FindTauTrigEfficiency_Signal(bool passAnaTrigger, int nTau, double met, double tauPt, double tauEta) {
+  // Denominator //
+  //std::cout << "taupt=" << tauPt << " MET=" << met << " passTrig=" << passAnaTrigger << std::endl;
+  if ((nTau>0) && (met>90) ) {
+    // std::cout << "Enter Deno" << std::endl;
+    h1_TauPt_TrigEff_Sig_Deno->Fill(tauPt,final_weight);
+  }
+  if ((nTau>0) && (met>90) ) {
+    // std::cout << "Enter Deno" << std::endl;
+    h1_TauEta_TrigEff_Sig_Deno->Fill(tauEta,final_weight);
+  }
+  if ((nTau>0) && (met>90) ) {
+    // std::cout << "Enter Deno" << std::endl;
+    h1_met_TrigEff_Sig_Deno->Fill(met,final_weight);
+  }
+  // Numerator //
+  if ((nTau>0) && (met>90) && passAnaTrigger ) {
+    // std::cout << "@@Enter Num" << std::endl;
+    h1_TauPt_TrigEff_Sig_Num->Fill(tauPt,final_weight); 
+  }
+  if ((nTau>0) && (met>90) && passAnaTrigger ) {
+    // std::cout << "@@Enter Num" << std::endl;
+    h1_TauEta_TrigEff_Sig_Num->Fill(tauEta,final_weight); 
+  }
+  if ((nTau>0) && (met>90) && passAnaTrigger ) {
+    // std::cout << "@@Enter Num" << std::endl;
+    h1_met_TrigEff_Sig_Num->Fill(met,final_weight); 
+  }
+  return true;
+}
+
 /*
 bool MiniAODAnalyzer::FindTauIDEfficiency(const edm::Event& iEvent, TLorentzVector gen_p4) {
   edm::Handle<pat::TauCollection> taus;
@@ -2244,8 +2329,8 @@ bool MiniAODAnalyzer::PassTauID(const pat::Tau &tau)
   bool passTauID_=true;
 
   //----Tau ID----//
-  if ( tau.tauID("decayModeFindingNewDMs") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("byMediumIsolationMVArun2v1DBnewDMwLT") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("byMediumIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
   if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_=false;
   if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
 
@@ -2258,7 +2343,7 @@ bool MiniAODAnalyzer::PassTauID_decay(const pat::Tau &tau)
   bool passTauID1_=true;
 
   //----Tau ID----//
-  if ( tau.tauID("decayModeFindingNewDMs") < 0.5 ) passTauID1_=false;
+  if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID1_=false;
   // std::cout << "pass? " << passTauID1_ << std::endl;
   return passTauID1_;
 }
@@ -2270,8 +2355,8 @@ bool MiniAODAnalyzer::PassTauID_decay_iso(const pat::Tau &tau)
   bool passTauID_=true;
 
   //----Tau ID----//
-  if ( tau.tauID("decayModeFindingNewDMs") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("byMediumIsolationMVArun2v1DBnewDMwLT") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("byMediumIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
   return passTauID_;
 }
 
@@ -2281,8 +2366,8 @@ bool MiniAODAnalyzer::PassTauID_decay_iso_muon(const pat::Tau &tau)
   bool passTauID_=true;
 
   //----Tau ID----//
-  if ( tau.tauID("decayModeFindingNewDMs") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("byMediumIsolationMVArun2v1DBnewDMwLT") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("byMediumIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
   if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
 
    return passTauID_;
@@ -2294,8 +2379,8 @@ bool MiniAODAnalyzer::PassTauID_NonIsolated(const pat::Tau &tau)
   bool passTauID_NonIso_=true;
 
   //----Tau ID----//
-  if ( tau.tauID("decayModeFindingNewDMs") < 0.5 ) passTauID_NonIso_=false;
-  if ( tau.tauID("byMediumIsolationMVArun2v1DBnewDMwLT") > 0.5 ) passTauID_NonIso_=false;
+  if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_NonIso_=false;
+  if ( tau.tauID("byMediumIsolationMVArun2v1DBoldDMwLT") > 0.5 ) passTauID_NonIso_=false;
   if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_NonIso_=false;
   if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_NonIso_=false;
 
@@ -2315,7 +2400,7 @@ bool MiniAODAnalyzer::PassTauID_NonIsolated(const pat::Tau &tau, std::string idc
     bool passTauID_NonIso_=true;
 
     //----Tau ID----//
-    if ( tau.tauID("decayModeFindingNewDMs") < 0.5 ) passTauID_NonIso_=false;
+    if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_NonIso_=false;
     if ( tau.tauID(idcheck) > 0.5 ) passTauID_NonIso_=false;
     if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_NonIso_=false;
     if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_NonIso_=false;
@@ -2580,9 +2665,15 @@ void MiniAODAnalyzer::Create_Trees(){
   if (doTrees) {
     mQCDTree["lepton_n"]=0;
     mQCDTree["pt"]=0;
+    mQCDTree["phi"]=0;
     mQCDTree["mt"]=0;
+    mQCDTree["ntrack"]=0;
+    mQCDTree["ChargedIso"]=0;
+    mQCDTree["NeutralIso"]=0;
     mQCDTree["eta"]=0;
     mQCDTree["met"]=0;
+    mQCDTree["met_phi"]=0;
+    mQCDTree["jetHT"]=0;
     mQCDTree["iso"]=0;
     mQCDTree["nvert"]=0;
     mQCDTree["mtpos"]=0;
@@ -2597,9 +2688,14 @@ void MiniAODAnalyzer::Create_Trees(){
     for(unsigned int ilep=1;ilep<3; ilep++){
       mQCDTree[ Form("mt_%d", ilep)   ]=0;
       mQCDTree[ Form("pt_%d", ilep)]=0;
+      mQCDTree[ Form("phi_%d", ilep)]=0;
       mQCDTree[ Form("eta_%d", ilep)]=0;
       mQCDTree[ Form("delta_phi_%d", ilep)]=0;
       mQCDTree[ Form("decay_mode_%d", ilep)]=0;
+      mQCDTree[ Form("ntrack_%d", ilep)]=0;
+      mQCDTree[ Form("ChargedIso_%d", ilep)]=0;
+      mQCDTree[ Form("NeutralIso_%d", ilep)]=0;
+    
       //if(m_do_complicated_tau_stuff){
       //for(auto idisc : d_mydisc){
       //mQCDTree[Form("%s_%d", idisc.c_str() ,ilep ) ]=0;
@@ -2787,15 +2883,33 @@ void MiniAODAnalyzer::Fill_Tree(TLorentzVector sel_lepton, const pat::MET sel_me
 }
 
 //void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, const pat::MET sel_met, double weight){
-void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lepton_n, edm::Handle<std::vector<pat::Jet>> JetList, const pat::MET sel_met, double weight,int ifake){
+void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lepton_n, edm::Handle<std::vector<pat::Jet>> JetList, const pat::MET sel_met, double weight,int ifake,int tauDM, int nTRK, double chIso, double neuIso){
+  //  std::cout << "Inside Fill_QCD_Tree" << std::endl;
+  float jetHT=0.0;
+  for( auto myJet : *JetList){
+    if ( myJet.pt()>30 ) {
+      jetHT = jetHT+myJet.pt();
+    }
+  }
+
+  //  if (jetHT>0)  std::cout << "jetHT = " << jetHT << std::endl;
 
     if(iso){
+      //      std::cout << "Isolated" << std::endl;
         mQCDTree["lepton_n"]=lepton_n;
         mQCDTree["iso"]=iso;
         mQCDTree["ThisWeight"]=weight;
         mQCDTree["QCDWeight"]=1.;
+	mQCDTree["ntrack"]=nTRK;
+	mQCDTree["ChargedIso"]=chIso;
+	mQCDTree["NeutralIso"]=neuIso;
         mQCDTree["met"]=sel_met.pt();
+        mQCDTree["met_phi"]=sel_met.phi();
+        mQCDTree["jetHT"]=jetHT;
+        mQCDTree["decay_mode"]=tauDM;
+      	//std::cout << "tau pt = " << sel_lepton.Pt() << std::endl;
         mQCDTree["pt"]=sel_lepton.Pt();
+        mQCDTree["phi"]=sel_lepton.Phi();
         mQCDTree["mt"]=calcMT(sel_lepton,sel_met);
         mQCDTree["eta"]=sel_lepton.Eta();
         mQCDTree["delta_phi"]=deltaPhi(sel_lepton.Phi(),sel_met.phi());
@@ -2808,7 +2922,7 @@ void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lept
             //mQCDTree["metTriggerd"]=sel_lepton->getUserRecord("metTriggered").toBool();
         //}
         //else{
-            mQCDTree["metTriggerd"]=0;
+	mQCDTree["metTriggerd"]=0;
         //}
         //mQCDTree["decay_mode"]=sel_lepton.decayMode();
         //if(abs(sel_lepton->getPdgNumber())==15 && m_do_complicated_tau_stuff){
@@ -2830,21 +2944,30 @@ void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lept
         }
 	if (doTrees)  helper->Tree_Filler("qcdtree");
     }else{
+      //      std::cout << "non-isolated" << std::endl;
         //if(!std::isfinite(qcd_weight[qcd_lepton->getPdgNumber()][ifake])){
             //cout<<qcd_weight[qcd_lepton->getPdgNumber()][ifake]<<" "<<ifake<<endl;
         //}
         //fill for every qcd lepton up to 2 additonal leptons
+      // tau_nTrack[nGoodTau]=tau.signalCands().size();
+      // tau_chIso[nGoodTau]=tau.tauID("chargedIsoPtSum");
+      // tau_neuIso[nGoodTau]=tau.tauID("neutralIsoPtSum");
 
         mQCDTree["lepton_n"]=lepton_n;
         mQCDTree["iso"]=iso;
         mQCDTree["ThisWeight"]=weight;
         mQCDTree["met"]=sel_met.pt();
+        mQCDTree["met_phi"]=sel_met.phi();
+	mQCDTree["jetHT"]=jetHT;
         mQCDTree["minDphi"]=minDphiMET(*JetList,sel_met);
         pat::Tau qcd_lepton=(*qcd_lepton_tau)[0];
-
         mQCDTree["QCDWeight"]=(*qcd_weight_tau)[ifake];
         mQCDTree["mt"]=calcMT(qcd_lepton,sel_met);
         mQCDTree["pt"]=qcd_lepton.pt();
+	mQCDTree["ntrack"]=qcd_lepton.signalCands().size();
+	mQCDTree["ChargedIso"]=qcd_lepton.tauID("chargedIsoPtSum");
+	mQCDTree["NeutralIso"]=qcd_lepton.tauID("neutralIsoPtSum");
+	mQCDTree["phi"]=qcd_lepton.phi();
         mQCDTree["eta"]=qcd_lepton.eta();
         mQCDTree["delta_phi"]=deltaPhi(qcd_lepton.phi(),sel_met.phi());
         //mQCDTree["lepton_type"]=qcd_lepton->getPdgNumber();
@@ -2886,9 +3009,14 @@ void MiniAODAnalyzer::Fill_QCD_Tree(bool iso,TLorentzVector sel_lepton, int lept
             }
             mQCDTree[ Form("mt_%d", i_qcd)   ]=calcMT(i_qcd_lepton,sel_met);
             mQCDTree[ Form("pt_%d", i_qcd)]=i_qcd_lepton.pt();
+            mQCDTree[ Form("phi_%d", i_qcd)]=i_qcd_lepton.phi();
             mQCDTree[ Form("eta_%d", i_qcd)]=i_qcd_lepton.eta();
             mQCDTree[ Form("delta_phi_%d", i_qcd)]=deltaPhi(i_qcd_lepton.phi(),sel_met.phi());
             mQCDTree[Form("decay_mode_%d", i_qcd)]=i_qcd_lepton.decayMode();
+	    mQCDTree[Form("ntrack_%d", i_qcd)]=i_qcd_lepton.signalCands().size();
+	    mQCDTree[Form("ChargedIso_%d",i_qcd)]=i_qcd_lepton.tauID("chargedIsoPtSum");
+	    mQCDTree[Form("NeutralIso_%d",i_qcd)]=i_qcd_lepton.tauID("neutralIsoPtSum");
+	    //mQCDTree[Form("ntrack"]=qcd_lepton.signalCands().size();
             //~if(abs(i_qcd_lepton->getPdgNumber())==15 && m_do_complicated_tau_stuff){
                 //~for(auto idisc : d_mydisc){
                     //~mQCDTree[Form("%s_%d", idisc.c_str(), i_qcd) ]=i_qcd_lepton->getUserRecord(idisc).toDouble();
@@ -3065,9 +3193,9 @@ bool MiniAODAnalyzer::Overlap(edm::Handle<edm::View<reco::GenParticle>> p1, doub
   if ( (sourceFileString.find("WToTauNu_M-4000_") != std::string::npos) && ( (getWmass(p1)<4000) || (getWmass(p1)>5000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-5000_") != std::string::npos) && ( (getWmass(p1)<5000) || (getWmass(p1)>6000)) ) return true;
   if ( (sourceFileString.find("WToTauNu_M-6000_") != std::string::npos) && ( (getWmass(p1)<6000)) ) return true;
-  if ( (sourceFileString.find("TT_Tune") != std::string::npos) && (genMTT>700) ) return true;
-  if ( (sourceFileString.find("TT_Mtt-700to1000_Tune") != std::string::npos) && ( (genMTT<700) || (genMTT>1000) ) ) return true;
-  if ( (sourceFileString.find("TT_Mtt-1000toInf_Tune") != std::string::npos) && (genMTT<1000) ) return true;
+  //  if ( (sourceFileString.find("TT_Tune") != std::string::npos) && (genMTT>700) ) return true;
+  // if ( (sourceFileString.find("TT_Mtt-700to1000_Tune") != std::string::npos) && ( (genMTT<700) || (genMTT>1000) ) ) return true;
+  // if ( (sourceFileString.find("TT_Mtt-1000toInf_Tune") != std::string::npos) && (genMTT<1000) ) return true;
   
   return false;
 }
@@ -3122,7 +3250,7 @@ void MiniAODAnalyzer::SetUpDisc(){
     d_mydisc->push_back("byMediumCombinedIsolationDeltaBetaCorr3Hits");
     d_mydisc->push_back("byMediumCombinedIsolationDeltaBetaCorr3HitsdR03");
     d_mydisc->push_back("byMediumIsolationMVA3newDMwLT");
-    d_mydisc->push_back("byMediumIsolationMVArun2v1DBnewDMwLT");
+    d_mydisc->push_back("byMediumIsolationMVArun2v1DBoldDMwLT");
     d_mydisc->push_back("byMediumIsolationMVArun2v1PWnewDMwLT");
     d_mydisc->push_back("byMediumPileupWeightedIsolation3Hits");
     d_mydisc->push_back("byTightCombinedIsolationDeltaBetaCorr3Hits");
