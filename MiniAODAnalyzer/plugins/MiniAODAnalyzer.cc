@@ -1105,7 +1105,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  //std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
+ std::cout << "\n\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
@@ -1425,7 +1425,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    }
 
   //   if (!RunOnData) passTauTrig=1;
-   // std::cout << "RunOnData=" << RunOnData <<  " ## passTauTrig=" << passTauTrig << std::endl;
+  std::cout << "RunOnData=" << RunOnData <<  " ## passTauTrig=" << passTauTrig << std::endl;
 
    //---Trigger MET---//
    edm::Handle<edm::TriggerResults> triggerBits_MET;
@@ -1499,7 +1499,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    iEvent.getByToken(vtxToken_, vertices);
    if (vertices->empty()) return; // skip the event if no PV found
    // std::cout << "Number of vertices " << vertices->size() << std::endl;
-   const reco::Vertex &PV = vertices->front();
+   //const reco::Vertex &PV = vertices->front();
    reco::VertexCollection vtxs = *vertices;
 
    int nvtx=0;
@@ -1522,7 +1522,6 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
 
    int nTightMu=0;
-   //edm::Handle<pat::MuonCollection> muons;  ///in header now
    iEvent.getByToken(muonToken_, muons);
    for (const pat::Muon &mu : *muons) {
      //https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2#Tight_Muon
@@ -1531,11 +1530,45 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
          nTightMu++;
          MuonIDPassed->push_back(1);}
      else {MuonIDPassed->push_back(0);}
+
+
      //std::cout << "mu.pt()=" << mu.pt() << " abs(mu.eta())=" << abs(mu.eta()) << " mu.isolationR03().sumPt/mu.pt()=" << mu.isolationR03().sumPt/mu.pt() << std::endl;
      //       printf("muon with pt %4.1f, dz(PV) %+5.3f, POG loose id %d, tight id %d\n",
      //     mu.pt(), mu.muonBestTrack()->dz(PV.position()), mu.isLooseMuon(), mu.isTightMuon(PV));
    }
-   //   std::cout << "nTightMu=" << nTightMu << std::endl;
+   std::cout << "nTightMu=" << nTightMu << std::endl;
+
+  mass=-99.0;
+
+   // Control region for fake tau background validation //
+   //   int nTightMu=0;
+   //edm::Handle<pat::MuonCollection> muons;  ///in header now
+
+   //   edm::Handle<std::vector<pat::Muon>>  muonHandle;
+   //iEvent.getByToken(muonToken_, muons);
+   for (std::vector<pat::Muon>::const_iterator iMu = muons->begin(); iMu != muons->end(); ++iMu) {
+     for (std::vector<pat::Muon>::const_iterator jMu = iMu+1; jMu != muons->end(); ++jMu) {
+        if (iMu->pt()>20.0 && jMu->pt()>20.0 ) {
+          if ( fabs(iMu->eta())<2.4 && fabs(jMu->eta())<2.4 ) {
+            if ( (iMu->charge())*(jMu->charge())<0 ) {
+              if ( (iMu->isLooseMuon()) && (jMu->isLooseMuon()) ) { 
+                 if ( ((iMu->isolationR03().sumPt/iMu->pt())<0.10) && ((jMu->isolationR03().sumPt/jMu->pt())<0.10) ) { 
+                       TLorentzVector mu1, mu2 ;
+		  mu1.SetPxPyPzE(iMu->px(), iMu->py(), iMu->pz(), iMu->energy());
+		  mu2.SetPxPyPzE(jMu->px(), jMu->py(), jMu->pz(), jMu->energy());
+		  TLorentzVector diMuon=mu1+mu2;
+
+                }
+              }
+           }
+         }
+       }
+      // std::cout << "pt1,2 " << iMu->pt() << " , " << jMu->pt() << std::endl;
+     }
+   }
+
+ 
+
 
    edm::Handle<edm::ValueMap<bool> > ele_id_decisions;
    iEvent.getByToken(eleIdMapToken_ ,ele_id_decisions);
@@ -1555,7 +1588,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        EleIDPassed->push_back(1);}
      else {EleIDPassed->push_back(0);}
    }
-   //   std::cout << "nLooseEle=" << nLooseEle << std::endl;
+  std::cout << "nLooseEle=" << nLooseEle << std::endl;
 
    //
    /*
@@ -1887,7 +1920,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    }
 
-   //     std::cout << "nGoodTau=" << nGoodTau << std::endl;
+   std::cout << "nGoodTau=" << nGoodTau << std::endl;
    // In each event, the tau-ID scale factor is obtained using the first good tau //
    // This should be fine because in the end we select events with one good tau //
    if (!RunOnData) {
@@ -1923,15 +1956,15 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     if (!RunOnData) {
 
       if ( fabs(tau_eta[0]) < 1.460) {
-	tauELE_SF = 1.32;
-	tauELE_SF_syst_up = 1.32+0.03;
-	tauELE_SF_syst_down = 1.32-0.03;
+	tauELE_SF =1.0; //1.32;
+	tauELE_SF_syst_up = 1.0;// 1.32+0.03;
+	tauELE_SF_syst_down = 1.0;//1.32-0.03;
       }
       
       else if ( fabs(tau_eta[0]) >= 1.460) {
-	tauELE_SF = 1.38;
-	tauELE_SF_syst_up = 1.38+0.04;
-	tauELE_SF_syst_down = 1.38-0.04;
+	tauELE_SF = 1.0;//1.38;
+	tauELE_SF_syst_up =1.0;// 1.38+0.04;
+	tauELE_SF_syst_down = 1.0;//1.38-0.04;
       }
     }
    
