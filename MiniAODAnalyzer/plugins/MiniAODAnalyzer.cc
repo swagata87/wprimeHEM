@@ -462,6 +462,7 @@ private:
   TH1F *h1_MT_New_VTight_Stage1;
 
   TH1F *h1_MT_Old_VLoose_Stage1;
+  TH1F *h1_MT_Old_Medium_Stage1;
   TH1F *h1_MT_Old_Loose_Stage1;
   TH1F *h1_MT_Old_Tight_Stage1;
   TH1F *h1_MT_Old_VTight_Stage1;
@@ -736,6 +737,7 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_MT_New_VTight_Stage1 = histoDir.make<TH1F>("mT_New_VTight_Stage1", "MT_Stage1_New_VTight", nbinMT, xlowMT, xupMT);
   //
   //
+  h1_MT_Old_Medium_Stage1 = histoDir.make<TH1F>("mT_Old_Medium_Stage1", "MT_Stage1_Old_Medium", nbinMT, xlowMT, xupMT);
   h1_MT_Old_VLoose_Stage1 = histoDir.make<TH1F>("mT_Old_VLoose_Stage1", "MT_Stage1_Old_VLoose", nbinMT, xlowMT, xupMT);
   h1_MT_Old_Loose_Stage1 = histoDir.make<TH1F>("mT_Old_Loose_Stage1", "MT_Stage1_Old_Loose", nbinMT, xlowMT, xupMT);
    h1_MT_Old_Tight_Stage1 = histoDir.make<TH1F>("mT_Old_Tight_Stage1", "MT_Stage1_Old_Tight", nbinMT, xlowMT, xupMT);
@@ -955,7 +957,7 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
       edm::Handle<LHERunInfoProduct> run;
       typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
       iRun.getByLabel( lheString , run );
-      //std::cout << "LHERunInfoProduct available ?  " << run.isValid() << std::endl;
+      std::cout << "LHERunInfoProduct available ?  " << run.isValid() << std::endl;
       if ( run.isValid()) {
 	LHERunInfoProduct myLHERunInfoProduct = *(run.product());
         std::vector<std::string> weight_lines;
@@ -1103,7 +1105,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
-  //  std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
+  //std::cout << "\n\n\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
@@ -1316,7 +1318,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
       // std::cout << " --PVI-- " << " BX=" << BX << std::endl;
       if(BX == 0) {
     Tnpv = PVI->getTrueNumInteractions();
-    //  std::cout << "Tnpv=" << Tnpv << std::endl;
+    // std::cout << "Tnpv=" << Tnpv << std::endl;
     continue;
       }
     }
@@ -1524,7 +1526,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    iEvent.getByToken(muonToken_, muons);
    for (const pat::Muon &mu : *muons) {
      //https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2#Tight_Muon
-     if ( (mu.pt()>20.0) &&  (abs(mu.eta())<2.4) && (mu.isTightMuon(PV)) &&  ((mu.isolationR03().sumPt/mu.pt())<0.10) ) {
+     //     if ( (mu.pt()>20.0) &&  (abs(mu.eta())<2.4) && (mu.isLooseMuon(PV)) &&  ((mu.isolationR03().sumPt/mu.pt())<0.10) ) {
+     if ( (mu.pt()>20.0) &&  (abs(mu.eta())<2.4) && (mu.isLooseMuon()) &&  ((mu.isolationR03().sumPt/mu.pt())<0.10) ) {
          nTightMu++;
          MuonIDPassed->push_back(1);}
      else {MuonIDPassed->push_back(0);}
@@ -1565,6 +1568,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    int tau_DM[10]={0};
    int nGoodTau=0;
 
+   int nGoodTau_Old_Medium=0;
    int nGoodTau_Old_VLoose=0;
    int nGoodTau_Old_Loose=0;
    int nGoodTau_Old_VTight=0;
@@ -1585,6 +1589,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    double tau_pt[10]={0};
    double tau_phi[10]={0};
+
+   double tau_pt_Old_Medium[10]={0};
+   double tau_phi_Old_Medium[10]={0};
 
    double tau_pt_Old_VLoose[10]={0};
    double tau_phi_Old_VLoose[10]={0};
@@ -1633,12 +1640,13 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    double tauScaleShiftUp=1;
    double tauScaleShiftDown=1;
    if (!RunOnData) {
-     tauScaleShiftUp=1.012;
-     tauScaleShiftDown=0.988;
+     tauScaleShiftUp=1.03;
+     tauScaleShiftDown=0.97;
    }
    TLorentzVector tau_NoESCorr(0,0,0,0);
    TLorentzVector tau_NoShift(0,0,0,0);
 
+   TLorentzVector tau_NoShift_Old_Medium(0,0,0,0);
    TLorentzVector tau_NoShift_Old_VLoose(0,0,0,0);
    TLorentzVector tau_NoShift_Old_Loose(0,0,0,0);
    TLorentzVector tau_NoShift_Old_VTight(0,0,0,0);
@@ -1684,19 +1692,20 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        kRareDecayMode = 15
      */
      // One prong = 0 , One prong pi0 = 1,2,3,4, Three prong = 10,11,12,13,14
-     tau_NoESCorr.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
-     float TES = 1.0 ;
-     if (!RunOnData) {
-       if (tauDM==0) {
-	 TES = 0.982 ;
-       } else if ((tauDM>0) && (tauDM<5)) {
-	 TES = 1.01;
-       } else if ((tauDM>9) && (tauDM<15)) {
-	 TES = 0.996;
-       }
-     }
+      tau_NoESCorr.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
+      // tau_NoESCorr.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
+     //float TES = 1.0 ;
+     //if (!RunOnData) {
+     // if (tauDM==0) {
+     //	 TES = 0.982 ;
+     // } else if ((tauDM>0) && (tauDM<5)) {
+     //	 TES = 1.01;
+     //} else if ((tauDM>9) && (tauDM<15)) {
+     //	 TES = 0.996;
+     //}
+     // }
      //     std::cout << "tauDM=" << tauDM << " TES=" << TES << std::endl;
-     tau_NoShift_acc=tau_NoESCorr*TES;
+      tau_NoShift_acc=tau_NoESCorr ;//*TES;
      //     tau_NoShift_acc.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
      if (PassTauAcceptance(tau_NoShift_acc)==true) {
        nGoodTau_acc++;
@@ -1704,17 +1713,26 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      // 
      //
      if ( (PassTauID_Old_VLoose(tau)==true) ) {
-       tau_NoShift_Old_VLoose=tau_NoESCorr*TES;       
+       tau_NoShift_Old_VLoose=tau_NoESCorr;//*TES;       
        if (PassTauAcceptance(tau_NoShift_Old_VLoose)==true) {
 	 tau_pt_Old_VLoose[nGoodTau_Old_VLoose]=tau_NoShift_Old_VLoose.Pt();
 	 tau_phi_Old_VLoose[nGoodTau_Old_VLoose]=tau_NoShift_Old_VLoose.Phi();
 	 nGoodTau_Old_VLoose++;
        }
      }
+
+     if ( (PassTauID_Old_Medium(tau)==true) ) {
+       tau_NoShift_Old_Medium=tau_NoESCorr;//*TES;       
+       if (PassTauAcceptance(tau_NoShift_Old_Medium)==true) {
+	 tau_pt_Old_Medium[nGoodTau_Old_Medium]=tau_NoShift_Old_Medium.Pt();
+	 tau_phi_Old_Medium[nGoodTau_Old_Medium]=tau_NoShift_Old_Medium.Phi();
+	 nGoodTau_Old_Medium++;
+       }
+     }
      //
      //
      if ( (PassTauID_Old_Loose(tau)==true) ) {
-       tau_NoShift_Old_Loose=tau_NoESCorr*TES;       
+       tau_NoShift_Old_Loose=tau_NoESCorr;//*TES;       
        if (PassTauAcceptance(tau_NoShift_Old_Loose)==true) {
 	 tau_pt_Old_Loose[nGoodTau_Old_Loose]=tau_NoShift_Old_Loose.Pt();
 	 tau_phi_Old_Loose[nGoodTau_Old_Loose]=tau_NoShift_Old_Loose.Phi();
@@ -1724,7 +1742,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //
      //
      if ( (PassTauID_Old_Tight(tau)==true) ) {
-       tau_NoShift_Old_Tight=tau_NoESCorr*TES;       
+       tau_NoShift_Old_Tight=tau_NoESCorr;//*TES;       
        if (PassTauAcceptance(tau_NoShift_Old_Tight)==true) {
 	 tau_pt_Old_Tight[nGoodTau_Old_Tight]=tau_NoShift_Old_Tight.Pt();
 	 tau_phi_Old_Tight[nGoodTau_Old_Tight]=tau_NoShift_Old_Tight.Phi();
@@ -1734,7 +1752,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //
      //
      if ( (PassTauID_Old_VTight(tau)==true) ) {
-       tau_NoShift_Old_VTight=tau_NoESCorr*TES;       
+       tau_NoShift_Old_VTight=tau_NoESCorr;//*TES;       
        if (PassTauAcceptance(tau_NoShift_Old_VTight)==true) {
 	 tau_pt_Old_VTight[nGoodTau_Old_VTight]=tau_NoShift_Old_VTight.Pt();
 	 tau_phi_Old_VTight[nGoodTau_Old_VTight]=tau_NoShift_Old_VTight.Phi();
@@ -1744,7 +1762,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //
      //
      if ( (PassTauID_New_VTight(tau)==true) ) {
-       tau_NoShift_New_VTight=tau_NoESCorr*TES;       
+       tau_NoShift_New_VTight=tau_NoESCorr;//*TES;       
        if (PassTauAcceptance(tau_NoShift_New_VTight)==true) {
 	 tau_pt_New_VTight[nGoodTau_New_VTight]=tau_NoShift_New_VTight.Pt();
 	 tau_phi_New_VTight[nGoodTau_New_VTight]=tau_NoShift_New_VTight.Phi();
@@ -1754,7 +1772,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //
      //
      if ( (PassTauID_New_Tight(tau)==true) ) {
-       tau_NoShift_New_Tight=tau_NoESCorr*TES;       
+       tau_NoShift_New_Tight=tau_NoESCorr;//*TES;       
        if (PassTauAcceptance(tau_NoShift_New_Tight)==true) {
 	 tau_pt_New_Tight[nGoodTau_New_Tight]=tau_NoShift_New_Tight.Pt();
 	 tau_phi_New_Tight[nGoodTau_New_Tight]=tau_NoShift_New_Tight.Phi();
@@ -1764,7 +1782,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //
      //
      if ( (PassTauID_New_Medium(tau)==true) ) {
-       tau_NoShift_New_Medium=tau_NoESCorr*TES;       
+       tau_NoShift_New_Medium=tau_NoESCorr;//*TES;       
        if (PassTauAcceptance(tau_NoShift_New_Medium)==true) {
 	 tau_pt_New_Medium[nGoodTau_New_Medium]=tau_NoShift_New_Medium.Pt();
 	 tau_phi_New_Medium[nGoodTau_New_Medium]=tau_NoShift_New_Medium.Phi();
@@ -1774,7 +1792,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //
      //
      if ( (PassTauID_New_Loose(tau)==true) ) {
-       tau_NoShift_New_Loose=tau_NoESCorr*TES;       
+       tau_NoShift_New_Loose=tau_NoESCorr;//*TES;       
        if (PassTauAcceptance(tau_NoShift_New_Loose)==true) {
 	 tau_pt_New_Loose[nGoodTau_New_Loose]=tau_NoShift_New_Loose.Pt();
 	 tau_phi_New_Loose[nGoodTau_New_Loose]=tau_NoShift_New_Loose.Phi();
@@ -1784,7 +1802,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //
      //
      if ( (PassTauID_New_VLoose(tau)==true) ) {
-       tau_NoShift_New_VLoose=tau_NoESCorr*TES;       
+       tau_NoShift_New_VLoose=tau_NoESCorr;//*TES;       
        if (PassTauAcceptance(tau_NoShift_New_VLoose)==true) {
 	 tau_pt_New_VLoose[nGoodTau_New_VLoose]=tau_NoShift_New_VLoose.Pt();
 	 tau_phi_New_VLoose[nGoodTau_New_VLoose]=tau_NoShift_New_VLoose.Phi();
@@ -1797,7 +1815,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        // std::cout << "This Tau passed ID " << std::endl;
        //define Tau energy scale
        //       float TES = 0.982 ;
-       tau_NoShift=tau_NoESCorr*TES;       
+       tau_NoShift=tau_NoESCorr;//*TES;       
        tau_ScaleUp=tau_NoShift*tauScaleShiftUp;
        tau_ScaleDown=tau_NoShift*tauScaleShiftDown;
              
@@ -1869,7 +1887,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    }
 
-   //    std::cout << "nGoodTau=" << nGoodTau << std::endl;
+   //     std::cout << "nGoodTau=" << nGoodTau << std::endl;
    // In each event, the tau-ID scale factor is obtained using the first good tau //
    // This should be fine because in the end we select events with one good tau //
    if (!RunOnData) {
@@ -2086,7 +2104,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    //---------------//
    //---Selection---//
    //---------------//
-   //   std::cout << "Proceed to selection cuts " << std::endl;
+   // std::cout << "Proceed to selection cuts " << std::endl;
    if (passTauTrig && passAllMETFilters ) {
      if ( (nvtx>0) && (nTightMu==0) && (nLooseEle==0) ) {
        //std::cout << "pt=" << tau_pt[0] << " met=" << met_val  <<   " pToverEtMiss_S2=" << pToverEtMiss_S2 << std::endl;
@@ -2107,6 +2125,13 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
        //
        //** Stage1 = final stage (all cuts applied) **//
+       //
+
+       // Old_Medium //
+       if ( (PassFinalCuts(nGoodTau_Old_Medium, met_val,met_phi,tau_pt_Old_Medium[0],tau_phi_Old_Medium[0]) == true) ) {
+	 double MT_Old_Medium=  sqrt(2*tau_pt_Old_Medium[0]*met_val*(1- cos(dphi_tau_met)));
+	 h1_MT_Old_Medium_Stage1->Fill(MT_Old_Medium,final_weight);
+       }
        //
 
        // Old_VLoose //
@@ -2504,8 +2529,13 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    //if (not RunOnData)
    tauGenMatchMap.clear();
    tauGenMatchMapAllFlav.clear();
-   //std::cout << "Call QCDAnalyseTau" << std::endl;
-   if (passEleTrig || passMuonTrig)  QCDAnalyseTau(met,final_weight,pruned);
+   //std::cout << "passEleTrig , passMuonTrig " << passEleTrig << " , " << passMuonTrig << std::endl; 
+    
+   if (passEleTrig || passMuonTrig) {
+     QCDAnalyseTau(met,final_weight,pruned);
+     //std::cout << "Call QCDAnalyseTau" << std::endl;
+ 
+   }
    //if(tau_NoShift.Pt()>80 && calcMT(tau_NoShift,met)>50){
    iEvent.getByToken(jetToken_, jets);
 
@@ -2602,7 +2632,7 @@ double MiniAODAnalyzer::GetTauIDScaleFactorUncert(double tauSF, double tau_pt, s
 bool MiniAODAnalyzer::PassFinalCuts(int nGoodTau_, double met_val_,double met_phi_,double tau_pt_,double tau_phi_) {
   bool passed=false;
   if (nGoodTau_==1) {
-    if ( met_val_>200 ) {
+    if ( met_val_>200 && tau_pt_>80.0) {
       dphi_tau_met = deltaPhi(tau_phi_,met_phi_);
       pToverEtMiss=tau_pt_/met_val_ ;
       if (pToverEtMiss>0.7 && pToverEtMiss<1.3) {
@@ -2620,7 +2650,7 @@ bool MiniAODAnalyzer::PassFinalCuts(int nGoodTau_, double met_val_,double met_ph
 bool MiniAODAnalyzer::PassFinalCuts_Except_dphiTauMET(int nGoodTau_, double met_val_,double met_phi_,double tau_pt_,double tau_phi_) {
   bool passed=false;
   if (nGoodTau_==1) {
-    if ( met_val_>200 ) {
+    if ( met_val_>200  && tau_pt_>80.0) {
       dphi_tau_met = deltaPhi(tau_phi_,met_phi_);
       pToverEtMiss=tau_pt_/met_val_ ;
       if (pToverEtMiss>0.7 && pToverEtMiss<1.3) {
@@ -2634,7 +2664,7 @@ bool MiniAODAnalyzer::PassFinalCuts_Except_dphiTauMET(int nGoodTau_, double met_
 bool MiniAODAnalyzer::PassFinalCuts_Except_pToverEtMiss(int nGoodTau_, double met_val_,double met_phi_,double tau_pt_,double tau_phi_) {
   bool passed=false;
   if (nGoodTau_==1) {
-    if ( met_val_>200 ) {
+    if ( met_val_>200  && tau_pt_>80.0) {
       dphi_tau_met = deltaPhi(tau_phi_,met_phi_);
       pToverEtMiss=tau_pt_/met_val_ ;
       if (fabs(dphi_tau_met)>2.4) {
@@ -2734,7 +2764,7 @@ bool MiniAODAnalyzer::FindTauIDEfficiency(const edm::Event& iEvent, TLorentzVect
 
 bool MiniAODAnalyzer::PassTauID(const pat::Tau &tau)
 {
-  return  PassTauID_Old_Medium(tau);
+  return  PassTauID_Old_VLoose(tau);
 }
 
 bool MiniAODAnalyzer::PassTauID_Old_Medium(const pat::Tau &tau)
@@ -3819,7 +3849,7 @@ void MiniAODAnalyzer::SetUpDisc(){
     d_mydisc_mu->push_back("isGlobalMuon");
     d_mydisc_mu->push_back("isTrackerMuon");
     d_mydisc_mu->push_back("isStandAloneMuon");
-    d_mydisc_mu->push_back("isTightMuon");
+    d_mydisc_mu->push_back("isLooseMuon");
     d_mydisc_mu->push_back("isHighPtMuon");
 }
 
@@ -4149,7 +4179,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
 //void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met) {
 
     double ptTauTreshold=80;
-    double m_leptonVetoPt=30;
+    double m_leptonVetoPt=20;
     double vetoConeSize=0.3;
     //int numVetoMuo=vetoNumberMuon(MuonList, m_leptonVetoPt,TauList,vetoConeSize);
     int numVetoMuo=vetoNumberMuon(m_leptonVetoPt,vetoConeSize);
@@ -4300,7 +4330,8 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
 	      
 	      if (doTrees) helper->Tree_Filler("fakeTree");
 	      if(PassTauID_NonIsolated(tau)){
-		//	std::cout << "Non-isolated tau, fill tau_fake_pt 0" << std::endl;
+		//std::cout << "*****" << std::endl;
+		//std::cout << "Non-isolated tau, fill tau_fake_pt 0" << std::endl;
 		if (doFakeHist) helper->Fill(0,"Tau_fake_pt",tau.pt(),weight);
 		if(muonBool) {
 		  // std::cout << "muonBool True, fill tau_fake_pt 1" << std::endl;
@@ -4316,16 +4347,21 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
 		if (doFakeHist)  helper->Fill( "Tau_fake_pt_decay",tau.pt(),tau.decayMode(),weight );
 		
 		if(not RunOnData and (GetTruthMatch("Tau",tau)!=0)){
+		  //std::cout << "filling true histograms" << std::endl;
 		  if(muonBool) {
 		    //  std::cout << "Truth-matched" << std::endl;
 		    if (doFakeHist) helper->Fill(1,"Tau_fake_pt_true",muoCandi.pt(),weight);
 		  }
+
 		  if (doFakeHist) helper->Fill(3,"Tau_fake_pt_true",tau.pt(),weight);
+
 		  if(eleBool) {
 		    if (doFakeHist)  helper->Fill(2,"Tau_fake_pt_true",eleCandi.pt(),weight);
 		  }
 		  if (doFakeHist)  helper->Fill(4,"Tau_fake_pt_true",tau.pt(),weight);
+
 		  if (doFakeHist)  helper->Fill(0,"Tau_fake_pt_true",tau.pt(),weight);
+
 		  if (doFakeHist)  helper->Fill( "Tau_fake_pt_eta_true",tau.pt(),tau.eta(),weight );
 		  if (doFakeHist)  helper->Fill( "Tau_fake_pt_met_true",tau.pt(),sel_met.pt(),weight );
 		  if(tau.decayMode()){
@@ -4359,7 +4395,8 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
 		  }
 		}
 	      }else if(PassTauID(tau)){
-		//	std::cout << "passTauID, fill Tau_nofake_pt" << std::endl;
+		//std::cout << "*****" << std::endl;
+		//std::cout << "passTauID, fill Tau_nofake_pt" << std::endl;
 		if (doFakeHist)   helper->Fill(0,"Tau_nofake_pt",tau.pt(),weight);
 		if(muonBool) {
 		  if (doFakeHist)  helper->Fill(1,"Tau_nofake_pt",muoCandi.pt(),weight);
@@ -4466,6 +4503,7 @@ void MiniAODAnalyzer::QCDAnalyseTau( const pat::MET sel_met,double weight,edm::H
 
 //reco::GenParticle MiniAODAnalyzer::GetTruthMatch(std::string name, auto lepton) {
 reco::GenParticle* MiniAODAnalyzer::GetTruthMatch(std::string name, auto lepton) {
+  // std::cout << "Inside GetTruthMatch" << std::endl;
     if (tauGenMatchMap.end()  !=tauGenMatchMap.find(&lepton)){
         return tauGenMatchMap[&lepton];
     }
@@ -4482,33 +4520,36 @@ reco::GenParticle* MiniAODAnalyzer::GetTruthMatch(std::string name, auto lepton)
     reco::GenParticle* gen_match=0;
 
     for (auto part_i: *pruned){
+      //      if (TMath::Abs(part_i.pdgId()) == 15) std::cout << "Tau " << part_i.pdgId() << std::endl;
         if (part_temp_id != (TMath::Abs(part_i.pdgId())) ) continue;
         double test_delta_r = DeltaR(lepton,part_i);
-	// std::cout << "delta r " << test_delta_r << std::endl;
+	//	std::cout << "delta r " << test_delta_r << std::endl;
         if (test_delta_r < temp_delta_r) {
             temp_delta_r = test_delta_r;
             gen_match = (&part_i);
         }
     }
+    /*
     if (gen_match){
-        //std::cout << "found something "
-                //<<"\n delta r" << temp_delta_r
-                 //<<  " gen_match " << gen_match
-                 //<< " pt of gen_match " << gen_match->pt()
-                 //<< " pt of lepton " << lepton.pt()
-                 //<< " eta of gen_match " << gen_match->eta()
-                 //<< " eta of lepton " << lepton.eta()
-        //<< std::endl;
-    }
-    else {
+        std::cout << "found something "
+                <<"\n delta r" << temp_delta_r
+                 <<  " gen_match " << gen_match
+                 << " pt of gen_match " << gen_match->pt()
+                 << " pt of lepton " << lepton.pt()
+                 << " eta of gen_match " << gen_match->eta()
+                 << " eta of lepton " << lepton.eta()
+        << std::endl;
+	}*/
+    // else {
         //std::cout << "found nothing "
                   //<<  "\n delta r " << temp_delta_r
                  //<< " pt of lepton " << lepton.pt()
                  //<< " eta of lepton " << lepton.eta()
         //<< std::endl;
-    }
+    // }
 
     tauGenMatchMap[&lepton]=gen_match;
+    // std::cout << "returning " << tauGenMatchMap[&lepton] << std::endl;
     return tauGenMatchMap[&lepton];
 }
 reco::GenParticle* MiniAODAnalyzer::GetTruthMatchAllFlavor(auto lepton) {
