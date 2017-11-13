@@ -74,6 +74,7 @@
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <fstream>
+#include "TProfile.h"
 
 //#include "stdlib.h"
 // cant set lorentzvetor branch without this
@@ -112,8 +113,10 @@ private:
   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
   virtual void endJob() override;
   virtual void beginRun( edm::Run const &iRun, edm::EventSetup const &iSetup ) override;
+
+  float DRTauMu(TLorentzVector, std::vector<TLorentzVector>);
+
   bool PassTauID(const pat::Tau &tau);
-  
   bool PassTauID_Old_VLoose(const pat::Tau &tau);
   bool PassTauID_Old_Loose(const pat::Tau &tau);
   bool PassTauID_Old_Medium(const pat::Tau &tau);
@@ -132,6 +135,7 @@ private:
   bool PassTauID_NonIsolated(const pat::Tau &tau);
   bool PassTauID_NonIsolated(const pat::Tau &tau, std::string idcheck);
   bool PassTauAcceptance(TLorentzVector tau);
+  bool PassTauAcceptanceForCR(TLorentzVector tau);
   bool PassTauAcceptanceForTrigEff(TLorentzVector tau); 
   bool FindTauIDEfficiency(const edm::Event&,TLorentzVector gen_p4);
   bool FindTauTrigEfficiency(bool passRefTrigger, bool passAnaTrigger, int nTau, double met, double tauPt, double tauEta);
@@ -320,7 +324,7 @@ private:
 
   //trigger for ele + muon
   bool passEleTrig=false;
-  bool passMuonTrig=false;
+  bool passMuonTrig;
   bool passMuonTrig_ForEff=false;
 
   //reweighting stuff
@@ -375,6 +379,26 @@ private:
   bool doPDFuncertainty;
   std::string generatorName_;
   int debugLevel;
+  //
+  //CONTROL region 
+  //
+  TProfile* hprof_taueta_dRtaumu; 
+  TH2F* h2_taueta_dRtaumu;
+  TH1F* h1_recoil_CR;
+  TH1F* h1_MT_CR;
+  TH1F* h1_tauPt_CR;
+  TH1F* h1_tauPhi_CR;
+  TH1F* h1_tauEta_CR;
+  TH1F* h1_dimuonMass_CR;
+  TH1F* h1_dimuonPt_CR;
+  TH1F* h1_original_MET_CR;
+  // 
+  TH1F* h1_TauCharge_CR;
+  TH1F* h1_TauDxy_CR;
+  TH1F* h1_TauChIso_CR;
+  TH1F* h1_TauNeuIso_CR;
+  TH1F* h1_TauNTrack_CR;
+  //
   TH1I *h1_EventCount;
   TH1I *h1_EventCount2;
   TH1F *h1_genMTT;
@@ -639,6 +663,7 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   sourceFileString=iConfig.getParameter<std::string>("sourceFileString");
   useReweighting=iConfig.getParameter<bool>("useReweighting");
   TFileDirectory histoDir = fs->mkdir("histoDir");
+  TFileDirectory controlDir = fs->mkdir("controlDir");
   /////  if (isPowheg) lheString = "source" ;
 
   h1_EventCount = histoDir.make<TH1I>("eventCount", "EventCount", 10, 0, 10);
@@ -679,6 +704,10 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   // h1_TauEta_reco = histoDir.make<TH1F>("tauEta_reco", "TauEta_reco", 48, -2.4, 2.4);
   // h1_TauEta_goodreco = histoDir.make<TH1F>("tauEta_goodreco", "TauEta_goodreco", 48, -2.4, 2.4);
   h1_TauPt_Stage1 = histoDir.make<TH1F>("tauPt_Stage1", "TauPt_Stage1", 1000, 0, 4000);
+  h1_tauPt_CR = controlDir.make<TH1F>("tauPt_CR", "TauPt_CR", 1000, 0, 4000);
+  h1_dimuonPt_CR = controlDir.make<TH1F>("dimuonPt_CR", "dimuonPt_CR", 1000, 0, 4000);
+  h2_taueta_dRtaumu = controlDir.make<TH2F>("tauEta_dRtaumu",   "tauEta_dRtaumu", 48, -2.4, 2.4, 500, 0, 5)  ;
+  hprof_taueta_dRtaumu = controlDir.make<TProfile>("profile_tauEta_dRtaumu",   "prof_tauEta_dRtaumu", 48, -2.4, 2.4, 0, 5)  ;
   //
   h1_TauPt_Stage1_NullDM = histoDir.make<TH1F>("tauPt_Stage1_null", "TauPt_Stage1_null", 1000, 0, 4000);
   h1_TauPt_Stage1_OneProngDM = histoDir.make<TH1F>("tauPt_Stage1_1prong", "TauPt_Stage1_1prong", 1000, 0, 4000);
@@ -687,12 +716,22 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_TauPt_Stage1_RareDM = histoDir.make<TH1F>("tauPt_Stage1_rare", "TauPt_Stage1_rare", 1000, 0, 4000);
   //
   h1_TauCharge_Stage1 = histoDir.make<TH1F>("tauCharge_Stage1", "TauCharge_Stage1", 5, -2.5, 2.5);
+  h1_TauCharge_CR = histoDir.make<TH1F>("tauCharge_CR", "TauCharge_CR", 5, -2.5, 2.5);
   h1_TauDxy_Stage1 = histoDir.make<TH1F>("tauDxy_Stage1", "TauDxy_Stage1", 1000, 0, 1);
   h1_TauChIso_Stage1 = histoDir.make<TH1F>("tauChIso_Stage1", "TauChIso_Stage1", 200, 0, 20);
   h1_TauNeuIso_Stage1 = histoDir.make<TH1F>("tauNeuIso_Stage1", "TauNeuIso_Stage1", 500, 0, 50);
   h1_TauNTrack_Stage1 = histoDir.make<TH1F>("tauNTrack_Stage1", "TauNTrack_Stage1", 50, -0.5, 49.5);
+  //
+  h1_TauDxy_CR = histoDir.make<TH1F>("tauDxy_CR", "TauDxy_CR", 1000, 0, 1);
+  h1_TauChIso_CR = histoDir.make<TH1F>("tauChIso_CR", "TauChIso_CR", 200, 0, 20);
+  h1_TauNeuIso_CR = histoDir.make<TH1F>("tauNeuIso_CR", "TauNeuIso_CR", 500, 0, 50);
+  h1_TauNTrack_CR = histoDir.make<TH1F>("tauNTrack_CR", "TauNTrack_CR", 50, -0.5, 49.5);
+  //
   h1_TauEta_Stage1 = histoDir.make<TH1F>("tauEta_Stage1", "TauEta_Stage1", 480, -2.4, 2.4);
+  h1_tauEta_CR = controlDir.make<TH1F>("tauEta_CR", "TauEta_CR", 480, -2.4, 2.4);
   h1_TauPhi_Stage1 = histoDir.make<TH1F>("tauPhi_Stage1", "TauPhi_Stage1", 800, -4.0, 4.0);
+  h1_tauPhi_CR = controlDir.make<TH1F>("tauPhi_CR", "TauPhi_CR", 800, -4.0, 4.0);
+
   //
   h1_TauPhi_Stage1_NullDM = histoDir.make<TH1F>("tauPhi_Stage1_null", "TauPhi_Stage1_null", 800, -4.0, 4.0);
   h1_TauPhi_Stage1_OneProngDM = histoDir.make<TH1F>("tauPhi_Stage1_1prong", "TauPhi_Stage1_1prong", 800, -4.0, 4.0);
@@ -727,6 +766,7 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_MET_Stage1_ThreeProngDM = histoDir.make<TH1F>("met_Stage1_3prong", "MET_Stage1_3prong", nbinMT, xlowMT, xupMT);
   h1_MET_Stage1_RareDM = histoDir.make<TH1F>("met_Stage1_rare", "MET_Stage1_rare", nbinMT, xlowMT, xupMT);
   //
+  h1_MT_CR = controlDir.make<TH1F>("mT_CR", "MT_CR", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1 = histoDir.make<TH1F>("mT_Stage1", "MT_Stage1", nbinMT, xlowMT, xupMT);
   h1_MT_Stage1_tauID_SF_other = histoDir.make<TH1F>("mT_Stage1_tauID_SF_other", "MT_Stage1_tauID_SF_other", nbinMT, xlowMT, xupMT);
   //
@@ -743,7 +783,9 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
    h1_MT_Old_Tight_Stage1 = histoDir.make<TH1F>("mT_Old_Tight_Stage1", "MT_Stage1_Old_Tight", nbinMT, xlowMT, xupMT);
   h1_MT_Old_VTight_Stage1 = histoDir.make<TH1F>("mT_Old_VTight_Stage1", "MT_Stage1_Old_VTight", nbinMT, xlowMT, xupMT);
   //
-
+  h1_dimuonMass_CR = controlDir.make<TH1F>("diMuMass", "mumu_mass", 400, 0, 200);
+  h1_recoil_CR=controlDir.make<TH1F>("recoil_CR", "hist_recoil_CR", nbinMT, xlowMT, xupMT);
+  h1_original_MET_CR = controlDir.make<TH1F>("original_MET_CR", "MET_original_CR", nbinMT, xlowMT, xupMT);
   h1_MET_Stage1 = histoDir.make<TH1F>("met_Stage1", "MET_Stage1", nbinMT, xlowMT, xupMT);
   h1_MET_phi_Stage1 = histoDir.make<TH1F>("met_phi_stage1", "MET_phi_Stage1", 800, -4.0, 4.0);
   //h1_MET_Stage1
@@ -966,11 +1008,11 @@ void MiniAODAnalyzer::beginRun( edm::Run const &iRun, edm::EventSetup const &iSe
 	  if( ( iter->tag() ).compare( tag_ ) == 0 ) {
 	    weight_lines = iter->lines();
 	  }
-	  if (debugLevel>3) {
+	   if (debugLevel>3) {
 	    for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
 	      std::cout   << "LINE " << lines.at(iLine);
 	    }
-	  }
+	    }
 	}
 	int pdfidx = 0;
 	pdfidx = run->heprup().PDFSUP.first;
@@ -1105,7 +1147,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //------//
   Run   = iEvent.id().run();
   Event = iEvent.id().event();
- std::cout << "\n\n --EVENT-- " << Event << std::endl;
+  // std::cout << "\n --EVENT-- " << Event << std::endl;
 
   edm::Handle<LHEEventProduct> EvtHandle ;
   if  ( !(RunOnData) ) {
@@ -1355,34 +1397,37 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
    bool passTauTrig=0;
-   //std::cout << "=== TRIGGER PATHS === " << std::endl;
+   passMuonTrig=0;
+
+   //   std::cout << "=== TRIGGER PATHS === " << std::endl;
    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
      
-     //     if (triggerBits->accept(i)==true ) { 
-     //    std::cout << "Trigger " << names.triggerName(i) <<
+     //         if (triggerBits->accept(i)==true ) { 
+     //  std::cout << "Trigger " << names.triggerName(i) <<
      //	 ", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
-     //	 ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)")
+     // ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)")
      //		 << std::endl;
-     //  }
+     // }
      if ( (names.triggerName(i)).find("HLT_LooseIsoPFTau50_Trk30_eta2p1_MET90") != std::string::npos ) {
        //  std::cout << names.triggerName(i) << " "  << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
        passTauTrig=triggerBits->accept(i) ;
        // std::cout << "passTauTrig=" << passTauTrig << std::endl;
      }
-     if ( (names.triggerName(i)).find("HLT_IsoMu22_eta2p1") != std::string::npos or
-          (names.triggerName(i)).find("HLT_IsoTkMu22_eta2p1") != std::string::npos or
-          (names.triggerName(i)).find("HLT_IsoMu22") != std::string::npos or
-          (names.triggerName(i)).find("HLT_IsoTkMu22") != std::string::npos or
-          (names.triggerName(i)).find("HLT_IsoMu24") != std::string::npos or
-          (names.triggerName(i)).find("HLT_IsoTkMu24") != std::string::npos or
-          (names.triggerName(i)).find("HLT_IsoMu24_eta2p1") != std::string::npos or
-          (names.triggerName(i)).find("HLT_IsoTkMu24_eta2p1") != std::string::npos or
-          (names.triggerName(i)).find("HLT_IsoMu27") != std::string::npos or
-          (names.triggerName(i)).find("HLT_IsoTkMu27") != std::string::npos or
-          (names.triggerName(i)).find("HLT_Mu45_eta2p1") != std::string::npos or
-	  (names.triggerName(i)).find("HLT_50") != std::string::npos or
-          (names.triggerName(i)).find("HLT_TkMu50") != std::string::npos
-     ) {
+     if ( 
+	 //(names.triggerName(i)).find("HLT_IsoMu22_eta2p1") != std::string::npos or
+	 //(names.triggerName(i)).find("HLT_IsoTkMu22_eta2p1") != std::string::npos or
+	 //(names.triggerName(i)).find("HLT_IsoMu22") != std::string::npos or
+	 //(names.triggerName(i)).find("HLT_IsoTkMu22") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoMu24_v") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoTkMu24_v") != std::string::npos or 
+	  (names.triggerName(i)).find("HLT_IsoMu24_eta2p1_v") != std::string::npos or
+          (names.triggerName(i)).find("HLT_IsoTkMu24_eta2p1_v") != std::string::npos or
+	  (names.triggerName(i)).find("HLT_IsoMu27_v") != std::string::npos or
+	  (names.triggerName(i)).find("HLT_IsoTkMu27_v") != std::string::npos or
+          //(names.triggerName(i)).find("HLT_Mu45_eta2p1") != std::string::npos or
+	  (names.triggerName(i)).find("HLT_Mu50_v") != std::string::npos or
+          (names.triggerName(i)).find("HLT_TkMu50_v") != std::string::npos
+	  ) {
        passMuonTrig=triggerBits->accept(i) ;
        if (passMuonTrig==true) break;
      }
@@ -1425,7 +1470,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    }
 
   //   if (!RunOnData) passTauTrig=1;
-  std::cout << "RunOnData=" << RunOnData <<  " ## passTauTrig=" << passTauTrig << std::endl;
+  //std::cout << "RunOnData=" << RunOnData <<  " ## passTauTrig=" << passTauTrig << std::endl;
 
    //---Trigger MET---//
    edm::Handle<edm::TriggerResults> triggerBits_MET;
@@ -1536,19 +1581,24 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //       printf("muon with pt %4.1f, dz(PV) %+5.3f, POG loose id %d, tight id %d\n",
      //     mu.pt(), mu.muonBestTrack()->dz(PV.position()), mu.isLooseMuon(), mu.isTightMuon(PV));
    }
-   std::cout << "nTightMu=" << nTightMu << std::endl;
+   //std::cout << "nTightMu=" << nTightMu << std::endl;
 
-  mass=-99.0;
-
+   float mass=0.0;
+   float pTz=0.0;
+   float PX_z=0.0;
+   float PY_z=0.0;
+   //float PZ_z=0.0;
+   float E_z=0.0;
+   // float Phi_z=0;
    // Control region for fake tau background validation //
    //   int nTightMu=0;
    //edm::Handle<pat::MuonCollection> muons;  ///in header now
-
    //   edm::Handle<std::vector<pat::Muon>>  muonHandle;
+
    //iEvent.getByToken(muonToken_, muons);
    for (std::vector<pat::Muon>::const_iterator iMu = muons->begin(); iMu != muons->end(); ++iMu) {
      for (std::vector<pat::Muon>::const_iterator jMu = iMu+1; jMu != muons->end(); ++jMu) {
-        if (iMu->pt()>20.0 && jMu->pt()>20.0 ) {
+        if (iMu->pt()>10.0 && jMu->pt()>10.0 ) {
           if ( fabs(iMu->eta())<2.4 && fabs(jMu->eta())<2.4 ) {
             if ( (iMu->charge())*(jMu->charge())<0 ) {
               if ( (iMu->isLooseMuon()) && (jMu->isLooseMuon()) ) { 
@@ -1557,7 +1607,15 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 		  mu1.SetPxPyPzE(iMu->px(), iMu->py(), iMu->pz(), iMu->energy());
 		  mu2.SetPxPyPzE(jMu->px(), jMu->py(), jMu->pz(), jMu->energy());
 		  TLorentzVector diMuon=mu1+mu2;
-
+		  if (diMuon.M()>mass)   {
+		    mass=diMuon.M();
+                     pTz=diMuon.Pt();   
+                     PX_z=diMuon.Px();
+		     PY_z=diMuon.Py();
+	             //PZ_z=diMuon.Pz();
+		     E_z=diMuon.E();	
+		     //Phi_z=diMuon.Phi();
+                  }	
                 }
               }
            }
@@ -1567,8 +1625,26 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      }
    }
 
- 
+   std::vector<TLorentzVector> v_muon;
+   for (std::vector<pat::Muon>::const_iterator iiMu = muons->begin(); iiMu != muons->end(); ++iiMu) {
+     if (iiMu->pt()>10.0 ) {
+       if ( fabs(iiMu->eta())<2.4 ) {
+	 if ( (iiMu->isLooseMuon()) ) { 
+	   if ( ((iiMu->isolationR03().sumPt/iiMu->pt())<0.10) ) { 
+	     TLorentzVector mui1;
+	     mui1.SetPxPyPzE(iiMu->px(), iiMu->py(), iiMu->pz(), iiMu->energy());
+	     v_muon.push_back(mui1);
+	   }	
+	 }
+       }
+     }
+   }
+   
 
+
+//std::cout << "dimuon mass = " << mass << " dimuon pt=" << pTz << std::endl; 
+//std::cout << "dimuon px=" << PX_z << " py=" << PY_z << " pz=" << PZ_z << " E=" << E_z << std::endl; 
+//   std::cout << "dimuon phi = " << Phi_z << std::endl;
 
    edm::Handle<edm::ValueMap<bool> > ele_id_decisions;
    iEvent.getByToken(eleIdMapToken_ ,ele_id_decisions);
@@ -1588,7 +1664,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        EleIDPassed->push_back(1);}
      else {EleIDPassed->push_back(0);}
    }
-  std::cout << "nLooseEle=" << nLooseEle << std::endl;
+  //std::cout << "nLooseEle=" << nLooseEle << std::endl;
 
    //
    /*
@@ -1599,20 +1675,19 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    int tau_Null[10] = {0};
    */
    int tau_DM[10]={0};
+   //   int tau_DM_CR[10]={0};
    int nGoodTau=0;
-
+   int nGoodTauCR=0;
    int nGoodTau_Old_Medium=0;
    int nGoodTau_Old_VLoose=0;
    int nGoodTau_Old_Loose=0;
    int nGoodTau_Old_VTight=0;
    int nGoodTau_Old_Tight=0;
-
    int nGoodTau_New_VLoose=0;
    int nGoodTau_New_Medium=0;
    int nGoodTau_New_Loose=0;
    int nGoodTau_New_VTight=0;
    int nGoodTau_New_Tight=0;
-
    int nGoodTau_decay= 0;
    int nGoodTau_acc= 0;
    int nGoodTau_decay_iso=0;
@@ -1622,46 +1697,52 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    double tau_pt[10]={0};
    double tau_phi[10]={0};
+   double tau_pt_CR[10]={0};
 
+   double tau_px_CR[10]={0};
+   double tau_py_CR[10]={0};
+   double tau_pz_CR[10]={0};
+   double tau_E_CR[10]={0};
+
+   double tau_phi_CR[10]={0};
    double tau_pt_Old_Medium[10]={0};
    double tau_phi_Old_Medium[10]={0};
-
    double tau_pt_Old_VLoose[10]={0};
    double tau_phi_Old_VLoose[10]={0};
-
    double tau_pt_Old_Loose[10]={0};
    double tau_phi_Old_Loose[10]={0};
-
    double tau_pt_Old_VTight[10]={0};
    double tau_phi_Old_VTight[10]={0};
-
    double tau_pt_Old_Tight[10]={0};
    double tau_phi_Old_Tight[10]={0};
-
    double tau_pt_New_VLoose[10]={0};
    double tau_phi_New_VLoose[10]={0};
-
    double tau_pt_New_Loose[10]={0};
    double tau_phi_New_Loose[10]={0};
-
    double tau_pt_New_Tight[10]={0};
    double tau_phi_New_Tight[10]={0};
-
    double tau_pt_New_VTight[10]={0};
    double tau_phi_New_VTight[10]={0};
-
    double tau_pt_New_Medium[10]={0};
    double tau_phi_New_Medium[10]={0};
 
-
    double tau_eta[10]={0};
+   double tau_eta_CR[10]={0};
+
    double tau_pt_trig[10]={0};
    double tau_eta_trig[10]={0};
+
    int tau_charge[10]={0};
    double tau_dxy[10]={0};
    int tau_nTrack[10]={0};
    double tau_chIso[10]={0};
    double tau_neuIso[10]={0};
+
+   int tau_charge_CR[10]={0};
+   double tau_dxy_CR[10]={0};
+   int tau_nTrack_CR[10]={0};
+   double tau_chIso_CR[10]={0};
+   double tau_neuIso_CR[10]={0};
 
    int nGoodTau_ScaleUp=0;
    double tau_pt_ScaleUp[10]={0};
@@ -1851,8 +1932,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        tau_NoShift=tau_NoESCorr;//*TES;       
        tau_ScaleUp=tau_NoShift*tauScaleShiftUp;
        tau_ScaleDown=tau_NoShift*tauScaleShiftDown;
-             
+       //std::cout << "\nID passed tau. Pt = " << tau_NoShift.Pt() << std::endl;             
        if (PassTauAcceptance(tau_NoShift)==true) {
+	 // std::cout << "accepted as analysis tau" << std::endl;
 	 //std::cout << "\nTau selected" << std::endl;
 	 tau_pt[nGoodTau]=tau_NoShift.Pt();
 	 tau_phi[nGoodTau]=tau_NoShift.Phi();
@@ -1862,13 +1944,29 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 tau_nTrack[nGoodTau]=tau.signalCands().size();
 	 tau_chIso[nGoodTau]=tau.tauID("chargedIsoPtSum");
 	 tau_neuIso[nGoodTau]=tau.tauID("neutralIsoPtSum");
-
-	 //	 std::cout << "Tau decaymode = " << tau.decayMode() << std::endl;
 	 tau_DM[nGoodTau] = tauDM;
-	 
-
 	 nGoodTau++;
-	 
+       }
+
+       if (PassTauAcceptanceForCR(tau_NoShift)==true) {
+	 //std::cout << "accepted as CR tau" << std::endl;
+	 //std::cout << "\nTau selected" << std::endl;
+	 tau_pt_CR[nGoodTauCR]=tau_NoShift.Pt();
+
+	 tau_px_CR[nGoodTauCR]=tau_NoShift.Px();
+	 tau_py_CR[nGoodTauCR]=tau_NoShift.Py();
+	 tau_pz_CR[nGoodTauCR]=tau_NoShift.Pz();
+	 tau_E_CR[nGoodTauCR]=tau_NoShift.Energy();
+
+	 tau_phi_CR[nGoodTauCR]=tau_NoShift.Phi();
+	 tau_eta_CR[nGoodTauCR]=tau_NoShift.Eta();
+	 tau_charge_CR[nGoodTauCR]=tau.charge();
+	 tau_dxy_CR[nGoodTauCR]=fabs(tau.dxy());
+	 tau_nTrack_CR[nGoodTauCR]=tau.signalCands().size();
+	 tau_chIso_CR[nGoodTauCR]=tau.tauID("chargedIsoPtSum");
+	 tau_neuIso_CR[nGoodTauCR]=tau.tauID("neutralIsoPtSum");
+	 //tau_DM_CR[nGoodTau] = tauDM;
+	 nGoodTauCR++;
        }
 
        //-Syst Up-//
@@ -1920,7 +2018,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    }
 
-   std::cout << "nGoodTau=" << nGoodTau << std::endl;
+   //std::cout << "nGoodTau=" << nGoodTau << std::endl;
    // In each event, the tau-ID scale factor is obtained using the first good tau //
    // This should be fine because in the end we select events with one good tau //
    if (!RunOnData) {
@@ -1980,6 +2078,26 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    const pat::MET &met = mets->front();
    double met_val=met.pt();
    double met_phi=met.phi();
+   float met_px=met.px();
+   float met_py=met.py();
+   float met_E=met.energy();
+   float recoil=0;
+   float recoil_phi=0;
+   //std::cout <<  "MET " << met.pt() << " GeV.  px=" << met.px() << " py=" << met.py() << " pz=" << met.pz() << " energy=" << met.energy() << std::endl;
+   // std::cout << "met_phi=" << met_phi << std::endl;
+   if (mass>0) {
+     TVector3 v1;  
+     v1.SetXYZ(PX_z+met_px,PY_z+met_py,E_z+met_E);	  
+     recoil=v1.Perp();
+     recoil_phi=v1.Phi();
+     //     std::cout << "recoil px2+py2 " <<   sqrt((PX_z+met_px)*(PX_z+met_px) + (PY_z+met_py)*(PY_z+met_py)) << std::endl;
+     //  std::cout << "recoil vector magnitude = " << v1.Mag() << std::endl;
+     // std::cout << "recoil vector perp = " << v1.Perp() << std::endl;
+     //std::cout << "met+Zpt scalar sum = " << met_val+pTz << std::endl;
+     
+   }
+   //   std::cout << "recoil phi = " << recoil_phi << std::endl;
+
    //-------------------------//
    //**--MET UNCERTAINTIES--**//
    //-------------------------//
@@ -2101,12 +2219,11 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      " kfak_up=" << k_fak_up <<
      " kfak_down=" << k_fak_down <<
      " tauID_SF=" << tauID_SF <<
-     " tauID_SF_up=" << tauID_SF_syst_up <<
-     " tauID_SF_down=" << tauID_SF_syst_down <<
+   //  " tauID_SF_up=" << tauID_SF_syst_up <<
+   //  " tauID_SF_down=" << tauID_SF_syst_down <<
      " tauELE_SF_up=" << tauELE_SF_syst_up <<
      " tauELE_SF_down=" << tauELE_SF_syst_down << std::endl;
    */
-
 
    if ((nGenTauJet==1))  h1_TauPt_Gen_den_reco->Fill(TauPt_Gen);
    if ((nGenTauJet==1) && (nGoodTau_acc>0))  h1_TauPt_Gen_num_reco->Fill(TauPt_Gen);
@@ -2133,7 +2250,48 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //        << " MET=" << met_val << std::endl;
      FindTauTrigEfficiency(passMuonTrig_ForEff, passTauTrig, nGoodTauTrig, met_val, tau_pt_trig[0], tau_eta_trig[0]);
      FindTauTrigEfficiency_Signal(passTauTrig, nGoodTauTrig, met_val, tau_pt_trig[0], tau_eta_trig[0]);
-   }   
+   }  
+
+////
+////// Define the control region ///////
+////
+//   std::cout << "===CONTROL REGION===  " << std::endl;
+//   std::cout << "pass trig and MET filters?" << std::endl;
+   if (passMuonTrig && passAllMETFilters ) {
+     if ( (nvtx>0) ) {
+       if (nGoodTauCR==1) {
+	 if (mass>80.0 && mass<100.0) {
+	   TLorentzVector my_control_tau;
+	   my_control_tau.SetPxPyPzE(tau_px_CR[0],tau_py_CR[0],tau_pz_CR[0],tau_E_CR[0]);
+	   float DR_tau_nearestMu = DRTauMu(my_control_tau, v_muon); 
+	   h2_taueta_dRtaumu->Fill(tau_eta_CR[0],DR_tau_nearestMu,final_weight);
+	   hprof_taueta_dRtaumu->Fill(tau_eta_CR[0],DR_tau_nearestMu,final_weight);
+	   //  std::cout << "DR_tau_nearestMu=" << DR_tau_nearestMu << std::endl;
+	   if (DR_tau_nearestMu>0.1) {
+	     h1_recoil_CR->Fill(recoil,final_weight);
+	     h1_tauPt_CR->Fill(tau_pt_CR[0],final_weight);
+	     h1_tauPhi_CR->Fill(tau_phi_CR[0],final_weight);
+	     h1_tauEta_CR->Fill(tau_eta_CR[0],final_weight);
+	     h1_dimuonMass_CR->Fill(mass,final_weight);
+	     h1_dimuonPt_CR->Fill(pTz,final_weight);
+	     h1_original_MET_CR->Fill(met_val,final_weight);
+	     //
+	     float dphi_tau_met_CR = deltaPhi(tau_phi_CR[0],recoil_phi);
+	     float MT_CR = sqrt(2*tau_pt_CR[0]*recoil*(1- cos(dphi_tau_met_CR)));
+	     h1_MT_CR->Fill(MT_CR,final_weight);
+	     //
+	     h1_TauCharge_CR->Fill(tau_charge_CR[0],final_weight);
+	     h1_TauDxy_CR->Fill(tau_dxy_CR[0],final_weight);
+	     h1_TauChIso_CR->Fill(tau_chIso_CR[0],final_weight);
+	     h1_TauNeuIso_CR->Fill(tau_neuIso_CR[0],final_weight);
+	     h1_TauNTrack_CR->Fill(tau_nTrack_CR[0],final_weight);
+	   }
+	 }
+       }
+     }
+   }
+
+ 
    //---------------//
    //---Selection---//
    //---------------//
@@ -2381,9 +2539,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	       }
 	       
 	       
-	       std::cout << "Evt selected. Size of alpha_s_container = " << alpha_s_container->size() << std::endl;
-	       std::cout << "alpha_s_container->at(0) = " << alpha_s_container->at(0) << std::endl;
-	       std::cout << "alpha_s_container->at(1) = " << alpha_s_container->at(1) << std::endl;
+	       //       std::cout << "Evt selected. Size of alpha_s_container = " << alpha_s_container->size() << std::endl;
+	       // std::cout << "alpha_s_container->at(0) = " << alpha_s_container->at(0) << std::endl;
+	       // std::cout << "alpha_s_container->at(1) = " << alpha_s_container->at(1) << std::endl;
 	       
 	       if ( alpha_s_container->size() != 0) {
 		 if  ( alpha_s_container->at(0) <= alpha_s_container->at(1) ) { 
@@ -2400,7 +2558,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
 	     final_weight_alpha_UP   = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_up * tauELE_SF ;
 	     final_weight_alpha_DOWN = Lumi_Wt * mc_event_weight * k_fak * tauID_SF * alpha_s_wt_down * tauELE_SF ;
-	     std::cout << "final_weight_alpha_UP = " << final_weight_alpha_UP << " final_weight_alpha_DOWN=" << final_weight_alpha_DOWN << std::endl;
+	     //	     std::cout << "final_weight_alpha_UP = " << final_weight_alpha_UP << " final_weight_alpha_DOWN=" << final_weight_alpha_DOWN << std::endl;
 	     
 	     h1_MT_Stage1_alphaUp->Fill(MT,final_weight_alpha_UP);
 	     h1_MT_Stage1_alphaDown->Fill(MT,final_weight_alpha_DOWN);
@@ -2608,8 +2766,15 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 #endif
 }
 
-
-
+float MiniAODAnalyzer::DRTauMu(TLorentzVector Tau, std::vector<TLorentzVector> MuonVect) {
+  float dR12=999.0;
+  int size=MuonVect.size();
+  for (int n=0; n<size; n++) {
+    float mydR12=Tau.DeltaR(MuonVect.at(n));
+    if (mydR12<dR12) dR12=mydR12;
+  }
+  return dR12;
+}
 
 double MiniAODAnalyzer::GetTauIDScaleFactor(double tau_pt, std::string mode) {
   double tauSF=1.0;
@@ -2993,6 +3158,19 @@ bool MiniAODAnalyzer::PassTauAcceptance(TLorentzVector tau) // For analysis //
   //  std::cout << "Inside PassTauAcceptance -> TAU pt=" << tau.Pt() << " energy=" << tau.Energy() << std::endl;
   //----pT----//
   if ( tau.Pt() < 50 ) passTauAcc_=false;
+
+  //----Eta----//
+  if ( fabs(tau.PseudoRapidity()) > 2.1 ) passTauAcc_=false;
+
+  return passTauAcc_;
+}
+
+bool MiniAODAnalyzer::PassTauAcceptanceForCR(TLorentzVector tau) // For analysis - Control Region //
+{
+  bool passTauAcc_=true;
+  //  std::cout << "Inside PassTauAcceptance -> TAU pt=" << tau.Pt() << " energy=" << tau.Energy() << std::endl;
+  //----pT----//
+  if ( tau.Pt() < 20 ) passTauAcc_=false;
 
   //----Eta----//
   if ( fabs(tau.PseudoRapidity()) > 2.1 ) passTauAcc_=false;
