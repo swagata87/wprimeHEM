@@ -117,7 +117,8 @@ private:
   float DRTauMu(TLorentzVector, std::vector<TLorentzVector>);
 
   bool PassTauID(const pat::Tau &tau);
-  bool PassTauID_Old_VLoose_noEleRej(const pat::Tau &tau);
+  bool PassTauID_noEleRej(const pat::Tau &tau);
+  bool PassTauID_noMuRej(const pat::Tau &tau);
   bool PassTauID_Old_VLoose(const pat::Tau &tau);
   bool PassTauID_Old_Loose(const pat::Tau &tau);
   bool PassTauID_Old_Medium(const pat::Tau &tau);
@@ -385,7 +386,14 @@ private:
   //CONTROL region 
   //
   TProfile* hprof_taueta_dRtaumu; 
+  TProfile* hprof_taueta_dRtaumu_pT_less_80; 
+  TProfile* hprof_taueta_dRtaumu_pT_80_140; 
+  TProfile* hprof_taueta_dRtaumu_pT_above_140; 
+
   TH2F* h2_taueta_dRtaumu;
+  TH2F* h2_taueta_dRtaumu_pT_less_80;
+  TH2F* h2_taueta_dRtaumu_pT_80_140;
+  TH2F* h2_taueta_dRtaumu_pT_above_140;
   //
   TH1F* h1_recoil_CR;
   TH1F* h1_tauPtOverMet_CR;
@@ -498,6 +506,12 @@ private:
   //
   TH1I *h1_EventCount;
   TH1I *h1_EventCount2;
+  TH1I *h1_EventCount_Stage1;
+  TH1I *h1_EventCount_Stage1_needEleSF;
+
+  TH1F* h1_dr_tau_ele;
+  TH1F* h1_dr_tau_mu;
+
   TH1F *h1_genMTT;
   TH1F *h1_TauPt_Gen_den;
   TH1F *h1_TauPt_Gen_den_reco;
@@ -537,6 +551,11 @@ private:
 
   // TH1F *h1_TauPt_goodreco;
   //  TH1F *h1_TauEta_goodreco;
+  TH2F *h2_IDfailEle_eta_pt_Stage1;
+
+  TH1F *h1_IDfailEle_eta_Stage1;
+  TH1F *h1_IDfailEle_pt_Stage1;
+
   TH1F *h1_TauPt_Stage1;
   TH1F *h1_TauCharge_Stage1;
   TH1F *h1_TauDxy_Stage1;
@@ -588,9 +607,14 @@ private:
   TH1F *h1_MT_New_Tight_Stage1;
   TH1F *h1_MT_New_VTight_Stage1;
 
+  TH1F *h1_MT_noEleRej_Stage1;
+  TH1F *h1_MT_noMuRej_Stage1;
   TH1F *h1_MT_Old_VLoose_Stage1;
   TH1F *h1_MT_Old_Medium_Stage1;
   TH1F *h1_MT_Old_Loose_Stage1;
+  TH1F *h1_MT_SR2;
+  TH1F *h1_MT_SR2_noEleRej;
+  TH1F *h1_MT_SR2_noMuRej;
   TH1F *h1_MT_Old_Tight_Stage1;
   TH1F *h1_MT_Old_VTight_Stage1;
 
@@ -772,6 +796,14 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   /////  if (isPowheg) lheString = "source" ;
 
   h1_EventCount = histoDir.make<TH1I>("eventCount", "EventCount", 10, 0, 10);
+  h1_EventCount2 = histoDir.make<TH1I>("eventCount2", "EventCount2", 10, 0, 10);
+
+  h1_EventCount_Stage1 = histoDir.make<TH1I>("eventCount_Stage1", "EventCount_Stage1", 10, 0, 10);
+  h1_EventCount_Stage1_needEleSF = histoDir.make<TH1I>("eventCount_Stage1_needEleSF", "EventCount_Stage1_needEleSF", 10, 0, 10);
+ 
+  h1_dr_tau_ele = histoDir.make<TH1F>("deltaR_tau_ele", "dR_tau_ele", 100, 0, 2);
+  h1_dr_tau_mu = histoDir.make<TH1F>("deltaR_tau_mu", "dR_tau_mu", 100, 0, 2);
+
   h1_nGenTau = histoDir.make<TH1I>("nGenTau", "nGenTau", 5, -0.5, 4.5);
   h1_nGoodTau_Reco = histoDir.make<TH1I>("nGoodTauReco", "nGoodTauReco", 5, -0.5, 4.5);
   //h1_genMTT
@@ -845,8 +877,21 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_tauPtOverMet_CR6 = controlDir.make<TH1F>("tauPtOverMet_CR6", "TauPtOverMet_CR6", 1000, 0, 10);
   h1_dPhiTauMet_CR6 = controlDir.make<TH1F>("dPhiTauMet_CR6", "DPhiTauMet_CR6", 800, -4.0, 4.0);
 
-  h2_taueta_dRtaumu = controlDir.make<TH2F>("tauEta_dRtaumu",   "tauEta_dRtaumu", 48, -2.4, 2.4, 500, 0, 5)  ;
-  hprof_taueta_dRtaumu = controlDir.make<TProfile>("profile_tauEta_dRtaumu",   "prof_tauEta_dRtaumu", 48, -2.4, 2.4, 0, 5)  ;
+  h1_IDfailEle_pt_Stage1  = histoDir.make<TH1F>("IDfailEle_pt_Stage1",  "IDfailEle_pt_Stage1",  400, 0, 4000);
+  h1_IDfailEle_eta_Stage1 = histoDir.make<TH1F>("IDfailEle_eta_Stage1", "IDfailEle_eta_Stage1", 100,  -2.5, 2.5);
+
+  h2_IDfailEle_eta_pt_Stage1 = histoDir.make<TH2F>("IDfailEle_eta_pt", "IDfailEle_eta_pt", 10, -2.5, 2.5, 400, 0, 4000) ;
+
+  h2_taueta_dRtaumu = controlDir.make<TH2F>("tauEta_dRtaumu",   "tauEta_dRtaumu", 44, -2.2, 2.2, 500, 0, 5)  ;
+  h2_taueta_dRtaumu_pT_less_80 = controlDir.make<TH2F>("tauEta_dRtaumu_pT_less_80",   "tauEta_dRtaumu_pT_less_80", 44, -2.2, 2.2, 500, 0, 5)  ;
+  h2_taueta_dRtaumu_pT_80_140 = controlDir.make<TH2F>("tauEta_dRtaumu_pT_80_140",   "tauEta_dRtaumu_pT_80_140", 44, -2.2, 2.2, 500, 0, 5)  ;
+  h2_taueta_dRtaumu_pT_above_140 = controlDir.make<TH2F>("tauEta_dRtaumu_pT_above_140",   "tauEta_dRtaumu_pT_above_140", 44, -2.2, 2.2, 500, 0, 5)  ;
+
+  hprof_taueta_dRtaumu = controlDir.make<TProfile>("profile_tauEta_dRtaumu",   "prof_tauEta_dRtaumu", 44, -2.2, 2.2, 0, 5)  ;
+  hprof_taueta_dRtaumu_pT_less_80 = controlDir.make<TProfile>("profile_tauEta_dRtaumu_pT_less_80",   "prof_tauEta_dRtaumu_pT_less_80", 44, -2.2, 2.2, 0, 5)  ;
+  hprof_taueta_dRtaumu_pT_80_140 = controlDir.make<TProfile>("profile_tauEta_dRtaumu_pT_80_140",   "prof_tauEta_dRtaumu_pT_80_140", 44, -2.2, 2.2, 0, 5)  ;
+  hprof_taueta_dRtaumu_pT_above_140 = controlDir.make<TProfile>("profile_tauEta_dRtaumu_pT_above_140",   "prof_tauEta_dRtaumu_pT_above_140", 44, -2.2, 2.2, 0, 5)  ;
+
   //
   h1_TauPt_Stage1_NullDM = histoDir.make<TH1F>("tauPt_Stage1_null", "TauPt_Stage1_null", 1000, 0, 4000);
   h1_TauPt_Stage1_OneProngDM = histoDir.make<TH1F>("tauPt_Stage1_1prong", "TauPt_Stage1_1prong", 1000, 0, 4000);
@@ -967,8 +1012,13 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   //
   h1_MT_Old_Medium_Stage1 = histoDir.make<TH1F>("mT_Old_Medium_Stage1", "MT_Stage1_Old_Medium", nbinMT, xlowMT, xupMT);
   h1_MT_Old_VLoose_Stage1 = histoDir.make<TH1F>("mT_Old_VLoose_Stage1", "MT_Stage1_Old_VLoose", nbinMT, xlowMT, xupMT);
+  h1_MT_noEleRej_Stage1 = histoDir.make<TH1F>("mT_noEleRej_Stage1", "MT_Stage1_noEleRej", nbinMT, xlowMT, xupMT);
+  h1_MT_noMuRej_Stage1 = histoDir.make<TH1F>("mT_noMuRej_Stage1", "MT_Stage1_noMuRej", nbinMT, xlowMT, xupMT);
   h1_MT_Old_Loose_Stage1 = histoDir.make<TH1F>("mT_Old_Loose_Stage1", "MT_Stage1_Old_Loose", nbinMT, xlowMT, xupMT);
-   h1_MT_Old_Tight_Stage1 = histoDir.make<TH1F>("mT_Old_Tight_Stage1", "MT_Stage1_Old_Tight", nbinMT, xlowMT, xupMT);
+  h1_MT_SR2 = histoDir.make<TH1F>("mT_SR2", "MT_SR2", nbinMT, xlowMT, xupMT);
+  h1_MT_SR2_noEleRej = histoDir.make<TH1F>("mT_SR2_noEleRej", "MT_SR2_noEleRej", nbinMT, xlowMT, xupMT);
+  h1_MT_SR2_noMuRej = histoDir.make<TH1F>("mT_SR2_noMuRej", "MT_SR2_noMuRej", nbinMT, xlowMT, xupMT);
+  h1_MT_Old_Tight_Stage1 = histoDir.make<TH1F>("mT_Old_Tight_Stage1", "MT_Stage1_Old_Tight", nbinMT, xlowMT, xupMT);
   h1_MT_Old_VTight_Stage1 = histoDir.make<TH1F>("mT_Old_VTight_Stage1", "MT_Stage1_Old_VTight", nbinMT, xlowMT, xupMT);
   //
   h1_dimuonMass_CR = controlDir.make<TH1F>("diMuMass", "mumu_mass", 400, 0, 200);
@@ -1680,9 +1730,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    }
 
   if (!RunOnData) {
-    trig_SF = 1.0;
-    trig_SF_syst_up = 1.1;
-    trig_SF_syst_down = 0.9;
+    trig_SF = 0.9;
+    trig_SF_syst_up = 0.99;
+    trig_SF_syst_down = 0.81;
    }
 
   //   if (!RunOnData) passTauTrig=1;
@@ -1781,13 +1831,14 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    //   std::cout << "Number of good vertices " << nvtx << std::endl;
 
 
-
+   TLorentzVector LooseMu(0,0,0,0);
    int nTightMu=0;
    iEvent.getByToken(muonToken_, muons);
    for (const pat::Muon &mu : *muons) {
      //https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2#Tight_Muon
      //     if ( (mu.pt()>20.0) &&  (abs(mu.eta())<2.4) && (mu.isLooseMuon(PV)) &&  ((mu.isolationR03().sumPt/mu.pt())<0.10) ) {
      if ( (mu.pt()>20.0) &&  (abs(mu.eta())<2.4) && (mu.isLooseMuon()) &&  ((mu.isolationR03().sumPt/mu.pt())<0.10) ) {
+       LooseMu.SetPxPyPzE(mu.px(),mu.py(),mu.pz(),mu.energy());
          nTightMu++;
          MuonIDPassed->push_back(1);}
      else {MuonIDPassed->push_back(0);}
@@ -1862,26 +1913,6 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 //std::cout << "dimuon px=" << PX_z << " py=" << PY_z << " pz=" << PZ_z << " E=" << E_z << std::endl; 
 //   std::cout << "dimuon phi = " << Phi_z << std::endl;
 
-   edm::Handle<edm::ValueMap<bool> > ele_id_decisions;
-   iEvent.getByToken(eleIdMapToken_ ,ele_id_decisions);
-
-   int nLooseEle=0;
-   iEvent.getByToken(electronToken_, electrons);
-   // for (const pat::Electron &el : *electrons) {
-   for (size_t i = 0; i < electrons->size(); ++i){
-     const auto el = electrons->ptrAt(i);
-     if (el->pt() < 5) continue;
-     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
-     //if ( (el.pt()>20) &&  ( abs(el.eta())<2.5 )  && (el.electronID("cutBasedElectronID-Spring15-25ns-V1-standalone-loose")>6) ){
-     bool isPassEleId  = (*ele_id_decisions)[el];
-     if ( (el->pt()>20) &&  ( abs(el->eta())<2.5 )  && isPassEleId ){
-       //     if ( (el.pt()>20) &&  ( abs(el.eta())<2.5 )  && (el.electronID("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose")>6) ){
-       nLooseEle++;
-       EleIDPassed->push_back(1);}
-     else {EleIDPassed->push_back(0);}
-   }
-  //std::cout << "nLooseEle=" << nLooseEle << std::endl;
-
    //
    /*
    int tau_OneProng[10] = {0};
@@ -1896,6 +1927,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    int nGoodTauCR=0;
    int nGoodTau_Old_Medium=0;
    int nGoodTau_Old_VLoose=0;
+   int nGoodTau_noEleRej=0;
+   int nGoodTau_noMuRej=0;
    int nGoodTau_Old_Loose=0;
    int nGoodTau_Old_VTight=0;
    int nGoodTau_Old_Tight=0;
@@ -1924,7 +1957,11 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    double tau_pt_Old_Medium[10]={0};
    double tau_phi_Old_Medium[10]={0};
    double tau_pt_Old_VLoose[10]={0};
+   double tau_pt_noEleRej[10]={0};
+   double tau_pt_noMuRej[10]={0};
    double tau_phi_Old_VLoose[10]={0};
+   double tau_phi_noEleRej[10]={0};
+   double tau_phi_noMuRej[10]={0};
    double tau_pt_Old_Loose[10]={0};
    double tau_phi_Old_Loose[10]={0};
    double tau_pt_Old_VTight[10]={0};
@@ -1980,6 +2017,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    TLorentzVector tau_NoShift_Old_Medium(0,0,0,0);
    TLorentzVector tau_NoShift_Old_VLoose(0,0,0,0);
+   TLorentzVector tau_NoShift_noEleRej(0,0,0,0);
+  TLorentzVector tau_NoShift_noMuRej(0,0,0,0);
    TLorentzVector tau_NoShift_Old_Loose(0,0,0,0);
    TLorentzVector tau_NoShift_Old_VTight(0,0,0,0);
    TLorentzVector tau_NoShift_Old_Tight(0,0,0,0);
@@ -2044,7 +2083,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      }
      // 
      //
-     if ( (PassTauID_Old_VLoose_noEleRej(tau)==true) ) {
+     if ( (PassTauID_Old_VLoose(tau)==true) ) {
        tau_NoShift_Old_VLoose=tau_NoESCorr;//*TES;       
        if (PassTauAcceptance(tau_NoShift_Old_VLoose)==true) {
 	 tau_pt_Old_VLoose[nGoodTau_Old_VLoose]=tau_NoShift_Old_VLoose.Pt();
@@ -2141,8 +2180,25 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 nGoodTau_New_VLoose++;
        }
      }
+   
+     if ( (PassTauID_noEleRej(tau) )==true)  {
+       tau_NoShift_noEleRej=tau_NoESCorr;//*TES;       
+       if (PassTauAcceptance(tau_NoShift_noEleRej)==true) {
+	 tau_pt_noEleRej[nGoodTau_noEleRej]=tau_NoShift_noEleRej.Pt();
+	 tau_phi_noEleRej[nGoodTau_noEleRej]=tau_NoShift_noEleRej.Phi();
+	 nGoodTau_noEleRej++;
+       }
+     }
+
+     if ( (PassTauID_noMuRej(tau) )==true)  {
+       tau_NoShift_noMuRej=tau_NoESCorr;//*TES;       
+       if (PassTauAcceptance(tau_NoShift_noMuRej)==true) {
+	 tau_pt_noMuRej[nGoodTau_noMuRej]=tau_NoShift_noMuRej.Pt();
+	 tau_phi_noMuRej[nGoodTau_noMuRej]=tau_NoShift_noMuRej.Phi();
+	 nGoodTau_noMuRej++;
+       }
+     }
      //
-     //     if ((     PassTauID_Old_VLoose_noEleRej(tau)==true ) ) {
      if ( (PassTauID(tau)==true) ) {
        // std::cout << "This Tau passed ID " << std::endl;
        //define Tau energy scale
@@ -2238,7 +2294,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
    }
 
-   //std::cout << "nGoodTau=" << nGoodTau << std::endl;
+   //   std::cout << "nGoodTau=" << nGoodTau << std::endl;
    // In each event, the tau-ID scale factor is obtained using the first good tau //
    // This should be fine because in the end we select events with one good tau //
    if (!RunOnData) {
@@ -2277,17 +2333,58 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     if (!RunOnData) {
 
       if ( fabs(tau_eta[0]) < 1.460) {
-	tauELE_SF =1.0; //1.32;
-	tauELE_SF_syst_up = 1.0;// 1.32+0.03;
-	tauELE_SF_syst_down = 1.0;//1.32-0.03;
+	tauELE_SF =1.32;
+	tauELE_SF_syst_up =  1.32+0.03;
+	tauELE_SF_syst_down = 1.32-0.03;
       }
       
       else if ( fabs(tau_eta[0]) >= 1.460) {
-	tauELE_SF = 1.0;//1.38;
-	tauELE_SF_syst_up =1.0;// 1.38+0.04;
-	tauELE_SF_syst_down = 1.0;//1.38-0.04;
+	tauELE_SF = 1.38;
+	tauELE_SF_syst_up = 1.38+0.04;
+	tauELE_SF_syst_down = 1.38-0.04;
       }
     }
+
+
+
+
+   edm::Handle<edm::ValueMap<bool> > ele_id_decisions;
+   iEvent.getByToken(eleIdMapToken_ ,ele_id_decisions);
+
+   TLorentzVector LooseEle(0,0,0,0);
+   int nLooseEle=0;
+   int nEleIDFail=0;
+   float IDfail_ele_pT[10]={0};
+   float IDfail_ele_eta[10]={0};
+
+   iEvent.getByToken(electronToken_, electrons);
+   // for (const pat::Electron &el : *electrons) {
+   //   std::cout << "\n***********electrons->size() = " << electrons->size() << std::endl;
+   for (size_t i = 0; i < electrons->size(); ++i){
+     const auto el = electrons->ptrAt(i);
+     if (el->pt() < 5) continue;
+     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
+     //if ( (el.pt()>20) &&  ( abs(el.eta())<2.5 )  && (el.electronID("cutBasedElectronID-Spring15-25ns-V1-standalone-loose")>6) ){
+     bool isPassEleId  = (*ele_id_decisions)[el];
+     //    std::cout << "pT=" << el->pt() << " eta=" << abs(el->eta()) << " idpass=" << isPassEleId << std::endl;
+     if ( (el->pt()>20) &&  ( abs(el->eta())<2.5 )  && !(isPassEleId) ){
+       IDfail_ele_pT[nEleIDFail]=el->pt();
+       IDfail_ele_eta[nEleIDFail]=el->eta();
+       nEleIDFail++;
+      }
+
+     //
+      if ( (el->pt()>20) &&  ( abs(el->eta())<2.5 )  && isPassEleId ){
+       //     if ( (el.pt()>20) &&  ( abs(el.eta())<2.5 )  && (el.electronID("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose")>6) ){
+      LooseEle.SetPxPyPzE(el->px(),el->py(),el->pz(),el->energy());
+       nLooseEle++;
+       EleIDPassed->push_back(1);}
+     else {EleIDPassed->push_back(0);}
+   }
+   //  std::cout << "nLooseEle=" << nLooseEle << std::endl;
+   if ( (nEleIDFail>0) && (nLooseEle==0) ) {
+     h1_EventCount2->Fill(1);
+   }
    
 
     ////// MET //////
@@ -2492,8 +2589,25 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 TLorentzVector my_control_tau;
 	 my_control_tau.SetPxPyPzE(tau_px_CR[0],tau_py_CR[0],tau_pz_CR[0],tau_E_CR[0]);
 	 float DR_tau_nearestMu = DRTauMu(my_control_tau, v_muon); 
+
 	 h2_taueta_dRtaumu->Fill(tau_eta_CR[0],DR_tau_nearestMu,final_weight);
 	 hprof_taueta_dRtaumu->Fill(tau_eta_CR[0],DR_tau_nearestMu,final_weight);
+
+	 if (tau_pt_CR[0]<80) {
+	   h2_taueta_dRtaumu_pT_less_80->Fill(tau_eta_CR[0],DR_tau_nearestMu,final_weight);
+	   hprof_taueta_dRtaumu_pT_less_80->Fill(tau_eta_CR[0],DR_tau_nearestMu,final_weight);
+	 }
+
+	 if (  (tau_pt_CR[0]>80) && (tau_pt_CR[0]<140) ) {
+	   h2_taueta_dRtaumu_pT_80_140->Fill(tau_eta_CR[0],DR_tau_nearestMu,final_weight);
+	   hprof_taueta_dRtaumu_pT_80_140->Fill(tau_eta_CR[0],DR_tau_nearestMu,final_weight);
+	 }
+
+	 if (tau_pt_CR[0]>140) {
+	   h2_taueta_dRtaumu_pT_above_140->Fill(tau_eta_CR[0],DR_tau_nearestMu,final_weight);
+	   hprof_taueta_dRtaumu_pT_above_140->Fill(tau_eta_CR[0],DR_tau_nearestMu,final_weight);
+	 }
+
 	 float dphi_tau_met_CR = deltaPhi(tau_phi_CR[0],recoil_phi);
 	 float MT_CR = sqrt(2*tau_pt_CR[0]*recoil*(1- cos(dphi_tau_met_CR)));
 	 float tauptovermet=tau_pt_CR[0]/recoil ;	     
@@ -2637,12 +2751,110 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    }
 
 
+
+   //---------------//
+   //---Selection---// VETO ele, mu ONLY if that is not matched with with
+   //---------------//
+   ///// name it SR2
+   // std::cout << "Proceed to selection cuts " << std::endl;
+ 
+   ///
+   //// tau ID (full) + veto additional ele and mu
+   ///
+   int nLooseEle_additional = nLooseEle;
+   int nLooseMu_additional = nTightMu;
+   if ( (nGoodTau==1) && (nLooseEle==1) ) {      
+     float dr_tau_ele=tau_NoShift.DeltaR(LooseEle);
+     // std::cout << "dr_tau_ele = " << dr_tau_ele << std::endl;
+     h1_dr_tau_ele->Fill(dr_tau_ele);
+     if (dr_tau_ele<0.5) {
+       nLooseEle_additional=0;
+     }
+   }
+   if ( (nGoodTau==1) && (nTightMu==1) ) {      
+     float dr_tau_mu=tau_NoShift.DeltaR(LooseMu);
+     // std::cout << "dr_tau_mu = " << dr_tau_mu << std::endl;
+     h1_dr_tau_mu->Fill(dr_tau_mu);
+     if (dr_tau_mu<0.5) {
+       nLooseMu_additional=0;
+     }
+   }
+   if (passTauTrig && passAllMETFilters ) {
+     if ( (nvtx>0) && (nLooseMu_additional==0) ) { 
+       if (nLooseEle_additional==0)  {
+	 if ( (PassFinalCuts(nGoodTau, met_val,met_phi,tau_pt[0],tau_phi[0]) == true) ) {
+	   double MT_SR2=  sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_tau_met)));
+	   h1_MT_SR2->Fill(MT_SR2,final_weight);
+	 }
+       }
+     }
+   }
+
+   ///
+   //// tau ID (no EleRej) + veto additional ele and mu
+   ///
+   int nLooseEle_additional_noEleRej = nLooseEle;
+   int nLooseMu_additional_noEleRej = nTightMu;
+   if ( (nGoodTau_noEleRej==1) && (nLooseEle==1) ) {      
+     float dr_tau_ele_noEleRej=tau_NoShift_noEleRej.DeltaR(LooseEle);
+      if (dr_tau_ele_noEleRej<0.5) {
+       nLooseEle_additional_noEleRej=0;
+     }
+   }
+   if ( (nGoodTau_noEleRej==1) && (nTightMu==1) ) {      
+     float dr_tau_mu_noEleRej=tau_NoShift_noEleRej.DeltaR(LooseMu);
+      if (dr_tau_mu_noEleRej<0.5) {
+       nLooseMu_additional_noEleRej=0;
+     }
+   }
+   if (passTauTrig && passAllMETFilters ) {
+     if ( (nvtx>0) && (nLooseMu_additional_noEleRej==0) ) { 
+       if (nLooseEle_additional_noEleRej==0)  {
+	 if ( (PassFinalCuts(nGoodTau_noEleRej, met_val,met_phi,tau_pt_noEleRej[0],tau_phi_noEleRej[0]) == true) ) {
+	   double MT_SR2_noEleRej=  sqrt(2*tau_pt_noEleRej[0]*met_val*(1- cos(dphi_tau_met)));
+	   h1_MT_SR2_noEleRej->Fill(MT_SR2_noEleRej,final_weight);
+	 }
+       }
+     }
+   }
+
+
+   ///
+   //// tau ID (no MuRej) + veto additional ele and mu
+   ///
+   int nLooseEle_additional_noMuRej = nLooseEle;
+   int nLooseMu_additional_noMuRej = nTightMu;
+   if ( (nGoodTau_noMuRej==1) && (nLooseEle==1) ) {      
+     float dr_tau_ele_noMuRej=tau_NoShift_noMuRej.DeltaR(LooseEle);
+      if (dr_tau_ele_noMuRej<0.5) {
+       nLooseEle_additional_noMuRej=0;
+     }
+   }
+   if ( (nGoodTau_noMuRej==1) && (nTightMu==1) ) {      
+     float dr_tau_mu_noMuRej=tau_NoShift_noMuRej.DeltaR(LooseMu);
+      if (dr_tau_mu_noMuRej<0.5) {
+       nLooseMu_additional_noMuRej=0;
+     }
+   }
+   if (passTauTrig && passAllMETFilters ) {
+     if ( (nvtx>0) && (nLooseMu_additional_noMuRej==0) ) { 
+       if (nLooseEle_additional_noMuRej==0)  {
+	 if ( (PassFinalCuts(nGoodTau_noMuRej, met_val,met_phi,tau_pt_noMuRej[0],tau_phi_noMuRej[0]) == true) ) {
+	   double MT_SR2_noMuRej=  sqrt(2*tau_pt_noMuRej[0]*met_val*(1- cos(dphi_tau_met)));
+	   h1_MT_SR2_noMuRej->Fill(MT_SR2_noMuRej,final_weight);
+	 }
+       }
+     }
+   }
+
+
+
    //---------------//
    //---Selection---//
    //---------------//
    // std::cout << "Proceed to selection cuts " << std::endl;
    if (passTauTrig && passAllMETFilters ) {
-     if ( (nvtx>0) && (nTightMu==0) && (nLooseEle==0) ) {
+     if ( (nvtx>0) && (nLooseMu_additional==0) && (nLooseEle_additional==0) ) {
        //std::cout << "pt=" << tau_pt[0] << " met=" << met_val  <<   " pToverEtMiss_S2=" << pToverEtMiss_S2 << std::endl;
 
        //
@@ -2674,6 +2886,20 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
        if ( (PassFinalCuts(nGoodTau_Old_VLoose, met_val,met_phi,tau_pt_Old_VLoose[0],tau_phi_Old_VLoose[0]) == true) ) {
 	 double MT_Old_VLoose=  sqrt(2*tau_pt_Old_VLoose[0]*met_val*(1- cos(dphi_tau_met)));
 	 h1_MT_Old_VLoose_Stage1->Fill(MT_Old_VLoose,final_weight);
+       }
+       //
+
+       // noEleRej //
+       if ( (PassFinalCuts(nGoodTau_noEleRej, met_val,met_phi,tau_pt_noEleRej[0],tau_phi_noEleRej[0]) == true) ) {
+	 double MT_noEleRej=  sqrt(2*tau_pt_noEleRej[0]*met_val*(1- cos(dphi_tau_met)));
+	 h1_MT_noEleRej_Stage1->Fill(MT_noEleRej,final_weight);
+       }
+       //
+
+       // noMuRej //
+       if ( (PassFinalCuts(nGoodTau_noMuRej, met_val,met_phi,tau_pt_noMuRej[0],tau_phi_noMuRej[0]) == true) ) {
+	 double MT_noMuRej=  sqrt(2*tau_pt_noMuRej[0]*met_val*(1- cos(dphi_tau_met)));
+	 h1_MT_noMuRej_Stage1->Fill(MT_noMuRej,final_weight);
        }
        //
 
@@ -2754,6 +2980,15 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	 h1_dPhi_tau_MET_Stage1->Fill(dphi_tau_met,final_weight);
 	 h1_pToverEtMiss_Stage1->Fill(pToverEtMiss,final_weight);
    
+	 h1_EventCount_Stage1->Fill(1);
+	 if (nEleIDFail>0)  {
+	   h1_EventCount_Stage1_needEleSF->Fill(1);
+	   h2_IDfailEle_eta_pt_Stage1->Fill(IDfail_ele_eta[0],IDfail_ele_pT[0]);
+	   h1_IDfailEle_eta_Stage1->Fill(IDfail_ele_eta[0]);
+	   h1_IDfailEle_pt_Stage1->Fill(IDfail_ele_pT[0]);
+	   //      	   std::cout << "id fail .. eta, pt = " << IDfail_ele_eta[0] << " " << IDfail_ele_pT[0] << std::endl;
+	 }
+
 	 //std::cout << "*Standard* dphi_tau_met=" << dphi_tau_met << std::endl;
 	 double MT=  sqrt(2*tau_pt[0]*met_val*(1- cos(dphi_tau_met)));
 	 //std::cout << "MT = " << MT << std::endl;
@@ -3045,7 +3280,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      h1_MT_passTauTrig->Fill(MT_all,final_weight); // 1
      if (passAllMETFilters) {
        h1_MT_passAllMETFilters->Fill(MT_all,final_weight); // 2
-       if ( (nTightMu==0) && (nLooseEle==0) ) {
+       if ( (nLooseMu_additional==0) && (nLooseEle_additional==0) ) {
 	 h1_MT_leptonVeto->Fill(MT_all,final_weight); // 3                                                                                                                      
 	 if (nGoodTau==1) {
 	   h1_MT_nGoodTau->Fill(MT_all,final_weight); // 4
@@ -3327,16 +3562,25 @@ bool MiniAODAnalyzer::FindTauIDEfficiency(const edm::Event& iEvent, TLorentzVect
 
 bool MiniAODAnalyzer::PassTauID(const pat::Tau &tau)
 {
-  return  PassTauID_Old_VLoose(tau);
+  bool passTauID_=true;
+  //----Tau ID----//
+  if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("byVLooseIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
+  return passTauID_;
+ //  return  PassTauID_Old_VLoose(tau);
 }
 
-bool MiniAODAnalyzer::PassTauID_Old_Medium(const pat::Tau &tau)
+bool MiniAODAnalyzer::PassTauID_Old_Medium(const pat::Tau &tau) /// medium means medium electron rejection
 {
   bool passTauID_=true;
   //----Tau ID----//
   if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("byMediumIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("byVLooseIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
+  //  if ( tau.tauID("byMediumIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
+  //  if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("againstElectronMediumMVA6") < 0.5 ) passTauID_=false;
   if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
   return passTauID_;
 }
@@ -3359,12 +3603,12 @@ bool MiniAODAnalyzer::PassTauID_Old_VLoose(const pat::Tau &tau)
   //----Tau ID----//
   if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
   if ( tau.tauID("byVLooseIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("againstElectronVLooseMVA6") < 0.5 ) passTauID_=false;
   if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
   return passTauID_;
 }
 
-bool MiniAODAnalyzer::PassTauID_Old_VLoose_noEleRej(const pat::Tau &tau)
+bool MiniAODAnalyzer::PassTauID_noEleRej(const pat::Tau &tau)
 {
   bool passTauID_=true;
   //----Tau ID----//
@@ -3372,6 +3616,17 @@ bool MiniAODAnalyzer::PassTauID_Old_VLoose_noEleRej(const pat::Tau &tau)
   if ( tau.tauID("byVLooseIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
   //  if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_=false;
   if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
+  return passTauID_;
+}
+
+bool MiniAODAnalyzer::PassTauID_noMuRej(const pat::Tau &tau)
+{
+  bool passTauID_=true;
+  //----Tau ID----//
+  if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("byVLooseIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_=false;
+  //  if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
   return passTauID_;
 }
 
@@ -3392,7 +3647,7 @@ bool MiniAODAnalyzer::PassTauID_Old_Loose(const pat::Tau &tau)
   bool passTauID_=true;
   //----Tau ID----//
   if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("byLooseIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("byVLooseIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
   if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_=false;
   if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
   return passTauID_;
@@ -3416,8 +3671,8 @@ bool MiniAODAnalyzer::PassTauID_Old_Tight(const pat::Tau &tau)
   bool passTauID_=true;
   //----Tau ID----//
   if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("byTightIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("byVLooseIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("againstElectronTightMVA6") < 0.5 ) passTauID_=false;
   if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
   return passTauID_;
 }
@@ -3439,8 +3694,8 @@ bool MiniAODAnalyzer::PassTauID_Old_VTight(const pat::Tau &tau)
   bool passTauID_=true;
   //----Tau ID----//
   if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("byVTightIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("byVLooseIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("againstElectronVTightMVA6") < 0.5 ) passTauID_=false;
   if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
   return passTauID_;
 }
