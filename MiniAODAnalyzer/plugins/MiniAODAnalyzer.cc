@@ -80,8 +80,9 @@
 //
 // class declaration
 //
-//class MiniAODAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
-class MiniAODAnalyzer : public edm::EDAnalyzer {
+
+class MiniAODAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+  ///////class MiniAODAnalyzer : public edm::EDAnalyzer {
 public:
   explicit MiniAODAnalyzer(const edm::ParameterSet&);
   ~MiniAODAnalyzer();
@@ -91,15 +92,11 @@ private:
   virtual void beginJob() override;
   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
   virtual void endJob() override;
-  virtual void beginRun( edm::Run const &iRun, edm::EventSetup const &iSetup ) override;
+  virtual void beginRun( edm::Run const &iRun, edm::EventSetup const &iSetup ) ; //override;
 
   float DRTauMu(TLorentzVector, std::vector<TLorentzVector>);
   bool PassTauID(const pat::Tau &tau);
-  bool PassTauID_DM(const pat::Tau &tau);
-  bool PassTauID_DM_iso(const pat::Tau &tau);
-  bool PassTauID_DM_iso_ele(const pat::Tau &tau);
-  bool PassTauID_newDM(const pat::Tau &tau);
-  bool PassTauAcceptance(TLorentzVector tau);
+
   double GetTauIDScaleFactor(double tau_pt, std::string mode);
   double GetTauIDScaleFactorUncert(double tauSF, double tau_pt, std::string mode, std::string up, std::string down);  
 
@@ -115,19 +112,7 @@ private:
   edm::Service<TFileService> fs;
   Helper* helper =new Helper(fs);  
   bool passMu50;
-  bool passTau50MET90;
-  bool passMu19Tau20;
-  bool passTau140;
-  bool passMu50_Tau50MET90;
-  bool passMu50_Mu19Tau20;
-  bool passMu50_Tau140;
-  //
   ///
-  bool passEle27;
-  bool passEle115;
-  bool passPhoton175;
-  bool passElePhoton;
-  bool passEle27Photon;
 
   // ----------member data ---------------------------
   edm::LumiReWeighting LumiWeights_;
@@ -150,8 +135,8 @@ private:
   edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
   edm::EDGetTokenT<GenEventInfoProduct> genEventInfoProductTagToken_;
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > puCollection_;
-  edm::EDGetTokenT<bool> BadChCandFilterToken_;
-  edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
+  //edm::EDGetTokenT<bool> BadChCandFilterToken_;
+  // edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleIdMapToken_;
  
   //------//
@@ -163,65 +148,41 @@ private:
   int debugLevel;
 
   TH1I *h1_EventCount;
-  TH1I *h1_EventCount_trg;
-  TH1I *h1_EventCount_trg_filter;
-  TH1I *h1_EventCount_trg_filter_vtx;
-  TH1I *h1_EventCount_trg_filter_vtx_mu;
-  TH1I *h1_EventCount_trg_filter_vtx_mu_DM;
-  TH1I *h1_EventCount_trg_filter_vtx_mu_DM_iso;
-  TH1I *h1_EventCount_trg_filter_vtx_mu_DM_iso_ele;
-  TH1I *h1_EventCount_trg_filter_vtx_mu_tau;
-  TH1I *h1_EventCount_trg_filter_vtx_mu_tau_newDM;
+  TH1I *h1_EventCount_trig;
+  TH1I *h1_EventCount_trig_vtx;
+  TH1I *h1_EventCount_trig_vtx_mu;
+  TH1I *h1_EventCount_trig_vtx_mu_tau;
 
-  TH1I* h1_EventCount_trigEff_Deno;
-
-  //  TH1I  *h1_EventCount_trigEff_MuPlusTauTrg_Num;
-  //  TH1I  *h1_EventCount_trigEff_MuTrg_Num;
-  //  TH1I  *h1_EventCount_trigEff_TauTrg_Num;
-
-  TH1I* h1_EventCount_trigEff_Mu50_Num;
-  TH1I* h1_EventCount_trigEff_Tau50MET90_Num;
-  TH1I* h1_EventCount_trigEff_Mu19Tau20_Num;
-  TH1I* h1_EventCount_trigEff_Tau140_Num;
-  TH1I* h1_EventCount_trigEff_Mu50_Tau50MET90_Num;
-  TH1I* h1_EventCount_trigEff_Mu50_Mu19Tau20_Num;
-  TH1I* h1_EventCount_trigEff_Mu50_Tau140_Num;
-
-
-  TH1I  *h1_EventCount_trigEff_Ele27_Num;
-  TH1I  *h1_EventCount_trigEff_Ele115_Num;
-  TH1I  *h1_EventCount_trigEff_Photon175_Num;
-  TH1I  *h1_EventCount_trigEff_ElePhoton_Num;
-  TH1I  *h1_EventCount_trigEff_Ele27Photon_Num;
-
-  /*
   TH1F *h1_TauPt_Stage1;
-  TH1F *h1_TauCharge_Stage1;
-  TH1F *h1_TauDxy_Stage1;
-  TH1F *h1_TauChIso_Stage1;
-  TH1F *h1_TauNeuIso_Stage1;
-  TH1F *h1_TauNTrack_Stage1;
   TH1F *h1_TauEta_Stage1;
   TH1F *h1_TauPhi_Stage1;
-  */ //
+
+  TH1F *h1_MuPt_Stage1;
+  TH1F *h1_MuEta_Stage1;
+  TH1F *h1_MuPhi_Stage1;
+
+  TH1F *h1_MuPt_Stage2;
+  TH1F *h1_MuEta_Stage2;
+  TH1F *h1_MuPhi_Stage2;
+
   TH1F *h1_M_Stage1;
+  TH1F *h1_Mtot_Stage1;
+  TH1F *h1_Mcoll_Stage1;
+  TH1F *h1_MTmumet_Stage1;
+
+  TH1F *h1_MET_Stage1;
+  TH1F *h1_MET_phi_Stage1;
+
+  TH1F *h1_MET_Stage2;
+  TH1F *h1_MET_phi_Stage2;
+
+  TH1F* h1_nrecoVtx_Stage1;
+  TH1F* h1_nrecoVtx_Stage2;
 
   int Run;
   int LumiSc;
   //  double  final_wt_NOPU=1;
   double final_weight=1;
-  /*
-  double final_weight_PUweight_UP=1;
-  double final_weight_PUweight_DOWN=1;
-  double final_weight_tauIDSF_flat_UP=1;
-  double final_weight_tauIDSF_flat_DOWN=1;
-  double final_weight_tauIDSF_ptDep_UP=1;
-  double final_weight_tauIDSF_ptDep_DOWN=1;
-  double final_weight_tauELESF_UP=1;
-  double final_weight_tauELESF_DOWN=1;
-  double final_weight_trigSF_UP=1;
-  double final_weight_trigSF_DOWN=1;
-  */
   unsigned long Event;
   std::ofstream myfile;
 
@@ -250,8 +211,8 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packed"))),
   genEventInfoProductTagToken_(consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("genEventInfoProductMiniAOD"))),
   puCollection_(consumes<std::vector<PileupSummaryInfo> >(iConfig.getParameter<edm::InputTag>("pileupCollection"))),
-  BadChCandFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadChargedCandidateFilter"))),
-  BadPFMuonFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadPFMuonFilter"))),
+  //BadChCandFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadChargedCandidateFilter"))),
+  //BadPFMuonFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadPFMuonFilter"))),
   eleIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleIdMap"))),
   // LHEEventToken_( consumes<LHEEventProduct>( iConfig.getParameter<edm::InputTag>( "LHEEventTag" ))),
   //  LHERunInfoToken_( consumes<LHERunInfoProduct,edm::InRun> ( iConfig.getParameter<edm::InputTag>( "LHEEventTag" ))),
@@ -278,89 +239,35 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   /////  if (isPowheg) lheString = "source" ;
 
   h1_EventCount = histoDir.make<TH1I>("eventCount", "EventCount", 10, 0, 10);
+  h1_EventCount_trig = histoDir.make<TH1I>("eventCount_trig", "EventCount_trig", 10, 0, 10);
+  h1_EventCount_trig_vtx = histoDir.make<TH1I>("eventCount_trig_vtx", "EventCount_trig_vtx", 10, 0, 10);
+  h1_EventCount_trig_vtx_mu = histoDir.make<TH1I>("eventCount_trig_vtx_mu", "EventCount_trig_vtx_mu", 10, 0, 10);
+  h1_EventCount_trig_vtx_mu_tau = histoDir.make<TH1I>("eventCount_trig_vtx_mu_tau", "EventCount_trig_vtx_mu_tau", 10, 0, 10);
 
-  h1_EventCount_trg = histoDir.make<TH1I>("eventCount_trg", "EventCount_trg", 10, 0, 10);
-  h1_EventCount_trg_filter = histoDir.make<TH1I>("eventCount_trg_filter", "EventCount_trg_filter", 10, 0, 10);
-  h1_EventCount_trg_filter_vtx = histoDir.make<TH1I>("eventCount_trg_filter_vtx", "EventCount_trg_filter_vtx", 10, 0, 10);
-  h1_EventCount_trg_filter_vtx_mu = histoDir.make<TH1I>("eventCount_trg_filter_vtx_mu", "EventCount_trg_filter_vtx_mu", 10, 0, 10);
-
-  h1_EventCount_trg_filter_vtx_mu_DM = histoDir.make<TH1I>("eventCount_trg_filter_vtx_mu_DM", "EventCount_trg_filter_vtx_mu_DM", 10, 0, 10);
-  h1_EventCount_trg_filter_vtx_mu_DM_iso = histoDir.make<TH1I>("eventCount_trg_filter_vtx_mu_DM_iso", "EventCount_trg_filter_vtx_mu_DM_iso", 10, 0, 10);
-  h1_EventCount_trg_filter_vtx_mu_DM_iso_ele = histoDir.make<TH1I>("eventCount_trg_filter_vtx_mu_DM_iso_ele", "EventCount_trg_filter_vtx_mu_DM_iso_ele", 10, 0, 10);
-
-  h1_EventCount_trg_filter_vtx_mu_tau = histoDir.make<TH1I>("eventCount_trg_filter_vtx_mu_tau", "EventCount_trg_filter_vtx_mu_tau", 10, 0, 10);
-  h1_EventCount_trg_filter_vtx_mu_tau_newDM = histoDir.make<TH1I>("eventCount_trg_filter_vtx_mu_tau_newDM", "EventCount_trg_filter_vtx_mu_tau_newDM", 10, 0, 10);
-
-  /*
-  TH1I* h1_EventCount_trigEff_Mu50_Num;
-  TH1I* h1_EventCount_trigEff_Tau50MET90_Num;
-  TH1I* h1_EventCount_trigEff_Mu19Tau20_Num;
-  TH1I* h1_EventCount_trigEff_Tau140_Num;
-  TH1I* h1_EventCount_trigEff_Mu50_Tau50MET90_Num;
-  TH1I* h1_EventCount_trigEff_Mu50_Mu19Tau20_Num;
-  TH1I* h1_EventCount_trigEff_Mu50_Tau140_Num;
-  */
-
-  h1_EventCount_trigEff_Mu50_Num = histoDir.make<TH1I>("eventCount_trigEff_Mu50_Num", "EventCount_trigEff_Mu50_Num", 10, 0, 10);
-  h1_EventCount_trigEff_Tau50MET90_Num = histoDir.make<TH1I>("eventCount_trigEff_Tau50MET90_Num", "EventCount_trigEff_Tau50MET90_Num", 10, 0, 10);
-  h1_EventCount_trigEff_Mu19Tau20_Num = histoDir.make<TH1I>("eventCount_trigEff_Mu19Tau20_Num", "EventCount_trigEff_Mu19Tau20_Num", 10, 0, 10);
-  h1_EventCount_trigEff_Tau140_Num = histoDir.make<TH1I>("eventCount_trigEff_Tau140_Num", "EventCount_trigEff_Tau140_Num", 10, 0, 10);
-  h1_EventCount_trigEff_Mu50_Tau50MET90_Num = histoDir.make<TH1I>("eventCount_trigEff_Mu50_Tau50MET90_Num", "EventCount_trigEff_Mu50_Tau50MET90_Num", 10, 0, 10);
-  h1_EventCount_trigEff_Mu50_Mu19Tau20_Num = histoDir.make<TH1I>("eventCount_trigEff_Mu50_Mu19Tau20_Num", "EventCount_trigEff_Mu50_Mu19Tau20_Num", 10, 0, 10);
-  h1_EventCount_trigEff_Mu50_Tau140_Num = histoDir.make<TH1I>("eventCount_trigEff_Mu50_Tau140_Num", "EventCount_trigEff_Mu50_Tau140_Num", 10, 0, 10);
-
-  h1_EventCount_trigEff_Ele27_Num = histoDir.make<TH1I>("eventCount_trigEff_Ele27_Num", "EventCount_trigEff_Ele27_Num", 10, 0, 10);
-  h1_EventCount_trigEff_Ele115_Num = histoDir.make<TH1I>("eventCount_trigEff_Ele115_Num", "EventCount_trigEff_Ele115_Num", 10, 0, 10);
-  h1_EventCount_trigEff_Photon175_Num = histoDir.make<TH1I>("eventCount_trigEff_Photon175_Num", "EventCount_trigEff_Photon175_Num", 10, 0, 10);
-  h1_EventCount_trigEff_ElePhoton_Num = histoDir.make<TH1I>("eventCount_trigEff_ElePhoton_Num", "EventCount_trigEff_ElePhoton_Num", 10, 0, 10);
-  h1_EventCount_trigEff_Ele27Photon_Num = histoDir.make<TH1I>("eventCount_trigEff_Ele27Photon_Num", "EventCount_trigEff_Ele27Photon_Num", 10, 0, 10);
-
-  h1_EventCount_trigEff_Deno = histoDir.make<TH1I>("eventCount_trigEff_Deno", "EventCount_trigEff_Deno", 10, 0, 10);
-
-  /* h1_TauPt_Stage1 = histoDir.make<TH1F>("tauPt_Stage1", "TauPt_Stage1", 1000, 0, 4000);
-  h1_TauCharge_Stage1 = histoDir.make<TH1F>("tauCharge_Stage1", "TauCharge_Stage1", 5, -2.5, 2.5);
-  h1_TauDxy_Stage1 = histoDir.make<TH1F>("tauDxy_Stage1", "TauDxy_Stage1", 1000, 0, 1);
-  h1_TauChIso_Stage1 = histoDir.make<TH1F>("tauChIso_Stage1", "TauChIso_Stage1", 200, 0, 20);
-  h1_TauNeuIso_Stage1 = histoDir.make<TH1F>("tauNeuIso_Stage1", "TauNeuIso_Stage1", 500, 0, 50);
-  h1_TauNTrack_Stage1 = histoDir.make<TH1F>("tauNTrack_Stage1", "TauNTrack_Stage1", 50, -0.5, 49.5);
+  h1_TauPt_Stage1 = histoDir.make<TH1F>("tauPt_Stage1", "TauPt_Stage1", 4000, 0, 4000);
   h1_TauEta_Stage1 = histoDir.make<TH1F>("tauEta_Stage1", "TauEta_Stage1", 480, -2.4, 2.4);
-  h1_TauPhi_Stage1 = histoDir.make<TH1F>("tauPhi_Stage1", "TauPhi_Stage1", 800, -4.0, 4.0);*/
-  h1_M_Stage1 = histoDir.make<TH1F>("m_Stage1", "M_Stage1", 13000, 0, 13000);
-  /*
-  h1_MET_Stage1 = histoDir.make<TH1F>("met_Stage1", "MET_Stage1", 13000, 0, 13000);
-  h1_MET_phi_Stage1 = histoDir.make<TH1F>("met_phi_stage1", "MET_phi_Stage1", 800, -4.0, 4.0);
-  */
-  /*
-  h1_M_Stage1_metUncert_JetEnUp = histoDir.make<TH1F>("mT_Stage1_metUncert_JetEnUp", "MT_Stage1_metUncert_JetEnUp", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_JetEnDown = histoDir.make<TH1F>("mT_Stage1_metUncert_JetEnDown", "MT_Stage1_metUncert_JetEnDown", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_JetResUp = histoDir.make<TH1F>("mT_Stage1_metUncert_JetResUp", "MT_Stage1_metUncert_JetResUp", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_JetResDown = histoDir.make<TH1F>("mT_Stage1_metUncert_JetResDown", "MT_Stage1_metUncert_JetResDown", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_MuonEnUp = histoDir.make<TH1F>("mT_Stage1_metUncert_MuonEnUp", "MT_Stage1_metUncert_MuonEnUp", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_MuonEnDown = histoDir.make<TH1F>("mT_Stage1_metUncert_MuonEnDown", "MT_Stage1_metUncert_MuonEnDown", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_ElectronEnUp = histoDir.make<TH1F>("mT_Stage1_metUncert_ElectronEnUp", "MT_Stage1_metUncert_ElectronEnUp", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_ElectronEnDown = histoDir.make<TH1F>("mT_Stage1_metUncert_ElectronEnDown", "MT_Stage1_metUncert_ElectronEnDown", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_TauEnUp = histoDir.make<TH1F>("mT_Stage1_metUncert_TauEnUp", "MT_Stage1_metUncert_TauEnUp", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_TauEnDown = histoDir.make<TH1F>("mT_Stage1_metUncert_TauEnDown", "MT_Stage1_metUncert_TauEnDown", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_PhotonEnUp = histoDir.make<TH1F>("mT_Stage1_metUncert_PhotonEnUp", "MT_Stage1_metUncert_PhotonEnUp", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_PhotonEnDown = histoDir.make<TH1F>("mT_Stage1_metUncert_PhotonEnDown", "MT_Stage1_metUncert_PhotonEnDown", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_UnclusteredEnUp = histoDir.make<TH1F>("mT_Stage1_metUncert_UnclusteredEnUp", "MT_Stage1_metUncert_UnclusteredEnUp", 13000, 0, 13000);
-  h1_M_Stage1_metUncert_UnclusteredEnDown = histoDir.make<TH1F>("mT_Stage1_metUncert_UnclusteredEnDown", "MT_Stage1_metUncert_UnclusteredEnDown", 13000, 0, 13000);
-  h1_M_Stage1_TauScaleUp = histoDir.make<TH1F>("mT_Stage1_TauScaleUp", "MT_Stage1_TauScaleUp", 13000, 0, 13000);
-  h1_M_Stage1_TauScaleDown = histoDir.make<TH1F>("mT_Stage1_TauScaleDown", "MT_Stage1_TauScaleDown", 13000, 0, 13000);
-  h1_M_Stage1_pileupUncertUp = histoDir.make<TH1F>("mT_Stage1_pileupUncertUp", "MT_Stage1_pileupUncertUp", 13000, 0, 13000);
-  h1_M_Stage1_pileupUncertDown =histoDir.make<TH1F>("mT_Stage1_pileupUncertDown", "MT_Stage1_pileupUncertDown", 13000, 0, 13000);
-  h1_M_Stage1_TauIDSF_flat_Up =histoDir.make<TH1F>("mT_Stage1_TauIDSF_flat_Up", "MT_Stage1_TauIDSF_flat_Up", 13000, 0, 13000);
-  h1_M_Stage1_TauIDSF_flat_Down =histoDir.make<TH1F>("mT_Stage1_TauIDSF_flat_Down", "MT_Stage1_TauIDSF_flat_Down", 13000, 0, 13000);
-  h1_M_Stage1_TauIDSF_ptDep_Up =histoDir.make<TH1F>("mT_Stage1_TauIDSF_ptDep_Up", "MT_Stage1_TauIDSF_ptDep_Up", 13000, 0, 13000);
-  h1_M_Stage1_TauIDSF_ptDep_Down =histoDir.make<TH1F>("mT_Stage1_TauIDSF_ptDep_Down", "MT_Stage1_TauIDSF_ptDep_Down", 13000, 0, 13000);
-  h1_M_Stage1_TauELESFUp =histoDir.make<TH1F>("mT_Stage1_TauELESFUp", "MT_Stage1_TauELESFUp", 13000, 0, 13000);
-  h1_M_Stage1_TauELESFDown =histoDir.make<TH1F>("mT_Stage1_TauELESFDown", "MT_Stage1_TauELESFDown", 13000, 0, 13000);
-  h1_M_Stage1_trigSFUp =histoDir.make<TH1F>("mT_Stage1_trigSFUp", "MT_Stage1_trigSFUp", 13000, 0, 13000);
-  h1_M_Stage1_trigSFDown =histoDir.make<TH1F>("mT_Stage1_trigSFDown", "MT_Stage1_trigSFDown", 13000, 0, 13000);
-  */
+  h1_TauPhi_Stage1 = histoDir.make<TH1F>("tauPhi_Stage1", "TauPhi_Stage1", 800, -4.0, 4.0);
 
-  //  h1_recoVtx_NoPUWt = histoDir.make<TH1F>("recoVtx_NoPUWt", "RecoVtx_NoPUWt", 100, 0, 100);
-  //  h1_recoVtx_WithPUWt = histoDir.make<TH1F>("recoVtx_WithPUWt", "RecoVtx_WithPUWt", 100, 0, 100);
+  h1_MuPt_Stage1 = histoDir.make<TH1F>("muPt_Stage1", "muPt_Stage1", 4000, 0, 4000);
+  h1_MuEta_Stage1 = histoDir.make<TH1F>("muEta_Stage1", "muEta_Stage1", 480, -2.4, 2.4);
+  h1_MuPhi_Stage1 = histoDir.make<TH1F>("muPhi_Stage1", "muPhi_Stage1", 800, -4.0, 4.0);
+
+  h1_MuPt_Stage2 = histoDir.make<TH1F>("muPt_Stage2", "muPt_Stage2", 4000, 0, 4000);
+  h1_MuEta_Stage2 = histoDir.make<TH1F>("muEta_Stage2", "muEta_Stage2", 480, -2.4, 2.4);
+  h1_MuPhi_Stage2 = histoDir.make<TH1F>("muPhi_Stage2", "muPhi_Stage2", 800, -4.0, 4.0);
+
+  h1_M_Stage1 = histoDir.make<TH1F>("m_Stage1", "M_Stage1", 13000, 0, 13000);
+  h1_Mtot_Stage1 = histoDir.make<TH1F>("mtot_Stage1", "Mtot_Stage1", 13000, 0, 13000);
+  h1_Mcoll_Stage1 = histoDir.make<TH1F>("mcoll_Stage1", "Mcoll_Stage1", 13000, 0, 13000);
+  h1_MTmumet_Stage1 = histoDir.make<TH1F>("mTmumet_Stage1", "MTmumet_Stage1", 13000, 0, 13000);
+
+  h1_MET_Stage1 = histoDir.make<TH1F>("met_Stage1", "MET_Stage1", 13000, 0, 13000);
+  h1_MET_phi_Stage1 = histoDir.make<TH1F>("met_phi_Stage1", "MET_phi_Stage1", 800, -4.0, 4.0);
+  h1_nrecoVtx_Stage1 = histoDir.make<TH1F>("nrecoVtx_Stage1", "NrecoVtx_Stage1", 100, 0, 100);
+
+  h1_MET_Stage2 = histoDir.make<TH1F>("met_Stage2", "MET_Stage2", 13000, 0, 13000);
+  h1_MET_phi_Stage2 = histoDir.make<TH1F>("met_phi_Stage2", "MET_phi_Stage2", 800, -4.0, 4.0);
+  h1_nrecoVtx_Stage2 = histoDir.make<TH1F>("nrecoVtx_Stage2", "NrecoVtx_Stage2", 100, 0, 100);
 
   if (!RunOnData) {
     LumiWeights_ = edm::LumiReWeighting(pileupMC_, pileupData_, "pileup", "pileup");
@@ -452,187 +359,80 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
   
    passMu50=0;
-   passTau50MET90=0;
-   passMu19Tau20=0;
-   passTau140=0;
-   passMu50_Tau50MET90=0;
-   passMu50_Mu19Tau20=0;
-   passMu50_Tau140=0;
-
-   passEle27=0;
-   passEle115=0;
-   passPhoton175=0;
-   passElePhoton=0;
-   passEle27Photon=0;
-
+  
    /////ele triggers
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     if ( 
-	 (names.triggerName(i)).find("HLT_Ele27_WPTight_Gsf_v") != std::string::npos) {
-       passEle27 =triggerBits->accept(i) ;
-       if (passEle27 ==true) break;
-     }
-   }
-   //
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     if ( 
-	 (names.triggerName(i)).find("HLT_Ele115_CaloIdVT_GsfTrkIdT_v") != std::string::npos) {
-       passEle115 =triggerBits->accept(i) ;
-       if (passEle115 ==true) break;
-     }
-   }
-   //
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     if ( 
-	 (names.triggerName(i)).find("HLT_Photon175_v") != std::string::npos) {
-       passPhoton175 =triggerBits->accept(i) ;
-       if (passPhoton175 ==true) break;
-     }
-   }
+   //   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
+   // if ( 
+   //	 (names.triggerName(i)).find("HLT_Ele27_WPTight_Gsf_v") != std::string::npos or
+   //	 (names.triggerName(i)).find("HLT_Ele115_CaloIdVT_GsfTrkIdT_v") != std::string::npos or
+   //	 (names.triggerName(i)).find("HLT_Photon175_v") != std::string::npos) {
+   //  passElePhoton=triggerBits->accept(i) ;
+   //  if (passElePhoton==true) break;
+   // }
+   // }
    //   
    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
      if ( 
-	 (names.triggerName(i)).find("HLT_Ele27_WPTight_Gsf_v") != std::string::npos or
-	 (names.triggerName(i)).find("HLT_Ele115_CaloIdVT_GsfTrkIdT_v") != std::string::npos or
-	 (names.triggerName(i)).find("HLT_Photon175_v") != std::string::npos) {
-       passElePhoton=triggerBits->accept(i) ;
-       if (passElePhoton==true) break;
-     }
-   }
-   //   
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     if ( 
-	 (names.triggerName(i)).find("HLT_Ele27_WPTight_Gsf_v") != std::string::npos or
-	 (names.triggerName(i)).find("HLT_Photon175_v") != std::string::npos) {
-       passEle27Photon=triggerBits->accept(i) ;
-       if (passEle27Photon==true) break;
-     }
-   }
-   
-   //////muon tau triggers
-  //   std::cout << "=== TRIGGER PATHS === " << std::endl;
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     if ( 
-	 (names.triggerName(i)).find("HLT_Mu50_v") != std::string::npos or
-	 (names.triggerName(i)).find("HLT_TkMu50_v") != std::string::npos
+	 (names.triggerName(i)).find("HLT_Mu50_v") != std::string::npos 
 	  ) {
        passMu50=triggerBits->accept(i) ;
        if (passMu50==true) break;
      }
    }
 
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     if ( 
-	 (names.triggerName(i)).find("HLT_LooseIsoPFTau50_Trk30_eta2p1_MET90_v") != std::string::npos 	  ) {
-       passTau50MET90=triggerBits->accept(i) ;
-       if (passTau50MET90==true) break;
-     }
-   }
-
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     if ( 
-	 (names.triggerName(i)).find("HLT_LooseIsoPFTau50_Trk30_eta2p1_MET90_v") != std::string::npos or
-	 (names.triggerName(i)).find("HLT_Mu50_v") != std::string::npos or
-	 (names.triggerName(i)).find("HLT_TkMu50_v") != std::string::npos 
-	  ) {
-       passMu50_Tau50MET90=triggerBits->accept(i) ;
-       if (passMu50_Tau50MET90==true) break;
-     }
-   }
-
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     if ( 
-	 (names.triggerName(i)).find("HLT_IsoMu19_eta2p1_LooseCombinedIsoPFTau20_v") != std::string::npos or
-	 (names.triggerName(i)).find("HLT_Mu50_v") != std::string::npos or
-	 (names.triggerName(i)).find("HLT_TkMu50_v") != std::string::npos 
-	  ) {
-       passMu50_Mu19Tau20=triggerBits->accept(i) ;
-       if (passMu50_Mu19Tau20==true) break;
-     }
-   }
-
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     if ( 
-	 (names.triggerName(i)).find("HLT_IsoMu19_eta2p1_LooseCombinedIsoPFTau20_v") != std::string::npos 
-	  ) {
-       passMu19Tau20=triggerBits->accept(i) ;
-       if (passMu19Tau20==true) break;
-     }
-   }
-
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     if ( 
-	 (names.triggerName(i)).find("HLT_VLooseIsoPFTau140_Trk50_eta2p1_v") != std::string::npos 
-	  ) {
-       passTau140=triggerBits->accept(i) ;
-       if (passTau140==true) break;
-     }
-   }
-
-   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-     if ( 
-	 (names.triggerName(i)).find("HLT_VLooseIsoPFTau140_Trk50_eta2p1_v") != std::string::npos or
-	 (names.triggerName(i)).find("HLT_Mu50_v") != std::string::npos or
-	 (names.triggerName(i)).find("HLT_TkMu50_v") != std::string::npos 
-	  ) {
-       passMu50_Tau140=triggerBits->accept(i) ;
-       if (passMu50_Tau140==true) break;
-     }
-   }
-
+   //   std::cout << "trigger mu50 " << passMu50 << std::endl;
 
    //---Trigger MET---//
    edm::Handle<edm::TriggerResults> triggerBits_MET;
    iEvent.getByToken(triggerBits_MET_, triggerBits_MET);
    const edm::TriggerNames &names_MET = iEvent.triggerNames(*triggerBits_MET);
-   bool passAllMETFilters=0;
-   bool passHBHENoiseFilter=0;
-   bool passHBHENoiseIsoFilter=0;
-   bool passEcalDeadCellTriggerPrimitiveFilter=0;
-   bool passgoodVertices=0;
-   bool passeeBadScFilter=0;
-   bool passglobalTightHalo2016Filter=0;
-   bool NobadMuons=0;
-   //   std::cout << " === TRIGGER PATHS (MET) === " << std::endl;
+   //  bool passAllMETFilters=0;
+
+   //   bool goodVertices =0;
+   // bool globalSuperTightHalo2016Filter =0;
+   // bool HBHENoiseFilter =0;
+   //  bool HBHENoiseIsoFilter =0;
+   // bool EcalDeadCellTriggerPrimitiveFilter =0;
+   // bool BadPFMuonFilter=0;
+   // bool BadChargedCandidateFilter =0;
+   // bool  eeBadScFilter=0;
+   // bool  ecalBadCalibFilter =0;
+  
+ //   std::cout << " === TRIGGER PATHS (MET) === " << std::endl;
+   /*
    for (unsigned int i = 0, n = triggerBits_MET->size(); i < n; ++i) {
+     //std::cout << names_MET.triggerName(i) << std::endl;
+     if ( (names_MET.triggerName(i)).find("Flag_goodVertices") != std::string::npos ) {
+       goodVertices=triggerBits_MET->accept(i) ;
+     }
+     if ( (names_MET.triggerName(i)).find("Flag_globalSuperTightHalo2016Filter") != std::string::npos ) {
+      globalSuperTightHalo2016Filter =triggerBits_MET->accept(i) ;
+     }
      if ( (names_MET.triggerName(i)).find("Flag_HBHENoiseFilter") != std::string::npos ) {
-       passHBHENoiseFilter=triggerBits_MET->accept(i) ;
+     HBHENoiseFilter =triggerBits_MET->accept(i) ;
      }
      if ( (names_MET.triggerName(i)).find("Flag_HBHENoiseIsoFilter") != std::string::npos ) {
-       passHBHENoiseIsoFilter=triggerBits_MET->accept(i) ;
+      HBHENoiseIsoFilter=triggerBits_MET->accept(i) ;
      }
      if ( (names_MET.triggerName(i)).find("Flag_EcalDeadCellTriggerPrimitiveFilter") != std::string::npos ) {
-       passEcalDeadCellTriggerPrimitiveFilter=triggerBits_MET->accept(i) ;
+      EcalDeadCellTriggerPrimitiveFilter=triggerBits_MET->accept(i) ;
      }
-     if ( (names_MET.triggerName(i)).find("Flag_goodVertices") != std::string::npos ) {
-       passgoodVertices=triggerBits_MET->accept(i) ;
+     if ( (names_MET.triggerName(i)).find("Flag_BadPFMuonFilter") != std::string::npos ) {
+      BadPFMuonFilter =triggerBits_MET->accept(i) ;
+     }
+     if ( (names_MET.triggerName(i)).find("Flag_BadChargedCandidateFilter") != std::string::npos ) {
+      BadChargedCandidateFilter =triggerBits_MET->accept(i) ;
      }
      if ( (names_MET.triggerName(i)).find("Flag_eeBadScFilter") != std::string::npos ) {
-       passeeBadScFilter=triggerBits_MET->accept(i) ;
+       eeBadScFilter=triggerBits_MET->accept(i) ;
      }
-     if ( (names_MET.triggerName(i)).find("Flag_globalTightHalo2016Filter") != std::string::npos ) {
-       passglobalTightHalo2016Filter=triggerBits_MET->accept(i) ;
-     }
-     if (RunOnData) {
-       if ( (names_MET.triggerName(i)).find("Flag_noBadMuons") != std::string::npos ) {
-	 NobadMuons=triggerBits_MET->accept(i) ;
-       }
-     } else if (!RunOnData) {
-       NobadMuons=1;
+     if ( (names_MET.triggerName(i)).find("Flag_ecalBadCalibFilter") != std::string::npos ) {
+       ecalBadCalibFilter=triggerBits_MET->accept(i) ;
      }
    }
-   if (!RunOnData) passeeBadScFilter=1;
-   //---MET FILTERS THAT ARE UNAVAILABLE IN MINIAOD AS FLAG---//
-   edm::Handle<bool> ifilterbadChCand;
-   iEvent.getByToken(BadChCandFilterToken_, ifilterbadChCand);
-   bool  filterbadChCandidate = *ifilterbadChCand;
-   //   if (filterbadChCandidate<1)   std::cout << "filterbadChCandidate=" << filterbadChCandidate << std::endl;
-   edm::Handle<bool> ifilterbadPFMuon;
-   iEvent.getByToken(BadPFMuonFilterToken_, ifilterbadPFMuon);
-   bool filterbadPFMuon = *ifilterbadPFMuon;
-   //  if (filterbadPFMuon<1)   std::cout << "filterbadPFMuon=" << filterbadPFMuon << std::endl;
-   //Pass All MET Filters? //
-   passAllMETFilters =  passHBHENoiseFilter * passHBHENoiseIsoFilter * passEcalDeadCellTriggerPrimitiveFilter * passgoodVertices * passeeBadScFilter * passglobalTightHalo2016Filter * filterbadChCandidate * filterbadPFMuon * NobadMuons ;
+   */
+   //   passAllMETFilters =  goodVertices * globalSuperTightHalo2016Filter * HBHENoiseFilter * HBHENoiseIsoFilter * EcalDeadCellTriggerPrimitiveFilter * BadPFMuonFilter * BadChargedCandidateFilter * eeBadScFilter * ecalBadCalibFilter ;
+   // std::cout << goodVertices << globalSuperTightHalo2016Filter << HBHENoiseFilter << HBHENoiseIsoFilter << EcalDeadCellTriggerPrimitiveFilter << BadPFMuonFilter << BadChargedCandidateFilter << eeBadScFilter << ecalBadCalibFilter << std::endl; 
    //  std::cout << "passAllMETFilters=" << passAllMETFilters << std::endl;
 
 
@@ -657,41 +457,26 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    }
    //   std::cout << "Number of good vertices " << nvtx << std::endl;
 
-
-
+   /*
    edm::Handle<edm::ValueMap<bool> > ele_id_decisions;
    iEvent.getByToken(eleIdMapToken_ ,ele_id_decisions);
-
-   //   TLorentzVector LooseEle(0,0,0,0);
    int nEle=0;
-   //int nEleIDFail=0;
-   // float IDfail_ele_pT[10]={0};
-   // float IDfail_ele_eta[10]={0};
-
    iEvent.getByToken(electronToken_, electrons);
-   // for (const pat::Electron &el : *electrons) {
-   //   std::cout << "\n***********electrons->size() = " << electrons->size() << std::endl;
    for (size_t i = 0; i < electrons->size(); ++i){
      const auto el = electrons->ptrAt(i);
      if (el->pt() < 5) continue;
-     //https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
-     //if ( (el.pt()>20) &&  ( abs(el.eta())<2.5 )  && (el.electronID("cutBasedElectronID-Spring15-25ns-V1-standalone-loose")>6) ){
      bool isPassEleId  = (*ele_id_decisions)[el];
-     //    std::cout << "pT=" << el->pt() << " eta=" << abs(el->eta()) << " idpass=" << isPassEleId << std::endl;
      if ( (el->pt()>50) && (isPassEleId) ){
        nEle++;
-       //printf("elec with pt %4.1f, supercluster eta %+5.3f, sigmaIetaIeta %.3f (%.3f with full5x5 shower shapes)\n",
-       //     el->pt(), el->superCluster()->eta(), el->sigmaIetaIeta(), el->full5x5_sigmaIetaIeta());
-
        break;
-       //  IDfail_ele_pT[nEleIDFail]=el->pt();
-       //IDfail_ele_eta[nEleIDFail]=el->eta();
-       // nEleIDFail++;
      }
    }
-
+   */
 
    int nMu=0;
+   double mu_pt=0;
+   double mu_eta=0;
+   double mu_phi=0;
    TLorentzVector Muon_sel(0,0,0,0);
    iEvent.getByToken(muonToken_, muons);
    for (const pat::Muon &mu : *muons) {
@@ -699,70 +484,42 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      //     if ( (mu.pt()>20.0) &&  (abs(mu.eta())<2.4) && (mu.isLooseMuon(PV)) &&  ((mu.isolationR03().sumPt/mu.pt())<0.10) ) {
      if ( (mu.pt()>53.0) &&  (abs(mu.eta())<2.4) && ( mu.isHighPtMuon(PV) ) &&  ((mu.isolationR03().sumPt/mu.pt())<0.10) ) {
        Muon_sel.SetPxPyPzE(mu.px(),mu.py(),mu.pz(),mu.energy());
-       //    std::cout << "\nmuon pt " << Muon_sel.Pt() << std::endl; 
+       //std::cout << "muon pt " << Muon_sel.Pt() << std::endl; 
        nMu++;
+       mu_pt=mu.pt();
+       mu_eta=mu.eta();
+       mu_phi=mu.phi();
        break;
      }
    }
 
-   //   int tau_vis_charge=0;
-   // double tau_vis_dxy=0;
-   // int tau_vis_nTrack=0;
-   // double tau_vis_chIso=0;
-   // double tau_vis_neuIso=0;
-   //int tau_vis_DM=0;
+   //   std::cout << "nMuon " << nMu << std::endl;
 
    int nTau=0;
-   int nTau_DM=0;
-   int nTau_DM_iso=0;
-   int nTau_DM_iso_ele=0;
-   int nTau_newDM=0;
+   double tau_pt=0;
+   double tau_eta=0;
+   double tau_phi=0;
    TLorentzVector tau_vis_p4(0,0,0,0);
-   //   TLorentzVector tau_vis_p4_newDM(0,0,0,0);
    iEvent.getByToken(tauToken_, taus);
-   //
    for (const pat::Tau &tau : *taus) {
-     //old,tight_iso,vlooseEle_rej,tightMu_rej
-       if ( (PassTauID_DM(tau)==true) ) {
-	 nTau_DM++;
-	 break;	 
-       }
-   }
-   //
-   for (const pat::Tau &tau : *taus) {
-     //old,tight_iso,vlooseEle_rej,tightMu_rej
-       if ( (PassTauID_DM_iso(tau)==true) ) {
-	 nTau_DM_iso++;
-	 break;	 
-       }
-   }
-   //
-   for (const pat::Tau &tau : *taus) {
-     if ( (PassTauID_DM_iso_ele(tau)==true) ) {
-	 nTau_DM_iso_ele++;
-	 break;	 
-       }
-   }
-   //
-   for (const pat::Tau &tau : *taus) {
-     //old,tight_iso,vlooseEle_rej,tightMu_rej
-       if ( (PassTauID(tau)==true) ) {
-     	 tau_vis_p4.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
-	 nTau++;
-	 break;	 
-       }
-     }
-   //
-   for (const pat::Tau &tau : *taus) {
-     //new,tight_iso,vlooseEle_rej,tightMu_rej
-     if ( (PassTauID_newDM(tau)==true) ) {
-       //	 tau_vis_p4_newDM.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
-       nTau_newDM++;
+     if ( (PassTauID(tau)==true) ) {
+       tau_vis_p4.SetPxPyPzE(tau.px(),tau.py(),tau.pz(),tau.energy());
+       // std::cout << "tau pt " << tau.pt() << std::endl;
+       nTau++;
+       tau_pt=tau.pt();
+       tau_eta=tau.eta();
+       tau_phi=tau.phi();
        break;	 
      }
-   }   
+   }
+
+   //   std::cout << "nTau " << nTau << std::endl;
+   ////  if (nTau>0) std::cout << "got a tau !!" << std::endl;
+
     ////// MET //////
    edm::Handle<pat::METCollection> mets;
+   TLorentzVector met_p4(0,0,0,0);
+   TLorentzVector neutrino_p4(0,0,0,0);
    if (!RunOnData) { 
      iEvent.getByToken(metToken_, mets);
    } else if (RunOnData) {
@@ -775,55 +532,8 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    float met_px=met.px();
    float met_py=met.py();
    float met_E=met.energy();
-
-   //   std::cout << "recoil phi = " << recoil_phi << std::endl;
-
-   //-------------------------//
-   //**--MET UNCERTAINTIES--**//
-   //-------------------------//
-   //--JetEnergy Up--//
-   /*   double met_val_JetEnUp=met.shiftedPt(pat::MET::JetEnUp);
-   double met_phi_JetEnUp=met.shiftedPhi(pat::MET::JetEnUp);
-   //--JetEnergy Down--//
-   double met_val_JetEnDown=met.shiftedPt(pat::MET::JetEnDown);
-   double met_phi_JetEnDown=met.shiftedPhi(pat::MET::JetEnDown);
-   //--JetRes Up--//
-   double met_val_JetResUp=met.shiftedPt(pat::MET::JetResUp);
-   double met_phi_JetResUp=met.shiftedPhi(pat::MET::JetResUp);
-   //--JetRes Down--//
-   double met_val_JetResDown=met.shiftedPt(pat::MET::JetResDown);
-   double met_phi_JetResDown=met.shiftedPhi(pat::MET::JetResDown);
-   //--MuonEnergy Up--//
-   double met_val_MuonEnUp=met.shiftedPt(pat::MET::MuonEnUp);
-   double met_phi_MuonEnUp=met.shiftedPhi(pat::MET::MuonEnUp);
-   //--MuonEnergy Down--//
-   double met_val_MuonEnDown=met.shiftedPt(pat::MET::MuonEnDown);
-   double met_phi_MuonEnDown=met.shiftedPhi(pat::MET::MuonEnDown);
-   //--ElectronEnergy Up--//
-   double met_val_ElectronEnUp=met.shiftedPt(pat::MET::ElectronEnUp);
-   double met_phi_ElectronEnUp=met.shiftedPhi(pat::MET::ElectronEnUp);
-   //--ElectronEnergy Down--//
-   double met_val_ElectronEnDown=met.shiftedPt(pat::MET::ElectronEnDown);
-   double met_phi_ElectronEnDown=met.shiftedPhi(pat::MET::ElectronEnDown);
-   //--TauEnergy Up--//
-   double met_val_TauEnUp=met.shiftedPt(pat::MET::TauEnUp);
-   double met_phi_TauEnUp=met.shiftedPhi(pat::MET::TauEnUp);
-   //--TauEnergy Down--//
-   double met_val_TauEnDown=met.shiftedPt(pat::MET::TauEnDown);
-   double met_phi_TauEnDown=met.shiftedPhi(pat::MET::TauEnDown);
-   //--PhotonEnergy Up--//
-   double met_val_PhotonEnUp=met.shiftedPt(pat::MET::PhotonEnUp);
-   double met_phi_PhotonEnUp=met.shiftedPhi(pat::MET::PhotonEnUp);
-   //--PhotonEnergy Down--//
-   double met_val_PhotonEnDown=met.shiftedPt(pat::MET::PhotonEnDown);
-   double met_phi_PhotonEnDown=met.shiftedPhi(pat::MET::PhotonEnDown);
-   //--UnclusteredEnergy Up--//
-   double met_val_UnclusteredEnUp=met.shiftedPt(pat::MET::UnclusteredEnUp);
-   double met_phi_UnclusteredEnUp=met.shiftedPhi(pat::MET::UnclusteredEnUp);
-   //--UnclusteredEnergy Down--//
-   double met_val_UnclusteredEnDown=met.shiftedPt(pat::MET::UnclusteredEnDown);
-   double met_phi_UnclusteredEnDown=met.shiftedPhi(pat::MET::UnclusteredEnDown);
-   */
+   met_p4.SetPxPyPzE(met.px(),met.py(),met.pz(),met.energy());
+   neutrino_p4.SetPtEtaPhiM(met.pt(),tau_eta,met.phi(),0);
 
    //----------------//
    //--Final Weight--//
@@ -833,115 +543,68 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    }
    else {
      final_weight               = 1.0;
-
  }
 
    //---------------//
    //---Selection---//
    //---------------//
    // std::cout << "Proceed to selection cuts " << std::endl;
+   // std::cout << "passMu50 " << passMu50  << " nvtx " << nvtx << " nMu " << nMu << "  nTau " << nTau << std::endl;
    double mutau_mass=0.0;
+   double mutaumet_mass=0.0;
+   double coll_mass=0.0;
 
-  if (passMu50) { 
-    h1_EventCount_trg->Fill(1);
-    if (passAllMETFilters ) {
-      h1_EventCount_trg_filter->Fill(1);
+  if (passMu50) {
+      h1_EventCount_trig->Fill(1);
+    //    if (passAllMETFilters ) {
       if ( (nvtx>0) ) { 
-	h1_EventCount_trg_filter_vtx->Fill(1);
-	if (nMu==1) { 
-	  h1_EventCount_trg_filter_vtx_mu->Fill(1);
-	  //
-	  if (nTau_DM==1) {
-	    h1_EventCount_trg_filter_vtx_mu_DM->Fill(1);
-	  }
-	  //
-	  if (nTau_DM_iso==1) {
-	    h1_EventCount_trg_filter_vtx_mu_DM_iso->Fill(1);
-	  }
-	  //
-	  if (nTau_DM_iso_ele==1) {
-	    h1_EventCount_trg_filter_vtx_mu_DM_iso_ele->Fill(1);
-	  }
-	  //
-	  if ((nTau==1)) {
-	    h1_EventCount_trg_filter_vtx_mu_tau->Fill(1);
+      h1_EventCount_trig_vtx->Fill(1);
+	if (nMu>0) { 
+	  h1_EventCount_trig_vtx_mu->Fill(1);
+	  h1_MuPt_Stage2->Fill(mu_pt,final_weight);
+	  h1_MuEta_Stage2->Fill(mu_eta,final_weight);
+	  h1_MuPhi_Stage2->Fill(mu_phi,final_weight);
+	  h1_MET_Stage2->Fill(met_val,final_weight);
+	  h1_MET_phi_Stage2->Fill(met_phi,final_weight);
+	  h1_nrecoVtx_Stage2->Fill(nvtx,final_weight);
+	  if ((nTau>0)) {
+	    h1_EventCount_trig_vtx_mu_tau->Fill(1);
 	    TLorentzVector mutau=(Muon_sel+tau_vis_p4);
 	    mutau_mass=mutau.M();
-	    //	    std::cout << "mutau mass " << mutau_mass << std::endl;
+	    ////std::cout << "\nmutau mass " << mutau_mass << std::endl;
 	    h1_M_Stage1->Fill(mutau_mass,final_weight);
+
+	    TLorentzVector mutaumet=(Muon_sel+tau_vis_p4+met_p4);
+	    mutaumet_mass=mutaumet.M();
+	    ///std::cout << "mutaumet mass " << mutaumet_mass << std::endl;
+	    h1_Mtot_Stage1->Fill(mutaumet_mass,final_weight);
+
+	    TLorentzVector tau_full=(tau_vis_p4+neutrino_p4);
+	    TLorentzVector mutau_coll=(Muon_sel+tau_full);
+	    coll_mass=mutau_coll.M();
+	    ////std::cout << "coll mass " << coll_mass << std::endl;
+	    h1_Mcoll_Stage1->Fill(coll_mass,final_weight);
+
+	    double dphi_mu_met = deltaPhi(mu_phi,met_phi);
+	    double MT_mu_met=  sqrt(2*mu_pt*met_val*(1- cos(dphi_mu_met)));
+	    ////std::cout << "mT " << MT_mu_met << std::endl;
+	    h1_MTmumet_Stage1->Fill(MT_mu_met,final_weight);
+
+	    h1_TauPt_Stage1->Fill(tau_pt,final_weight);
+	    h1_TauEta_Stage1->Fill(tau_eta,final_weight);
+	    h1_TauPhi_Stage1->Fill(tau_phi,final_weight);
+	    h1_MuPt_Stage1->Fill(mu_pt,final_weight);
+	    h1_MuEta_Stage1->Fill(mu_eta,final_weight);
+	    h1_MuPhi_Stage1->Fill(mu_phi,final_weight);
+	    h1_MET_Stage1->Fill(met_val,final_weight);
+	    h1_MET_phi_Stage1->Fill(met_phi,final_weight);
+	    h1_nrecoVtx_Stage1->Fill(nvtx,final_weight);
 	  }
-	  //
-	  if ((nTau_newDM==1)) {
-	    h1_EventCount_trg_filter_vtx_mu_tau_newDM->Fill(1);
-	  }
-	  //
 	}
       }
-    }
+      // }
   }
 
-   /*
-   passMu50=0;
-   passTau50MET90=0;
-   passMu19Tau20=0;
-   passTau140=0;
-   passMu50_Tau50MET90=0;
-   passMu50_Mu19Tau20=0;
-   passMu50_Tau140=0;
-   */
-  if ((nTau>0) && (nMu>0) ) {
-    // std::cout << "Enter Deno" << std::endl;
-    h1_EventCount_trigEff_Deno->Fill(1);
-  }
-  // Numerator //
-  if ((nTau>0) && (nMu>0) && passMu50 ) {
-    h1_EventCount_trigEff_Mu50_Num->Fill(1);
-  }  
-  if ((nTau>0) && (nMu>0) && passTau50MET90 ) {
-    h1_EventCount_trigEff_Tau50MET90_Num->Fill(1);
-  }  
-  if ((nTau>0) && (nMu>0) && passMu19Tau20 ) {
-    h1_EventCount_trigEff_Mu19Tau20_Num->Fill(1);
-  }
-  if ((nTau>0) && (nMu>0) && passTau140 ) {
-    h1_EventCount_trigEff_Tau140_Num->Fill(1);
-  }
-  if ((nTau>0) && (nMu>0) && passMu50_Tau50MET90 ) {
-    h1_EventCount_trigEff_Mu50_Tau50MET90_Num->Fill(1);
-  }
-  if ((nTau>0) && (nMu>0) && passMu50_Mu19Tau20 ) {
-    h1_EventCount_trigEff_Mu50_Mu19Tau20_Num->Fill(1);
-  }
-  if ((nTau>0) && (nMu>0) && passMu50_Tau140 ) {
-    h1_EventCount_trigEff_Mu50_Tau140_Num->Fill(1);
-  }
-  
-
-  /*
-  ///// ele
-  if ((nTau>0) && (nEle>0) ) {
-    // std::cout << "Enter Deno" << std::endl;
-    h1_EventCount_trigEff_Deno->Fill(1);
-  }
-  // Numerator //
-  if ((nTau>0) && (nEle>0) && passEle27 ) {
-    h1_EventCount_trigEff_Ele27_Num->Fill(1);
-  }  
-  if ((nTau>0) && (nEle>0) && passEle115 ) {
-    h1_EventCount_trigEff_Ele115_Num->Fill(1);
-  }  
-  if ((nTau>0) && (nEle>0) && passPhoton175 ) {
-    h1_EventCount_trigEff_Photon175_Num->Fill(1);
-  }  
-  if ((nTau>0) && (nEle>0) && passElePhoton ) {
-    h1_EventCount_trigEff_ElePhoton_Num->Fill(1);
-  }  
-  if ((nTau>0) && (nEle>0) && passEle27Photon ) {
-    h1_EventCount_trigEff_Ele27Photon_Num->Fill(1);
-  }  
-
-
-  */
 
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
@@ -1049,75 +712,6 @@ bool MiniAODAnalyzer::PassTauID(const pat::Tau &tau)
 
   return passTauID_;
  //  return  PassTauID_Old_VLoose(tau);
-}
-
-//
-
-bool MiniAODAnalyzer::PassTauID_DM(const pat::Tau &tau)
-{
-  bool passTauID_=true;
-  //----Tau ID----//
-  if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
-  if (tau.pt()<30) passTauID_=false;
-  if (fabs(tau.eta())>2.3) passTauID_=false;
-  return passTauID_;
- //  return  PassTauID_Old_VLoose(tau);
-}
-
-bool MiniAODAnalyzer::PassTauID_DM_iso(const pat::Tau &tau)
-{
-  bool passTauID_=true;
-  //----Tau ID----//
-  if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("byTightIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
-  if (tau.pt()<30) passTauID_=false;
-  if (fabs(tau.eta())>2.3) passTauID_=false;
-
-  return passTauID_;
- //  return  PassTauID_Old_VLoose(tau);
-}
-
-bool MiniAODAnalyzer::PassTauID_DM_iso_ele(const pat::Tau &tau)
-{
-  bool passTauID_=true;
-  //----Tau ID----//
-  if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("byTightIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("againstElectronVLooseMVA6") < 0.5 ) passTauID_=false;
-  if (tau.pt()<30) passTauID_=false;
-  if (fabs(tau.eta())>2.3) passTauID_=false;
-
-  return passTauID_;
- //  return  PassTauID_Old_VLoose(tau);
-}
-
-
-bool MiniAODAnalyzer::PassTauID_newDM(const pat::Tau &tau)
-{
-  bool passTauID_=true;
-  //----Tau ID----//
-  if ( tau.tauID("decayModeFindingNewDMs") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("byTightIsolationMVArun2v1DBnewDMwLT") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("againstElectronVLooseMVA6") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("againstMuonTight3") < 0.5 ) passTauID_=false;
-  if (tau.pt()<30) passTauID_=false;
-  if (fabs(tau.eta())>2.3) passTauID_=false;
-
-  return passTauID_;
- //  return  PassTauID_Old_VLoose(tau);
-}
-
-bool MiniAODAnalyzer::PassTauAcceptance(TLorentzVector tau) // For analysis //
-{
-  bool passTauAcc_=true;
-  //  std::cout << "Inside PassTauAcceptance -> TAU pt=" << tau.Pt() << " energy=" << tau.Energy() << std::endl;
-  //----pT----//
-  if ( tau.Pt() < 30 ) passTauAcc_=false;
-
-  //----Eta----//
-  if ( fabs(tau.PseudoRapidity()) > 2.3 ) passTauAcc_=false;
-
-  return passTauAcc_;
 }
 
 // ------------ method called once each job just before starting event loop  ------------

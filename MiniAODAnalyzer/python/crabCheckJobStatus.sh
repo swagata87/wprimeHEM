@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd crab_projects_March3
+cd  crab_projects_HCALissue_v3/
 echo " "
 echo $(pwd)
 
@@ -17,6 +17,7 @@ do
     #cd "$i/results"
     #echo "------" $(pwd)
     crab status $i
+    crab getoutput $i
     #cd ../..
 done;
 
