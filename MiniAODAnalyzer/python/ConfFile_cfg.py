@@ -20,8 +20,8 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #  that is typically found in the DAS under the Configs for given dataset
 #  (although it can be "overridden" by requirements of a given release)
 
-####process.GlobalTag = GlobalTag(process.GlobalTag, '101X_dataRun2_Prompt_HEmiss_v1', '') 
-process.GlobalTag = GlobalTag(process.GlobalTag, '101X_dataRun2_Prompt_v11', '') 
+process.GlobalTag = GlobalTag(process.GlobalTag, '101X_dataRun2_Prompt_HEmiss_v1', '') 
+####process.GlobalTag = GlobalTag(process.GlobalTag, '101X_dataRun2_Prompt_v11', '') 
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
@@ -49,9 +49,9 @@ switchOnVIDElectronIdProducer(process, dataFormat)
 
 # define which IDs we want to produce
 my_id_modules = [
-     'RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff'
+  #   'RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff'
   #  'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronHLTPreselecition_Summer16_V1_cff'
-  # 'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff'
+   'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff'
     ]
 #add them to the VID producer
 for idmod in my_id_modules:
@@ -64,7 +64,8 @@ process.source = cms.Source("PoolSource",
 #        '/store/data/Run2017F/Tau/MINIAOD/PromptReco-v1/000/305/043/00000/B68B7448-1AB2-E711-BE14-02163E012A93.root'
 #        '/store/relval/CMSSW_10_1_7/SingleMuon/MINIAOD/101X_dataRun2_Prompt_HEmiss_v1_RelVal_sigMu2018B-v1/10000/F0173B54-EA7F-E811-A82E-003048FFCBB8.root',
 #        '/store/relval/CMSSW_10_1_7/SingleMuon/MINIAOD/101X_dataRun2_Prompt_HEmiss_v1_RelVal_sigMu2018B-v1/10000/C22BB9A2-EC7F-E811-9BF6-0025905A6082.root'
-        '/store/relval/CMSSW_10_1_7/SingleMuon/MINIAOD/101X_dataRun2_Prompt_v11_RelVal_sigMu2018B-v1/10000/A20C0E46-1F80-E811-BA58-0025905B8586.root'
+#        '/store/relval/CMSSW_10_1_7/SingleMuon/MINIAOD/101X_dataRun2_Prompt_v11_RelVal_sigMu2018B-v1/10000/A20C0E46-1F80-E811-BA58-0025905B8586.root'
+        ''
     )
 #    eventsToProcess = cms.untracked.VEventRange('1:40000-1:86000'),
 )
@@ -116,8 +117,8 @@ process.demo = cms.EDAnalyzer('MiniAODAnalyzer',
        BadChargedCandidateFilter = cms.InputTag("BadChargedCandidateFilter"),
        BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
 #       eleIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronHLTPreselection-Summer16-V1"),
-       eleIdMap = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV70"),
-    #  eleIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose"),
+#       eleIdMap = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV70"),
+       eleIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose"),
   #     LHEEventTag = cms.InputTag("externalLHEProducer","","LHE"),
 #       LHEEventTag = cms.InputTag("externalLHEProducer"),
   #     LHEEventTag = cms.InputTag("source","","LHEFile"),
