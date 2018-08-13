@@ -1,4 +1,7 @@
+
+
 // -*- C++ -*-
+
 //
 // Original Author:  Swagata Mukherjee
 //         Created:  Tue, 05 Jul 2016 09:41:37 GMT
@@ -111,7 +114,7 @@ private:
 
   edm::Service<TFileService> fs;
   Helper* helper =new Helper(fs);  
-  bool passMu50;
+  bool passtrig;
   ///
 
   // ----------member data ---------------------------
@@ -150,34 +153,40 @@ private:
   TH1I *h1_EventCount;
   TH1I *h1_EventCount_trig;
   TH1I *h1_EventCount_trig_vtx;
-  TH1I *h1_EventCount_trig_vtx_mu;
-  TH1I *h1_EventCount_trig_vtx_mu_tau;
+  TH1I *h1_EventCount_trig_vtx_tau;
+  TH1I *h1_EventCount_trig_vtx_tau_met;
+  TH1I *h1_EventCount_trig_vtx_tau_met_other;
+  TH1I *h1_EventCount_trig_vtx_tau_met_other_veto;
 
   TH1F *h1_TauPt_Stage1;
   TH1F *h1_TauEta_Stage1;
   TH1F *h1_TauPhi_Stage1;
-
-  TH1F *h1_MuPt_Stage1;
-  TH1F *h1_MuEta_Stage1;
-  TH1F *h1_MuPhi_Stage1;
-
-  TH1F *h1_MuPt_Stage2;
-  TH1F *h1_MuEta_Stage2;
-  TH1F *h1_MuPhi_Stage2;
-
-  TH1F *h1_M_Stage1;
-  TH1F *h1_Mtot_Stage1;
-  TH1F *h1_Mcoll_Stage1;
-  TH1F *h1_MTmumet_Stage1;
-
+  TH1F *h1_MT_Stage1;
   TH1F *h1_MET_Stage1;
   TH1F *h1_MET_phi_Stage1;
+  TH1F* h1_nrecoVtx_Stage1;
+  TH1F* h1_dphi_Stage1;
+  TH1F* h1_pt_over_met_Stage1;
 
+  TH1F *h1_TauPt_Stage2;
+  TH1F *h1_TauEta_Stage2;
+  TH1F *h1_TauPhi_Stage2;
+  TH1F *h1_MT_Stage2;
   TH1F *h1_MET_Stage2;
   TH1F *h1_MET_phi_Stage2;
-
-  TH1F* h1_nrecoVtx_Stage1;
   TH1F* h1_nrecoVtx_Stage2;
+  TH1F* h1_dphi_Stage2;
+  TH1F* h1_pt_over_met_Stage2;
+
+  TH1F *h1_TauPt_Stage3;
+  TH1F *h1_TauEta_Stage3;
+  TH1F *h1_TauPhi_Stage3;
+  TH1F *h1_MT_Stage3;
+  TH1F *h1_MET_Stage3;
+  TH1F *h1_MET_phi_Stage3;
+  TH1F* h1_nrecoVtx_Stage3;
+  TH1F* h1_dphi_Stage3;
+  TH1F* h1_pt_over_met_Stage3;
 
   int Run;
   int LumiSc;
@@ -241,33 +250,41 @@ MiniAODAnalyzer::MiniAODAnalyzer(const edm::ParameterSet& iConfig):
   h1_EventCount = histoDir.make<TH1I>("eventCount", "EventCount", 10, 0, 10);
   h1_EventCount_trig = histoDir.make<TH1I>("eventCount_trig", "EventCount_trig", 10, 0, 10);
   h1_EventCount_trig_vtx = histoDir.make<TH1I>("eventCount_trig_vtx", "EventCount_trig_vtx", 10, 0, 10);
-  h1_EventCount_trig_vtx_mu = histoDir.make<TH1I>("eventCount_trig_vtx_mu", "EventCount_trig_vtx_mu", 10, 0, 10);
-  h1_EventCount_trig_vtx_mu_tau = histoDir.make<TH1I>("eventCount_trig_vtx_mu_tau", "EventCount_trig_vtx_mu_tau", 10, 0, 10);
+  h1_EventCount_trig_vtx_tau = histoDir.make<TH1I>("eventCount_trig_vtx_tau", "EventCount_trig_vtx_tau", 10, 0, 10);
+  h1_EventCount_trig_vtx_tau_met = histoDir.make<TH1I>("eventCount_trig_vtx_tau_met", "EventCount_trig_vtx_tau_met", 10, 0, 10);
+  h1_EventCount_trig_vtx_tau_met_other = histoDir.make<TH1I>("eventCount_trig_vtx_tau_met_other", "EventCount_trig_vtx_tau_met_other", 10, 0, 10);
+  h1_EventCount_trig_vtx_tau_met_other_veto = histoDir.make<TH1I>("eventCount_trig_vtx_tau_met_other_veto", "EventCount_trig_vtx_tau_met_other_veto", 10, 0, 10);
 
   h1_TauPt_Stage1 = histoDir.make<TH1F>("tauPt_Stage1", "TauPt_Stage1", 4000, 0, 4000);
   h1_TauEta_Stage1 = histoDir.make<TH1F>("tauEta_Stage1", "TauEta_Stage1", 480, -2.4, 2.4);
   h1_TauPhi_Stage1 = histoDir.make<TH1F>("tauPhi_Stage1", "TauPhi_Stage1", 800, -4.0, 4.0);
-
-  h1_MuPt_Stage1 = histoDir.make<TH1F>("muPt_Stage1", "muPt_Stage1", 4000, 0, 4000);
-  h1_MuEta_Stage1 = histoDir.make<TH1F>("muEta_Stage1", "muEta_Stage1", 480, -2.4, 2.4);
-  h1_MuPhi_Stage1 = histoDir.make<TH1F>("muPhi_Stage1", "muPhi_Stage1", 800, -4.0, 4.0);
-
-  h1_MuPt_Stage2 = histoDir.make<TH1F>("muPt_Stage2", "muPt_Stage2", 4000, 0, 4000);
-  h1_MuEta_Stage2 = histoDir.make<TH1F>("muEta_Stage2", "muEta_Stage2", 480, -2.4, 2.4);
-  h1_MuPhi_Stage2 = histoDir.make<TH1F>("muPhi_Stage2", "muPhi_Stage2", 800, -4.0, 4.0);
-
-  h1_M_Stage1 = histoDir.make<TH1F>("m_Stage1", "M_Stage1", 13000, 0, 13000);
-  h1_Mtot_Stage1 = histoDir.make<TH1F>("mtot_Stage1", "Mtot_Stage1", 13000, 0, 13000);
-  h1_Mcoll_Stage1 = histoDir.make<TH1F>("mcoll_Stage1", "Mcoll_Stage1", 13000, 0, 13000);
-  h1_MTmumet_Stage1 = histoDir.make<TH1F>("mTmumet_Stage1", "MTmumet_Stage1", 13000, 0, 13000);
-
+  h1_MT_Stage1 = histoDir.make<TH1F>("mT_Stage1", "MT_Stage1", 13000, 0, 13000);
   h1_MET_Stage1 = histoDir.make<TH1F>("met_Stage1", "MET_Stage1", 13000, 0, 13000);
   h1_MET_phi_Stage1 = histoDir.make<TH1F>("met_phi_Stage1", "MET_phi_Stage1", 800, -4.0, 4.0);
   h1_nrecoVtx_Stage1 = histoDir.make<TH1F>("nrecoVtx_Stage1", "NrecoVtx_Stage1", 100, 0, 100);
+  h1_dphi_Stage1 = histoDir.make<TH1F>("dphi_Stage1", "Dphi_Stage1", 800, -4.0, 4.0);
+  h1_pt_over_met_Stage1 = histoDir.make<TH1F>("pt_over_met_Stage1", "Pt_over_met_Stage1", 1000, 0, 1);
 
+  h1_TauPt_Stage2 = histoDir.make<TH1F>("tauPt_Stage2", "TauPt_Stage2", 4000, 0, 4000);
+  h1_TauEta_Stage2 = histoDir.make<TH1F>("tauEta_Stage2", "TauEta_Stage2", 480, -2.4, 2.4);
+  h1_TauPhi_Stage2 = histoDir.make<TH1F>("tauPhi_Stage2", "TauPhi_Stage2", 800, -4.0, 4.0);
+  h1_MT_Stage2 = histoDir.make<TH1F>("mT_Stage2", "MT_Stage2", 13000, 0, 13000);
   h1_MET_Stage2 = histoDir.make<TH1F>("met_Stage2", "MET_Stage2", 13000, 0, 13000);
   h1_MET_phi_Stage2 = histoDir.make<TH1F>("met_phi_Stage2", "MET_phi_Stage2", 800, -4.0, 4.0);
   h1_nrecoVtx_Stage2 = histoDir.make<TH1F>("nrecoVtx_Stage2", "NrecoVtx_Stage2", 100, 0, 100);
+  h1_dphi_Stage2 = histoDir.make<TH1F>("dphi_Stage2", "Dphi_Stage2", 800, -4.0, 4.0);
+  h1_pt_over_met_Stage2 = histoDir.make<TH1F>("pt_over_met_Stage2", "Pt_over_met_Stage2", 1000, 0, 1);
+
+  h1_TauPt_Stage3 = histoDir.make<TH1F>("tauPt_Stage3", "TauPt_Stage3", 4000, 0, 4000);
+  h1_TauEta_Stage3 = histoDir.make<TH1F>("tauEta_Stage3", "TauEta_Stage3", 480, -2.4, 2.4);
+  h1_TauPhi_Stage3 = histoDir.make<TH1F>("tauPhi_Stage3", "TauPhi_Stage3", 800, -4.0, 4.0);
+  h1_MT_Stage3 = histoDir.make<TH1F>("mT_Stage3", "MT_Stage3", 13000, 0, 13000);
+  h1_MET_Stage3 = histoDir.make<TH1F>("met_Stage3", "MET_Stage3", 13000, 0, 13000);
+  h1_MET_phi_Stage3 = histoDir.make<TH1F>("met_phi_Stage3", "MET_phi_Stage3", 800, -4.0, 4.0);
+  h1_nrecoVtx_Stage3 = histoDir.make<TH1F>("nrecoVtx_Stage3", "NrecoVtx_Stage3", 100, 0, 100);
+  h1_dphi_Stage3 = histoDir.make<TH1F>("dphi_Stage3", "Dphi_Stage3", 800, -4.0, 4.0);
+  h1_pt_over_met_Stage3 = histoDir.make<TH1F>("pt_over_met_Stage3", "Pt_over_met_Stage3", 1000, 0, 1);
+
 
   if (!RunOnData) {
     LumiWeights_ = edm::LumiReWeighting(pileupMC_, pileupData_, "pileup", "pileup");
@@ -358,25 +375,14 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    iEvent.getByToken(triggerPrescales_, triggerPrescales);
    const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
   
-   passMu50=0;
+   passtrig=0;
   
-   /////ele triggers
-   //   for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-   // if ( 
-   //	 (names.triggerName(i)).find("HLT_Ele27_WPTight_Gsf_v") != std::string::npos or
-   //	 (names.triggerName(i)).find("HLT_Ele115_CaloIdVT_GsfTrkIdT_v") != std::string::npos or
-   //	 (names.triggerName(i)).find("HLT_Photon175_v") != std::string::npos) {
-   //  passElePhoton=triggerBits->accept(i) ;
-   //  if (passElePhoton==true) break;
-   // }
-   // }
-   //   
    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
      if ( 
-	 (names.triggerName(i)).find("HLT_Mu50_v") != std::string::npos 
+	 (names.triggerName(i)).find("HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET100_v") != std::string::npos 
 	  ) {
-       passMu50=triggerBits->accept(i) ;
-       if (passMu50==true) break;
+       passtrig =triggerBits->accept(i) ;
+       if (passtrig ==true) break;
      }
    }
 
@@ -457,7 +463,7 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    }
    //   std::cout << "Number of good vertices " << nvtx << std::endl;
 
-   /*
+
    edm::Handle<edm::ValueMap<bool> > ele_id_decisions;
    iEvent.getByToken(eleIdMapToken_ ,ele_id_decisions);
    int nEle=0;
@@ -468,28 +474,19 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      bool isPassEleId  = (*ele_id_decisions)[el];
      if ( (el->pt()>50) && (isPassEleId) ){
        nEle++;
-       break;
+       //break;
      }
    }
-   */
+
 
    int nMu=0;
-   double mu_pt=0;
-   double mu_eta=0;
-   double mu_phi=0;
-   TLorentzVector Muon_sel(0,0,0,0);
    iEvent.getByToken(muonToken_, muons);
    for (const pat::Muon &mu : *muons) {
      //https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2#Tight_Muon
      //     if ( (mu.pt()>20.0) &&  (abs(mu.eta())<2.4) && (mu.isLooseMuon(PV)) &&  ((mu.isolationR03().sumPt/mu.pt())<0.10) ) {
-     if ( (mu.pt()>53.0) &&  (abs(mu.eta())<2.4) && ( mu.isHighPtMuon(PV) ) &&  ((mu.isolationR03().sumPt/mu.pt())<0.10) ) {
-       Muon_sel.SetPxPyPzE(mu.px(),mu.py(),mu.pz(),mu.energy());
-       //std::cout << "muon pt " << Muon_sel.Pt() << std::endl; 
+     if ( (mu.pt()>20.0) &&  (abs(mu.eta())<2.4) && ( mu.isLooseMuon() ) &&  ((mu.isolationR03().sumPt/mu.pt())<0.10) ) {
        nMu++;
-       mu_pt=mu.pt();
-       mu_eta=mu.eta();
-       mu_phi=mu.phi();
-       break;
+       //break;
      }
    }
 
@@ -529,11 +526,9 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    const pat::MET &met = mets->front();
    double met_val=met.pt();
    double met_phi=met.phi();
-   float met_px=met.px();
-   float met_py=met.py();
-   float met_E=met.energy();
-   met_p4.SetPxPyPzE(met.px(),met.py(),met.pz(),met.energy());
-   neutrino_p4.SetPtEtaPhiM(met.pt(),tau_eta,met.phi(),0);
+   //   float met_px=met.px();
+   // float met_py=met.py();
+   // float met_E=met.energy();
 
    //----------------//
    //--Final Weight--//
@@ -549,63 +544,73 @@ void MiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    //---Selection---//
    //---------------//
    // std::cout << "Proceed to selection cuts " << std::endl;
-   // std::cout << "passMu50 " << passMu50  << " nvtx " << nvtx << " nMu " << nMu << "  nTau " << nTau << std::endl;
-   double mutau_mass=0.0;
-   double mutaumet_mass=0.0;
-   double coll_mass=0.0;
+   std::cout << "\npasstrig " << passtrig  << " nvtx " << nvtx << " nMu " << nMu << "  nTau " << nTau << std::endl;
 
-  if (passMu50) {
-      h1_EventCount_trig->Fill(1);
-    //    if (passAllMETFilters ) {
-      if ( (nvtx>0) ) { 
-      h1_EventCount_trig_vtx->Fill(1);
-	if (nMu>0) { 
-	  h1_EventCount_trig_vtx_mu->Fill(1);
-	  h1_MuPt_Stage2->Fill(mu_pt,final_weight);
-	  h1_MuEta_Stage2->Fill(mu_eta,final_weight);
-	  h1_MuPhi_Stage2->Fill(mu_phi,final_weight);
-	  h1_MET_Stage2->Fill(met_val,final_weight);
-	  h1_MET_phi_Stage2->Fill(met_phi,final_weight);
-	  h1_nrecoVtx_Stage2->Fill(nvtx,final_weight);
-	  if ((nTau>0)) {
-	    h1_EventCount_trig_vtx_mu_tau->Fill(1);
-	    TLorentzVector mutau=(Muon_sel+tau_vis_p4);
-	    mutau_mass=mutau.M();
-	    ////std::cout << "\nmutau mass " << mutau_mass << std::endl;
-	    h1_M_Stage1->Fill(mutau_mass,final_weight);
+   double dphi_tau_met = 0;
+   double pt_over_met=0;
+   double MT_tau_met= 0;
 
-	    TLorentzVector mutaumet=(Muon_sel+tau_vis_p4+met_p4);
-	    mutaumet_mass=mutaumet.M();
-	    ///std::cout << "mutaumet mass " << mutaumet_mass << std::endl;
-	    h1_Mtot_Stage1->Fill(mutaumet_mass,final_weight);
+   if (passtrig) {
+     h1_EventCount_trig->Fill(1);
 
-	    TLorentzVector tau_full=(tau_vis_p4+neutrino_p4);
-	    TLorentzVector mutau_coll=(Muon_sel+tau_full);
-	    coll_mass=mutau_coll.M();
-	    ////std::cout << "coll mass " << coll_mass << std::endl;
-	    h1_Mcoll_Stage1->Fill(coll_mass,final_weight);
+     //    if (passAllMETFilters ) {
+     if ( (nvtx>0) ) { 
+       h1_EventCount_trig_vtx->Fill(1);
 
-	    double dphi_mu_met = deltaPhi(mu_phi,met_phi);
-	    double MT_mu_met=  sqrt(2*mu_pt*met_val*(1- cos(dphi_mu_met)));
-	    ////std::cout << "mT " << MT_mu_met << std::endl;
-	    h1_MTmumet_Stage1->Fill(MT_mu_met,final_weight);
+       if (nTau>0) { 
+	 h1_EventCount_trig_vtx_tau->Fill(1);
 
-	    h1_TauPt_Stage1->Fill(tau_pt,final_weight);
-	    h1_TauEta_Stage1->Fill(tau_eta,final_weight);
-	    h1_TauPhi_Stage1->Fill(tau_phi,final_weight);
-	    h1_MuPt_Stage1->Fill(mu_pt,final_weight);
-	    h1_MuEta_Stage1->Fill(mu_eta,final_weight);
-	    h1_MuPhi_Stage1->Fill(mu_phi,final_weight);
-	    h1_MET_Stage1->Fill(met_val,final_weight);
-	    h1_MET_phi_Stage1->Fill(met_phi,final_weight);
-	    h1_nrecoVtx_Stage1->Fill(nvtx,final_weight);
-	  }
-	}
-      }
-      // }
-  }
+	 dphi_tau_met = deltaPhi(tau_phi,met_phi);
+	 pt_over_met=tau_pt/met_val ;
+	 MT_tau_met=  sqrt(2*tau_pt*met_val*(1- cos(dphi_tau_met)));
+	 std::cout << "mT " << MT_tau_met << std::endl;                                                                                                                                            
 
+	 h1_TauPt_Stage1->Fill(tau_pt,final_weight);
+	 h1_TauEta_Stage1->Fill(tau_eta,final_weight);
+	 h1_TauPhi_Stage1->Fill(tau_phi,final_weight);
+	 h1_MET_Stage1->Fill(met_val,final_weight);
+	 h1_MET_phi_Stage1->Fill(met_phi,final_weight);
+	 h1_nrecoVtx_Stage1->Fill(nvtx,final_weight);
+	 h1_MT_Stage1->Fill(MT_tau_met,final_weight);
+	 h1_dphi_Stage1->Fill(dphi_tau_met,final_weight);
+	 h1_pt_over_met_Stage1->Fill(pt_over_met,final_weight);
+	 	 
+	 if ((met_val>150)) {
+	   h1_EventCount_trig_vtx_tau_met->Fill(1);
+	   
+	   if  ( (fabs(dphi_tau_met)>2.4) &&  ( pt_over_met>0.7 ) && ( pt_over_met<1.3 )  ) {
+	     h1_EventCount_trig_vtx_tau_met_other->Fill(1);
 
+	     h1_TauPt_Stage2->Fill(tau_pt,final_weight);
+	     h1_TauEta_Stage2->Fill(tau_eta,final_weight);
+	     h1_TauPhi_Stage2->Fill(tau_phi,final_weight);
+	     h1_MET_Stage2->Fill(met_val,final_weight);
+	     h1_MET_phi_Stage2->Fill(met_phi,final_weight);
+	     h1_nrecoVtx_Stage2->Fill(nvtx,final_weight);
+	     h1_MT_Stage2->Fill(MT_tau_met,final_weight);
+	     h1_dphi_Stage2->Fill(dphi_tau_met,final_weight);
+	     h1_pt_over_met_Stage2->Fill(pt_over_met,final_weight);
+	     
+	     if ( (nEle==0) && (nMu==0) ) {
+	       h1_EventCount_trig_vtx_tau_met_other_veto->Fill(1);
+
+	       h1_TauPt_Stage3->Fill(tau_pt,final_weight);
+	       h1_TauEta_Stage3->Fill(tau_eta,final_weight);
+	       h1_TauPhi_Stage3->Fill(tau_phi,final_weight);
+	       h1_MET_Stage3->Fill(met_val,final_weight);
+	       h1_MET_phi_Stage3->Fill(met_phi,final_weight);
+	       h1_nrecoVtx_Stage3->Fill(nvtx,final_weight);
+	       h1_MT_Stage3->Fill(MT_tau_met,final_weight);
+	       h1_dphi_Stage3->Fill(dphi_tau_met,final_weight);
+	       h1_pt_over_met_Stage3->Fill(pt_over_met,final_weight);
+	       
+	     } 
+	   }
+	 }
+	 // }
+       }
+     }
+   }
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
    Handle<ExampleData> pIn;
@@ -703,13 +708,12 @@ bool MiniAODAnalyzer::PassTauID(const pat::Tau &tau)
   //----Tau ID----//
   if ( tau.tauID("decayModeFinding") < 0.5 ) passTauID_=false;
   if ( tau.tauID("byTightIsolationMVArun2v1DBoldDMwLT") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("againstElectronVLooseMVA6") < 0.5 ) passTauID_=false;
+  if ( tau.tauID("againstElectronLooseMVA6") < 0.5 ) passTauID_=false;
   /////if ( tau.tauID("againstElectronTightMVA6") < 0.5 ) passTauID_=false;
-  /////  if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
-  if ( tau.tauID("againstMuonTight3") < 0.5 ) passTauID_=false;
-  if (tau.pt()<30) passTauID_=false;
-  if (fabs(tau.eta())>2.3) passTauID_=false;
-
+  if ( tau.tauID("againstMuonLoose3") < 0.5 ) passTauID_=false;
+  ///  if ( tau.tauID("againstMuonTight3") < 0.5 ) passTauID_=false;
+  if (tau.pt()<50) passTauID_=false;
+  if (fabs(tau.eta())>2.1) passTauID_=false;
   return passTauID_;
  //  return  PassTauID_Old_VLoose(tau);
 }
